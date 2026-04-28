@@ -16,3 +16,9 @@ This repository is prepared for the Software Engineering AOL project and Git ver
 ## Project Status
 
 Initial repository structure with placeholder files.
+
+## Contributors
+- Nicholas
+- Saladin
+- Oslando
+- Davinus
