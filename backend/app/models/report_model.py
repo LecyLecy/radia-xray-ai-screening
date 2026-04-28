@@ -1,0 +1,3 @@
+"""
+Report model placeholder
+"""

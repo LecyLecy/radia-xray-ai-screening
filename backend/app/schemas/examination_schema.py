@@ -1,0 +1,3 @@
+"""
+Examination schema placeholder
+"""
