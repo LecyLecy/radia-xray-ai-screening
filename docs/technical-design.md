@@ -130,8 +130,10 @@
 * Admin accounts may be created manually in Supabase for MVP/demo setup.
 * Supabase secret/service key is backend-only and must never be exposed in
   frontend code, screenshots, README examples, or committed files.
-* For the first MVP auth milestone, full protected-route security can be
-  implemented after patient registration and login are proven to work.
+* The first protected-route layer is implemented for current patient profile
+  lookup and doctor/admin patient/examination setup routes.
+* More complete role-based authorization is still needed for upload, AI result,
+  feedback, report, and admin management workflows.
 
 # Database Strategy (Supabase PostgreSQL)
 
@@ -273,6 +275,18 @@
       2. Accepts JPG, JPEG, and PNG files and returns Normal/Pneumonia with confidence score.
       3. Does not store images or predictions in Supabase yet.
 
+3. Current Implemented API Subset
+   1. GET /health
+   2. GET /supabase/test
+   3. POST /auth/register/patient
+   4. POST /auth/login
+   5. GET /patients/me
+   6. GET /doctor/patients
+   7. GET /doctor/patients/{patient_id}
+   8. POST /doctor/examinations
+   9. POST /ai/predict/mock
+   10. POST /doctor/examinations/{examination_id}/predict
+
 # Repository Structure
 
 1. radia
@@ -313,8 +327,8 @@
 
 1. env. Example
    1. SUPABASE_URL
-   2. SUPABASE_ANON_KEY
-   3. SUPABASE_SERVICE_ROLE_KEY
+   2. SUPABASE_PUBLISHABLE_KEY
+   3. SUPABASE_SECRET_KEY
    4. DATABASE_URL
    5. STORAGE_BUCKET_XRAY
    6. STORAGE_BUCKET_REPORT

@@ -21,6 +21,8 @@ Current MVP foundation progress:
 - Supabase database schema and private storage buckets have been prepared.
 - Backend Supabase connection test is available.
 - Patient registration and login backend auth foundation is available.
+- Current patient profile endpoint is available for authenticated patient dashboard data.
+- Doctor/admin patient list, patient detail, and examination creation endpoints are available.
 - Mock AI prediction endpoints are available so frontend upload/result pages can connect before the real model workflow is complete.
 - Frontend login, register, and dashboard pages are in progress; auth UI integration with backend endpoints is still being connected.
 
@@ -30,6 +32,10 @@ Implemented backend endpoints include:
 - `GET /supabase/test`
 - `POST /auth/register/patient`
 - `POST /auth/login`
+- `GET /patients/me`
+- `GET /doctor/patients`
+- `GET /doctor/patients/{patient_id}`
+- `POST /doctor/examinations`
 - `POST /ai/predict/mock`
 - `POST /doctor/examinations/{examination_id}/predict`
 

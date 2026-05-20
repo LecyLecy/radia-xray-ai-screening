@@ -145,7 +145,9 @@ adding or changing features.
 
 ## Current Repo Status Reminder
 
-The documentation is more complete than the implementation. The backend and
-frontend currently contain early scaffolding and placeholder modules. When
-implementing features, prefer the documented MVP order: authentication and roles
-first, then patient/doctor/admin workflows, then AI integration and PDF reports.
+The implementation is now past the initial scaffold. The backend has health,
+Supabase connection, patient registration/login, current patient profile,
+doctor/admin patient list/detail, examination creation, and mock AI prediction
+endpoints. The frontend has early auth and dashboard pages that are being wired
+to the backend contracts. The next MVP order is upload/storage, AI result
+persistence, doctor notes/feedback, PDF reports, then full workflow hardening.

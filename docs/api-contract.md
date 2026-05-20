@@ -374,6 +374,7 @@ demo/security hardening.
 ## Current Limitations
 
 - Doctor/admin creation endpoints are not implemented yet.
-- Full role-based authorization is not implemented yet.
+- Full role-based authorization beyond the current patient and doctor/admin
+  checks is not implemented yet.
 - Upload storage and AI prediction persistence are not implemented yet.
 - PDF report generation is not implemented yet.

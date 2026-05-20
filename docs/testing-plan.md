@@ -219,6 +219,25 @@ Testing Levels
 | AC-05       | PDF report contains disclaimer                | Not Tested |
 | AC-06       | Admin can manage patient and doctor data      | Not Tested |
 
+# Current Manual Verification Snapshot
+
+These checks have been manually verified during backend MVP setup. They do not
+replace the full test plan above, but they document the current working backend
+foundation.
+
+| Feature | Verified Behavior | Status |
+| ------- | ----------------- | ------ |
+| Supabase connection | `GET /supabase/test` returns connected response from `profiles` | Passed |
+| Patient auth | Patient registration creates auth, `profiles`, and `patient_profiles` rows | Passed |
+| Login | Login returns access token, refresh token, and role | Passed |
+| Patient profile | `GET /patients/me` returns current patient profile with bearer token | Passed |
+| Patient access control | Missing/malformed token is rejected for protected patient route | Passed |
+| Doctor access control | Patient token is rejected from doctor endpoints with `403` | Passed |
+| Doctor patient list | Doctor token can read `GET /doctor/patients` | Passed |
+| Doctor patient detail | Doctor token can read `GET /doctor/patients/{patient_id}` | Passed |
+| Examination creation | Doctor token can create `POST /doctor/examinations` | Passed |
+| Backend syntax | `python -m compileall app` passes | Passed |
+
 # Testing Log Format for Google Sheets
 
 1. Testing Log

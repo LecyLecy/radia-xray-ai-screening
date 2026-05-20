@@ -28,11 +28,16 @@ uvicorn app.main:app --reload
 - `GET /supabase/test` verifies backend connectivity to the `profiles` table. This is a development-only test endpoint.
 - `POST /auth/register/patient` creates a Supabase Auth user, a `profiles` row, and a `patient_profiles` row.
 - `POST /auth/login` signs in a user and returns session tokens with the role from `profiles`.
+- `GET /patients/me` returns the current authenticated patient's profile.
+- `GET /doctor/patients` lists patient profiles for authenticated doctor/admin users.
+- `GET /doctor/patients/{patient_id}` returns one patient profile by `patient_profiles.id`.
+- `POST /doctor/examinations` creates an examination row for a selected patient.
 - `POST /ai/predict/mock` accepts a JPG/JPEG/PNG X-Ray file and returns a mock Normal/Pneumonia prediction.
 - `POST /doctor/examinations/{examination_id}/predict` is a workflow-shaped mock prediction endpoint for doctor examination screens.
 
 ## Current Limitations
 
 - Frontend auth forms are still being connected to backend auth endpoints.
+- Doctor/admin accounts are still created manually in Supabase for MVP testing.
 - Mock AI endpoints do not store images or predictions in Supabase yet.
-- Full protected-route and role authorization dependencies are planned for the next auth/security milestone.
+- X-Ray upload storage, AI result persistence, doctor notes, feedback, and PDF generation are still planned.
