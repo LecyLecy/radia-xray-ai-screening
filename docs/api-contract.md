@@ -163,6 +163,7 @@ Success response:
 
 ```json
 {
+  "id": "patient_profile_uuid",
   "user_id": "uuid",
   "email": "patient@example.com",
   "full_name": "Patient Name",
@@ -183,6 +184,118 @@ Frontend notes:
 
 - Use this endpoint for patient dashboard/profile header data.
 - Do not pass patient id from frontend for the current user's own profile.
+
+## Doctor Workflow
+
+These endpoints are for doctor/admin workflow screens. They require an
+authenticated user with role `doctor` or `admin` in the `profiles` table.
+
+### `GET /doctor/patients`
+
+Returns patient profile rows for doctor patient list screens.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Success response:
+
+```json
+[
+  {
+    "id": "patient_profile_uuid",
+    "user_id": "auth_user_uuid",
+    "email": "patient@example.com",
+    "full_name": "Patient Name",
+    "phone_number": "08123456789",
+    "age": 30,
+    "gender": "male",
+    "profile_picture_url": null
+  }
+]
+```
+
+Expected errors:
+
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not doctor/admin.
+- `500`: patient list could not be loaded.
+
+### `GET /doctor/patients/{patient_id}`
+
+Returns one patient profile by `patient_profiles.id`.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Success response:
+
+```json
+{
+  "id": "patient_profile_uuid",
+  "user_id": "auth_user_uuid",
+  "email": "patient@example.com",
+  "full_name": "Patient Name",
+  "phone_number": "08123456789",
+  "age": 30,
+  "gender": "male",
+  "profile_picture_url": null
+}
+```
+
+Expected errors:
+
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not doctor/admin.
+- `404`: patient was not found.
+
+### `POST /doctor/examinations`
+
+Creates a new examination record for a patient.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+Request:
+
+```json
+{
+  "patient_id": "patient_profile_uuid",
+  "examination_date": "2026-05-21T10:00:00Z"
+}
+```
+
+`examination_date` is optional. If omitted, backend uses the current time.
+
+Success response:
+
+```json
+{
+  "id": "examination_uuid",
+  "patient_id": "patient_profile_uuid",
+  "doctor_id": "doctor_profile_uuid_or_null",
+  "created_by_user_id": "auth_user_uuid",
+  "examination_date": "2026-05-21T10:00:00Z",
+  "status": "pending_review",
+  "doctor_note": null
+}
+```
+
+Expected errors:
+
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not doctor/admin.
+- `404`: patient was not found.
+- `500`: examination could not be created.
 
 ## AI Mock
 
