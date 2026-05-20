@@ -83,6 +83,10 @@ The core workflow is:
 
 - Use snake_case for Python files, functions, and variables.
 - Keep API endpoint names lowercase and consistent with the docs.
+- Frontend calls backend auth APIs; it should not call Supabase Auth or tables
+  directly for Radia MVP workflows.
+- Patient registration is public. Doctor accounts are created by admin workflow.
+  Admin accounts may be created manually for MVP/demo setup.
 - Validate uploaded X-Ray files before storage or prediction.
 - Accept only JPG, JPEG, and PNG for X-Ray uploads unless requirements change.
 - Never store plaintext passwords.

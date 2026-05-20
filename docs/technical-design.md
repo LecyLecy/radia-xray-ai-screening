@@ -91,6 +91,9 @@
   * User login
   * User role checking
   * Session or token validation
+  * Patient self-registration through backend API
+  * Doctor accounts created by admin workflow
+  * Admin accounts created manually for MVP/demo setup
 * Profile Module
 * Patient profile
 * Doctor profile
@@ -115,6 +118,20 @@
 * Save X Ray image
 * Save profile picture
 * Save PDF report
+
+# Authentication Implementation Strategy
+
+* Frontend calls FastAPI backend auth endpoints; it does not call Supabase Auth
+  or database tables directly.
+* Backend uses Supabase Auth to create and authenticate users.
+* Patient registration is public and creates auth user, `profiles`, and
+  `patient_profiles` rows.
+* Doctor accounts are created by admin workflow, not by public registration.
+* Admin accounts may be created manually in Supabase for MVP/demo setup.
+* Supabase secret/service key is backend-only and must never be exposed in
+  frontend code, screenshots, README examples, or committed files.
+* For the first MVP auth milestone, full protected-route security can be
+  implemented after patient registration and login are proven to work.
 
 # Database Strategy (Supabase PostgreSQL)
 
