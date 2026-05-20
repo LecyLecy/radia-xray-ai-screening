@@ -81,6 +81,8 @@ For Radia MVP:
 - Supabase secret/service key is backend-only and must never be committed or
   exposed to frontend code.
 - Full protected route and role enforcement is a separate backend milestone.
+- The first protected endpoints are already available for `GET /patients/me`
+  and doctor/admin patient/examination setup routes.
 
 ## File Ownership
 
@@ -202,8 +204,9 @@ not blocked.
 Current priority is end-to-end MVP flow in small milestones:
 
 1. Frontend auth forms connect to backend auth endpoints.
-2. Patient profile endpoint and patient dashboard data.
-3. Doctor patient list and examination creation.
-4. X-Ray upload and mock AI result persistence.
-5. PDF report generation.
-6. Full local demo test and documentation cleanup.
+2. Frontend patient dashboard/profile reads `GET /patients/me`.
+3. Frontend doctor patient list/detail/examination form reads the doctor workflow endpoints.
+4. X-Ray upload storage and mock AI result persistence.
+5. Doctor note, AI feedback, and examination status updates.
+6. PDF report generation.
+7. Full local demo test and documentation cleanup.

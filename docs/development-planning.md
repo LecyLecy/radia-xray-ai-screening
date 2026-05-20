@@ -128,6 +128,26 @@
 
 # MVP Implementation Priority
 
+Current backend progress snapshot:
+
+1. Done
+   1. FastAPI scaffold and health check
+   2. Supabase schema and private storage bucket setup
+   3. Supabase connection test endpoint
+   4. Patient registration and login backend auth foundation
+   5. Current patient profile endpoint
+   6. Doctor/admin patient list and examination creation endpoints
+   7. Mock AI prediction endpoints
+2. In Progress
+   1. Frontend auth form integration with backend endpoints
+   2. Frontend dashboard integration with patient and doctor workflow endpoints
+3. Next
+   1. X-Ray upload storage
+   2. AI prediction persistence in Supabase
+   3. Doctor note and AI feedback persistence
+   4. PDF report generation and download access
+   5. Full demo workflow testing
+
 1. Priority 1
 
    1. Authentication
