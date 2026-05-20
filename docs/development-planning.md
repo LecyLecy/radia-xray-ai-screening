@@ -343,7 +343,7 @@ radia
 
 **	**README.md
 
-**	**.env.example
+**	**backend/.env.example
 
 **	**.gitignore
 
@@ -393,9 +393,12 @@ radia
 
 **	**Do not hardcode API keys
 
-**	**Use .env file locally
+**	**Use backend/.env file locally
 
-**	**Provide .env.example for team members
+**	**Provide backend/.env.example for team members
+
+**	**Do not commit backend/.env, .venv, node_modules, __pycache__, uploads,
+reports, or model checkpoint files such as model.pth.tar
 
 4. Documentation
 
@@ -487,7 +490,7 @@ chore
 5. **	**python -m venv .venv
 6. **	**activate virtual environment
 7. **	**pip install -r requirements.txt
-8. **	**copy .env.example to .env
+8. **	**copy backend/.env.example to backend/.env
 9. **	**fill environment variables
 10. **	**uvicorn app.main:app --reload
 11. Setup Database

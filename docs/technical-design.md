@@ -233,8 +233,9 @@
 1. Endpoints
    1. Auth
 
-      1. POST /auth/login
-      2. POST /auth/logout
+      1. POST /auth/register/patient
+      2. POST /auth/login
+      3. POST /auth/logout
    2. Patient
    3. POST /patients/register
    4. GET /patients/me
@@ -262,6 +263,15 @@
    26. DELETE /admin/examinations/{id}
    27. Report
    28. GET /reports/{id}/download
+
+2. Temporary / Development Endpoints
+   1. GET /supabase/test
+      1. Development-only endpoint to verify backend Supabase connectivity.
+      2. Should be removed or protected before demo/security hardening.
+   2. POST /ai/predict/mock
+      1. Temporary mock AI endpoint for frontend upload/result integration.
+      2. Accepts JPG, JPEG, and PNG files and returns Normal/Pneumonia with confidence score.
+      3. Does not store images or predictions in Supabase yet.
 
 # Repository Structure
 
