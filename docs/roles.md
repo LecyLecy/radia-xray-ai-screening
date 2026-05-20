@@ -54,93 +54,20 @@ communicating first.
 
 ## Current Backend Contracts Nicholas Can Use
 
-Local backend base URL:
+The current frontend/backend API contract lives in
+[`docs/api-contract.md`](api-contract.md).
 
-```text
-http://127.0.0.1:8000
-```
+Use that file as the source of truth for:
 
-Current endpoints:
+- endpoint URLs
+- request and response shapes
+- auth header format
+- expected error status codes
+- temporary/mock endpoint notes
+- frontend integration notes
 
-```text
-GET  /health
-GET  /supabase/test
-POST /auth/register/patient
-POST /auth/login
-POST /ai/predict/mock
-POST /doctor/examinations/{examination_id}/predict
-```
-
-Patient register request:
-
-```json
-{
-  "email": "patient@example.com",
-  "password": "Secret123",
-  "full_name": "Patient Name",
-  "phone_number": "08123456789",
-  "age": 30,
-  "gender": "male",
-  "profile_picture_url": null
-}
-```
-
-Patient register response:
-
-```json
-{
-  "user_id": "uuid",
-  "email": "patient@example.com",
-  "role": "patient"
-}
-```
-
-Login request:
-
-```json
-{
-  "email": "patient@example.com",
-  "password": "Secret123"
-}
-```
-
-Login response:
-
-```json
-{
-  "access_token": "jwt",
-  "refresh_token": "token",
-  "token_type": "bearer",
-  "user": {
-    "user_id": "uuid",
-    "email": "patient@example.com",
-    "role": "patient"
-  }
-}
-```
-
-Mock AI upload request:
-
-```text
-POST /ai/predict/mock
-Content-Type: multipart/form-data
-field: xray_image
-allowed: JPG, JPEG, PNG
-```
-
-Mock AI response:
-
-```json
-{
-  "examination_id": null,
-  "prediction_result": "Normal",
-  "confidence_score": 0.74,
-  "confidence_percentage": 74,
-  "model_name": "radia-mock-ai-v1",
-  "is_mock": true,
-  "disclaimer": "This AI assisted result is provided for clinical decision support only..."
-}
-```
+Whenever Adin changes a backend endpoint or response shape, he should update
+`docs/api-contract.md` in the same feature branch before merging to `dev`.
 
 ## Auth Decision
 
