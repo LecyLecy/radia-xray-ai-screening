@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.routes.auth_routes import router as auth_router
+from app.routes.examination_routes import router as examination_router
+from app.routes.supabase_routes import router as supabase_router
+
 app = FastAPI(title="Radia API")
 
 app.add_middleware(
@@ -22,3 +26,8 @@ def health_check():
     return {
         "status": "ok"
     }
+
+
+app.include_router(examination_router)
+app.include_router(supabase_router)
+app.include_router(auth_router)
