@@ -15,7 +15,23 @@ This repository is prepared for the Software Engineering AOL project and Git ver
 
 ## Project Status
 
-Initial repository structure with placeholder files.
+Current MVP foundation progress:
+
+- FastAPI backend scaffold is available.
+- Supabase database schema and private storage buckets have been prepared.
+- Backend Supabase connection test is available.
+- Patient registration and login backend auth foundation is available.
+- Mock AI prediction endpoints are available so frontend upload/result pages can connect before the real model workflow is complete.
+- Frontend login, register, and dashboard pages are in progress; auth UI integration with backend endpoints is still being connected.
+
+Implemented backend endpoints include:
+
+- `GET /health`
+- `GET /supabase/test`
+- `POST /auth/register/patient`
+- `POST /auth/login`
+- `POST /ai/predict/mock`
+- `POST /doctor/examinations/{examination_id}/predict`
 
 ## Contributors
 - Nicholas
