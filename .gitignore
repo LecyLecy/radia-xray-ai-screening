@@ -19,3 +19,6 @@ reports
 *.pt
 *.pth
 *.h5
+
+model.pth.tar
+AGENTS.md
