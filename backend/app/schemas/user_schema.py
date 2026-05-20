@@ -14,6 +14,7 @@ class CurrentUserResponse(BaseModel):
 
 
 class PatientProfileResponse(BaseModel):
+    id: str | None = None
     user_id: str
     email: str
     full_name: str

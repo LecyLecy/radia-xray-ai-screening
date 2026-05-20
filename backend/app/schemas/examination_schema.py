@@ -1,9 +1,11 @@
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
 
 PredictionResult = Literal["Normal", "Pneumonia"]
+ExaminationStatus = Literal["pending_review", "reviewed", "report_ready"]
 
 
 class MockAIPredictionResponse(BaseModel):
@@ -14,3 +16,18 @@ class MockAIPredictionResponse(BaseModel):
     model_name: str
     is_mock: bool
     disclaimer: str
+
+
+class CreateExaminationRequest(BaseModel):
+    patient_id: str
+    examination_date: datetime | None = None
+
+
+class ExaminationResponse(BaseModel):
+    id: str
+    patient_id: str
+    doctor_id: str | None = None
+    created_by_user_id: str
+    examination_date: datetime
+    status: ExaminationStatus
+    doctor_note: str | None = None

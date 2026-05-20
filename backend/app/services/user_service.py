@@ -62,7 +62,7 @@ def get_patient_profile(auth_user: CurrentUserResponse) -> PatientProfileRespons
         response = (
             supabase.table("patient_profiles")
             .select(
-                "user_id,email,full_name,phone_number,age,gender,profile_picture_url"
+                "id,user_id,email,full_name,phone_number,age,gender,profile_picture_url"
             )
             .eq("user_id", current_user.user_id)
             .single()
@@ -81,3 +81,17 @@ def get_patient_profile(auth_user: CurrentUserResponse) -> PatientProfileRespons
         )
 
     return PatientProfileResponse(**response.data)
+
+
+def require_role(
+    auth_user: CurrentUserResponse,
+    allowed_roles: set[str],
+) -> CurrentUserResponse:
+    current_user = get_current_user_with_role(auth_user)
+    if current_user.role not in allowed_roles:
+        raise UserServiceError(
+            message="User role is not allowed to access this endpoint.",
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    return current_user
