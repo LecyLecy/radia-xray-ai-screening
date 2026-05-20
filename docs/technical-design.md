@@ -1,3 +1,338 @@
-# Technical Design
 
-This document will contain architecture, tech stack, database strategy, storage strategy, AI integration, and PDF strategy.
+**# Architecture and Technical Design
+
+# Tujuan
+
+1. Tech stack apa yang dipakai?
+2. Arsitektur sistemnya seperti apa?
+3. Database dan storage pakai apa?
+4. AI model masuk ke sistem lewat cara apa?
+5. PDF report dibuat di mana?
+6. Struktur repository bagaimana supaya gampang di-pull dan dijalankan?
+7. Deployment nanti arahnya ke mana?
+
+# Technical Direction
+
+* Web Based Application
+* Layered Client Server Architecture
+* Frontend Web Interface
+* Backend API
+* Database
+* Storage
+* AI Inference Service
+* PDF Report Generator
+
+# Tech Stack
+
+* Frontend
+
+  * React
+  * Vite
+  * Tailwind CSS
+* Backend
+* FastAPI
+* Python
+* Database
+* Supabase PostgreSQL
+* Storage
+* Supabase Storage
+* AI Model
+* PyTorch Model
+* DenseNet or CheXNet Based Model
+* PDF Generator
+* ReportLab or WeasyPrint
+* Version Control
+* GitHub
+* Project Management
+* Google Docs
+* Google Sheets
+* Deployment
+* Vercel
+* Render or Railway
+
+# System Architecture
+
+* Client Layer
+
+  * Patient Portal
+  * Doctor Workspace
+  * Admin Workspace
+* Frontend Layer
+* React Web Application
+* Role Based Routing
+* Form Validation
+* Upload Interface
+* Backend API Layer
+* Authentication Module
+* Profile Module
+* Examination Module
+* AI Prediction Module
+* Report Module
+* Data Layer
+* Supabase PostgreSQL
+* Supabase Storage
+* AI Layer
+* Image Preprocessing
+* Pneumonia Screening Model
+* Prediction Output
+* Grad CAM Optional
+* Reporting Layer
+* PDF Report Generator
+* Alur
+* Patient Doctor Admin
+* Frontend Web App
+* Backend API
+* Database Storage AI Model PDF Generator
+
+# Module Architecture
+
+* Auth Module
+
+  * User login
+  * User role checking
+  * Session or token validation
+* Profile Module
+* Patient profile
+* Doctor profile
+* Admin account
+* Examination Module
+* Create examination
+* Upload X Ray
+* Save examination result
+* View history
+* AI Module
+* Preprocess image
+* Run prediction
+* Return result and confidence
+* Feedback Module
+* Save doctor validation
+* Save correct incorrect uncertain status
+* Report Module
+* Generate PDF
+* Save report URL
+* Allow authorized download
+* Storage Module
+* Save X Ray image
+* Save profile picture
+* Save PDF report
+
+# Database Strategy (Supabase PostgreSQL)
+
+* Tabel utama
+  * users
+  * patient_profiles
+  * doctor_profiles
+  * admin_profiles
+  * examinations
+  * xray_images
+  * ai_predictions
+  * doctor_feedbacks
+  * Pdf_reports
+* Relasi utama
+* users to patient_profiles
+* users to doctor_profiles
+* users to admin_profiles
+* patient_profiles to examinations
+* doctor_profiles to examinations
+* examinations to xray_images
+* examinations to ai_predictions
+* examinations to doctor_feedbacks
+* examinations to pdf_reports
+
+# Storage Strategy
+
+1. Untuk simpan
+
+* Profile Pictures
+* Patient profile picture
+* Doctor profile picture
+* X Ray Images
+* Uploaded chest X Ray image
+* AI Output
+* Grad CAM image if available
+* PDF Reports
+* Generated examination report
+
+2. Bucket
+   1. profile-pictures
+   2. xray-images
+   3. gradcam-results
+   4. Pdf-reports
+
+# AI Integration Strategy
+
+1. Alur
+
+   1. Doctor uploads X Ray
+   2. Backend receives image
+   3. Backend saves image to storage
+   4. Backend preprocesses image
+   5. Backend sends image to AI model
+   6. AI model returns prediction
+   7. Backend saves prediction to database
+   8. Frontend displays result
+2. Output
+3. Minimal
+4. Prediction Result
+5. Normal or Pneumonia
+6. Confidence Score
+7. Example 82 percent
+8. Optional
+9. Grad CAM Image
+10. Visual explanation of model focus area
+
+# PDF Report Strategy
+
+1. Isi PDF Report
+   1. Report Title
+   2. Radia X Ray Examination Report
+   3. Patient Information
+   4. Full name
+   5. Email
+   6. Phone number
+   7. Age
+   8. Gender
+   9. Doctor Information
+   10. Doctor name
+   11. Doctor email
+   12. Doctor phone number
+   13. Specialization
+   14. License number
+   15. Examination Information
+   16. Examination date
+   17. Examination status
+   18. AI Result
+   19. Prediction result
+   20. Confidence score
+   21. Doctor Review
+   22. Doctor note
+   23. AI feedback status
+   24. Disclaimer
+   25. AI output is not a final medical diagnosis
+   26. Final decision remains under doctor responsibility
+
+# API Design Draft (Might change)
+
+1. Endpoints
+   1. Auth
+
+      1. POST /auth/login
+      2. POST /auth/logout
+   2. Patient
+   3. POST /patients/register
+   4. GET /patients/me
+   5. PATCH /patients/me/profile-picture
+   6. GET /patients/me/examinations
+   7. GET /patients/me/examinations/{id}
+   8. Doctor
+   9. GET /doctor/patients
+   10. GET /doctor/patients/{id}
+   11. POST /doctor/examinations
+   12. POST /doctor/examinations/{id}/upload-xray
+   13. POST /doctor/examinations/{id}/predict
+   14. PATCH /doctor/examinations/{id}/note
+   15. PATCH /doctor/examinations/{id}/feedback
+   16. POST /doctor/examinations/{id}/report
+   17. Admin
+   18. GET /admin/patients
+   19. POST /admin/patients
+   20. PATCH /admin/patients/{id}
+   21. GET /admin/doctors
+   22. POST /admin/doctors
+   23. PATCH /admin/doctors/{id}
+   24. GET /admin/examinations
+   25. PATCH /admin/examinations/{id}
+   26. DELETE /admin/examinations/{id}
+   27. Report
+   28. GET /reports/{id}/download
+
+# Repository Structure
+
+1. radia
+2. Frontend
+
+   1. Src
+   2. Components
+   3. pages
+   4. layouts
+   5. services
+   6. hooks
+   7. utils
+   8. Assets
+   9. package.json
+3. Backend
+4. app
+5. main.py
+6. routes
+7. services
+8. models
+9. schemas
+10. utils
+11. ai
+12. Reports
+13. requirements.txt
+14. README.md
+15. docs
+16. problem-planning.md
+17. sdlc-planning.md
+18. requirements.md
+19. system-design.md
+20. testing-plan.md
+21. risk-security-ethics.md
+22. .env.example
+23. .gitignore
+
+# Environment Setup Strategy
+
+1. env. Example
+   1. SUPABASE_URL
+   2. SUPABASE_ANON_KEY
+   3. SUPABASE_SERVICE_ROLE_KEY
+   4. DATABASE_URL
+   5. STORAGE_BUCKET_XRAY
+   6. STORAGE_BUCKET_REPORT
+   7. JWT_SECRET
+   8. AI_MODEL_PATH
+2. README Minimal
+3. Project overview
+4. Tech stack
+5. Folder structure
+6. Frontend setup
+7. Backend setup
+8. Environment variables
+9. How to run locally
+10. Demo accounts
+11. Known limitations
+
+# Ideal Deployment Direction
+
+1. Frontend
+
+   1. Vercel
+2. Backend
+3. Render or Railway
+4. Database
+5. Supabase PostgreSQL
+6. Storage
+7. Supabase Storage
+8. Repository
+9. GitHub
+
+# Technical Risks
+
+1. Risks
+   1. AI model too heavy for free deployment
+   2. Grad CAM integration takes too much time
+   3. Supabase role access configuration is confusing
+   4. PDF layout becomes inconsistent
+   5. File upload fails due to size or format
+   6. Frontend backend integration takes longer than expected
+2. Mitigasi
+3. Use local AI inference for demo if needed
+4. Make Grad CAM optional
+5. Start with simple role checking before complex rules
+6. Use simple PDF layout first
+7. Limit upload to JPG JPEG PNG
+8. Implement core workflow before UI polish
+
+**
