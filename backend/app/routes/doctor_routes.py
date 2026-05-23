@@ -7,6 +7,7 @@ from app.schemas.examination_schema import (
     ExaminationResponse,
     UpdateDoctorNoteRequest,
 )
+from app.schemas.report_schema import ReportResponse
 from app.schemas.user_schema import CurrentUserResponse, PatientProfileResponse
 from app.services.examination_service import (
     ExaminationServiceError,
@@ -16,6 +17,7 @@ from app.services.examination_service import (
     save_doctor_feedback,
     update_doctor_note,
 )
+from app.services.report_service import ReportServiceError, generate_examination_report
 from app.services.user_service import UserServiceError, require_role
 from app.utils.security import get_current_auth_user
 
@@ -106,6 +108,23 @@ def save_doctor_examination_feedback(
     try:
         return save_doctor_feedback(examination_id, payload, current_user)
     except ExaminationServiceError as error:
+        raise HTTPException(
+            status_code=error.status_code,
+            detail=error.message,
+        ) from error
+
+
+@router.post(
+    "/examinations/{examination_id}/report",
+    response_model=ReportResponse,
+)
+def generate_doctor_examination_report(
+    examination_id: str,
+    current_user: CurrentUserResponse = Depends(require_doctor_or_admin),
+) -> ReportResponse:
+    try:
+        return generate_examination_report(examination_id, current_user)
+    except ReportServiceError as error:
         raise HTTPException(
             status_code=error.status_code,
             detail=error.message,

@@ -36,10 +36,12 @@ uvicorn app.main:app --reload
 - `PATCH /doctor/examinations/{examination_id}/feedback` saves AI validation feedback and marks the examination reviewed.
 - `POST /ai/predict/mock` accepts a JPG/JPEG/PNG X-Ray file and returns a mock Normal/Pneumonia prediction.
 - `POST /doctor/examinations/{examination_id}/predict` stores a JPG/JPEG/PNG X-Ray image up to 10 MB, saves image metadata, runs mock AI prediction, and saves the prediction.
+- `POST /doctor/examinations/{examination_id}/report` generates a reviewed examination PDF and saves it in Supabase Storage.
+- `GET /reports/{report_id}/download` returns a temporary signed URL for a private PDF report.
 
 ## Current Limitations
 
 - Frontend auth forms are still being connected to backend auth endpoints.
 - Doctor/admin accounts are still created manually in Supabase for MVP testing.
-- PDF generation is still planned.
+- Patient examination history and patient-facing report list endpoints are still planned.
 - Real AI model inference is still planned; the workflow endpoint currently persists mock AI predictions.
