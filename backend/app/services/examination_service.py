@@ -5,8 +5,11 @@ from postgrest.exceptions import APIError
 
 from app.schemas.examination_schema import (
     CreateExaminationRequest,
+    DoctorFeedbackRequest,
+    DoctorFeedbackResponse,
     ExaminationResponse,
     StoredAIPredictionResponse,
+    UpdateDoctorNoteRequest,
 )
 from app.schemas.user_schema import CurrentUserResponse, PatientProfileResponse
 from app.services.ai_service import create_mock_prediction
@@ -122,6 +125,13 @@ def _get_doctor_profile_id(user_id: str) -> str | None:
     return response.data[0].get("id")
 
 
+def _get_doctor_profile_id_or_none(current_user: CurrentUserResponse) -> str | None:
+    if current_user.role != "doctor":
+        return None
+
+    return _get_doctor_profile_id(current_user.user_id)
+
+
 def create_examination(
     payload: CreateExaminationRequest,
     current_user: CurrentUserResponse,
@@ -129,9 +139,7 @@ def create_examination(
     supabase = get_supabase_client()
     get_patient_by_id(payload.patient_id)
 
-    doctor_id = None
-    if current_user.role == "doctor":
-        doctor_id = _get_doctor_profile_id(current_user.user_id)
+    doctor_id = _get_doctor_profile_id_or_none(current_user)
 
     examination_date = payload.examination_date or datetime.now(timezone.utc)
     row = {
@@ -239,3 +247,99 @@ async def create_stored_mock_prediction(
         ai_prediction_id=prediction_response.data[0]["id"],
         image_url=image_url,
     )
+
+
+def update_doctor_note(
+    examination_id: str,
+    payload: UpdateDoctorNoteRequest,
+) -> ExaminationResponse:
+    get_examination_by_id(examination_id)
+    supabase = get_supabase_client()
+
+    try:
+        response = (
+            supabase.table("examinations")
+            .update({"doctor_note": payload.doctor_note})
+            .eq("id", examination_id)
+            .execute()
+        )
+    except Exception as error:
+        raise ExaminationServiceError(
+            message=_read_error_message(error) or "Doctor note could not be saved.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    if not response.data:
+        raise ExaminationServiceError(
+            message="Doctor note could not be saved.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    return ExaminationResponse(**response.data[0])
+
+
+def save_doctor_feedback(
+    examination_id: str,
+    payload: DoctorFeedbackRequest,
+    current_user: CurrentUserResponse,
+) -> DoctorFeedbackResponse:
+    get_examination_by_id(examination_id)
+    supabase = get_supabase_client()
+    doctor_id = _get_doctor_profile_id_or_none(current_user)
+
+    feedback_row = {
+        "examination_id": examination_id,
+        "doctor_id": doctor_id,
+        "feedback_status": payload.feedback_status,
+        "feedback_note": payload.feedback_note,
+    }
+
+    try:
+        existing_response = (
+            supabase.table("doctor_feedbacks")
+            .select("id")
+            .eq("examination_id", examination_id)
+            .limit(1)
+            .execute()
+        )
+    except Exception as error:
+        raise ExaminationServiceError(
+            message=_read_error_message(error) or "Doctor feedback could not be loaded.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    try:
+        if existing_response.data:
+            feedback_response = (
+                supabase.table("doctor_feedbacks")
+                .update(feedback_row)
+                .eq("id", existing_response.data[0]["id"])
+                .execute()
+            )
+        else:
+            feedback_response = (
+                supabase.table("doctor_feedbacks").insert(feedback_row).execute()
+            )
+    except Exception as error:
+        raise ExaminationServiceError(
+            message=_read_error_message(error) or "Doctor feedback could not be saved.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    if not feedback_response.data:
+        raise ExaminationServiceError(
+            message="Doctor feedback could not be saved.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    try:
+        supabase.table("examinations").update({"status": "reviewed"}).eq(
+            "id", examination_id
+        ).execute()
+    except Exception as error:
+        raise ExaminationServiceError(
+            message=_read_error_message(error) or "Examination status could not be updated.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    return DoctorFeedbackResponse(**feedback_response.data[0])

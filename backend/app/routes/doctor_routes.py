@@ -2,7 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.schemas.examination_schema import (
     CreateExaminationRequest,
+    DoctorFeedbackRequest,
+    DoctorFeedbackResponse,
     ExaminationResponse,
+    UpdateDoctorNoteRequest,
 )
 from app.schemas.user_schema import CurrentUserResponse, PatientProfileResponse
 from app.services.examination_service import (
@@ -10,6 +13,8 @@ from app.services.examination_service import (
     create_examination,
     get_patient_by_id,
     list_patients,
+    save_doctor_feedback,
+    update_doctor_note,
 )
 from app.services.user_service import UserServiceError, require_role
 from app.utils.security import get_current_auth_user
@@ -64,6 +69,42 @@ def create_doctor_examination(
 ) -> ExaminationResponse:
     try:
         return create_examination(payload, current_user)
+    except ExaminationServiceError as error:
+        raise HTTPException(
+            status_code=error.status_code,
+            detail=error.message,
+        ) from error
+
+
+@router.patch(
+    "/examinations/{examination_id}/note",
+    response_model=ExaminationResponse,
+)
+def update_doctor_examination_note(
+    examination_id: str,
+    payload: UpdateDoctorNoteRequest,
+    _: CurrentUserResponse = Depends(require_doctor_or_admin),
+) -> ExaminationResponse:
+    try:
+        return update_doctor_note(examination_id, payload)
+    except ExaminationServiceError as error:
+        raise HTTPException(
+            status_code=error.status_code,
+            detail=error.message,
+        ) from error
+
+
+@router.patch(
+    "/examinations/{examination_id}/feedback",
+    response_model=DoctorFeedbackResponse,
+)
+def save_doctor_examination_feedback(
+    examination_id: str,
+    payload: DoctorFeedbackRequest,
+    current_user: CurrentUserResponse = Depends(require_doctor_or_admin),
+) -> DoctorFeedbackResponse:
+    try:
+        return save_doctor_feedback(examination_id, payload, current_user)
     except ExaminationServiceError as error:
         raise HTTPException(
             status_code=error.status_code,
