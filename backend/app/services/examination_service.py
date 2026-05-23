@@ -8,11 +8,18 @@ from app.schemas.examination_schema import (
     DoctorFeedbackRequest,
     DoctorFeedbackResponse,
     ExaminationResponse,
+    PatientDoctorSummary,
+    PatientExaminationDetailResponse,
+    PatientExaminationHistoryItem,
+    PatientFeedbackSummary,
+    PatientPredictionSummary,
+    PatientReportSummary,
+    PatientXraySummary,
     StoredAIPredictionResponse,
     UpdateDoctorNoteRequest,
 )
 from app.schemas.user_schema import CurrentUserResponse, PatientProfileResponse
-from app.services.ai_service import create_mock_prediction
+from app.services.ai_service import MEDICAL_AI_DISCLAIMER, create_mock_prediction
 from app.services.supabase_service import get_supabase_client
 from app.services.storage_service import (
     StorageServiceError,
@@ -130,6 +137,218 @@ def _get_doctor_profile_id_or_none(current_user: CurrentUserResponse) -> str | N
         return None
 
     return _get_doctor_profile_id(current_user.user_id)
+
+
+def _get_current_patient_profile_id(current_user: CurrentUserResponse) -> str:
+    supabase = get_supabase_client()
+
+    try:
+        role_response = (
+            supabase.table("profiles")
+            .select("role")
+            .eq("user_id", current_user.user_id)
+            .single()
+            .execute()
+        )
+    except Exception as error:
+        raise ExaminationServiceError(
+            message=_read_error_message(error) or "User role could not be loaded.",
+            status_code=status.HTTP_404_NOT_FOUND,
+        ) from error
+
+    role = role_response.data.get("role") if role_response.data else None
+    if role != "patient":
+        raise ExaminationServiceError(
+            message="Only patient users can access patient examination records.",
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    try:
+        patient_response = (
+            supabase.table("patient_profiles")
+            .select("id")
+            .eq("user_id", current_user.user_id)
+            .single()
+            .execute()
+        )
+    except Exception as error:
+        raise ExaminationServiceError(
+            message=_read_error_message(error) or "Patient profile was not found.",
+            status_code=status.HTTP_404_NOT_FOUND,
+        ) from error
+
+    patient_id = patient_response.data.get("id") if patient_response.data else None
+    if not patient_id:
+        raise ExaminationServiceError(
+            message="Patient profile was not found.",
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    return patient_id
+
+
+def _latest_related_rows(
+    table_name: str,
+    examination_ids: list[str],
+    order_column: str,
+) -> dict[str, dict]:
+    if not examination_ids:
+        return {}
+
+    supabase = get_supabase_client()
+    try:
+        response = (
+            supabase.table(table_name)
+            .select("*")
+            .in_("examination_id", examination_ids)
+            .order(order_column, desc=True)
+            .execute()
+        )
+    except Exception as error:
+        raise ExaminationServiceError(
+            message=_read_error_message(error) or f"{table_name} data could not be loaded.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    latest_by_examination: dict[str, dict] = {}
+    for row in response.data or []:
+        examination_id = row.get("examination_id")
+        if examination_id and examination_id not in latest_by_examination:
+            latest_by_examination[examination_id] = row
+
+    return latest_by_examination
+
+
+def _doctor_profiles_by_id(doctor_ids: list[str]) -> dict[str, dict]:
+    if not doctor_ids:
+        return {}
+
+    supabase = get_supabase_client()
+    try:
+        response = (
+            supabase.table("doctor_profiles")
+            .select("id,email,full_name,specialization")
+            .in_("id", doctor_ids)
+            .execute()
+        )
+    except Exception as error:
+        raise ExaminationServiceError(
+            message=_read_error_message(error) or "Doctor profiles could not be loaded.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    return {row["id"]: row for row in response.data or []}
+
+
+def list_current_patient_examinations(
+    current_user: CurrentUserResponse,
+) -> list[PatientExaminationHistoryItem]:
+    patient_id = _get_current_patient_profile_id(current_user)
+    supabase = get_supabase_client()
+
+    try:
+        response = (
+            supabase.table("examinations")
+            .select("*")
+            .eq("patient_id", patient_id)
+            .order("examination_date", desc=True)
+            .execute()
+        )
+    except Exception as error:
+        raise ExaminationServiceError(
+            message=_read_error_message(error) or "Patient examinations could not be loaded.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    examinations = response.data or []
+    examination_ids = [row["id"] for row in examinations]
+    doctor_ids = list({row["doctor_id"] for row in examinations if row.get("doctor_id")})
+    doctors = _doctor_profiles_by_id(doctor_ids)
+    predictions = _latest_related_rows("ai_predictions", examination_ids, "created_at")
+    reports = _latest_related_rows("pdf_reports", examination_ids, "generated_at")
+
+    return [
+        PatientExaminationHistoryItem(
+            id=examination["id"],
+            examination_date=examination["examination_date"],
+            status=examination["status"],
+            doctor_name=doctors.get(examination.get("doctor_id") or "", {}).get(
+                "full_name"
+            ),
+            prediction_result=predictions.get(examination["id"], {}).get(
+                "prediction_result"
+            ),
+            confidence_percentage=predictions.get(examination["id"], {}).get(
+                "confidence_percentage"
+            ),
+            report_id=reports.get(examination["id"], {}).get("id"),
+        )
+        for examination in examinations
+    ]
+
+
+def get_current_patient_examination_detail(
+    examination_id: str,
+    current_user: CurrentUserResponse,
+) -> PatientExaminationDetailResponse:
+    patient_id = _get_current_patient_profile_id(current_user)
+    supabase = get_supabase_client()
+
+    try:
+        response = (
+            supabase.table("examinations")
+            .select("*")
+            .eq("id", examination_id)
+            .eq("patient_id", patient_id)
+            .single()
+            .execute()
+        )
+    except Exception as error:
+        raise ExaminationServiceError(
+            message="Examination was not found.",
+            status_code=status.HTTP_404_NOT_FOUND,
+        ) from error
+
+    if not response.data:
+        raise ExaminationServiceError(
+            message="Examination was not found.",
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    examination = response.data
+    examination_ids = [examination_id]
+    doctors = _doctor_profiles_by_id(
+        [examination["doctor_id"]] if examination.get("doctor_id") else []
+    )
+    xray_image = _latest_related_rows("xray_images", examination_ids, "uploaded_at").get(
+        examination_id
+    )
+    prediction = _latest_related_rows("ai_predictions", examination_ids, "created_at").get(
+        examination_id
+    )
+    feedback = _latest_related_rows("doctor_feedbacks", examination_ids, "created_at").get(
+        examination_id
+    )
+    report = _latest_related_rows("pdf_reports", examination_ids, "generated_at").get(
+        examination_id
+    )
+    doctor = doctors.get(examination.get("doctor_id") or "")
+
+    return PatientExaminationDetailResponse(
+        id=examination["id"],
+        patient_id=examination["patient_id"],
+        doctor_id=examination.get("doctor_id"),
+        created_by_user_id=examination["created_by_user_id"],
+        examination_date=examination["examination_date"],
+        status=examination["status"],
+        doctor_note=examination.get("doctor_note"),
+        doctor=PatientDoctorSummary(**doctor) if doctor else None,
+        xray_image=PatientXraySummary(**xray_image) if xray_image else None,
+        ai_prediction=PatientPredictionSummary(**prediction) if prediction else None,
+        doctor_feedback=PatientFeedbackSummary(**feedback) if feedback else None,
+        report=PatientReportSummary(**report) if report else None,
+        disclaimer=MEDICAL_AI_DISCLAIMER,
+    )
 
 
 def create_examination(

@@ -152,9 +152,10 @@ endpoints. The doctor workflow prediction endpoint now handles X-Ray upload
 storage and AI result persistence against Supabase for MVP testing. Doctor note
 and AI feedback persistence are also implemented and tested. PDF report
 generation and signed report download are implemented for reviewed examinations.
-The frontend has early auth and dashboard pages that are being wired to the
-backend contracts. The next MVP order is patient examination history/report
-access, then full workflow hardening.
+Patient-owned examination history/detail report access endpoints are implemented
+on the backend. The frontend has early auth and dashboard pages that are being
+wired to the backend contracts. The next MVP order is frontend integration for
+patient history/report access, then full workflow hardening.
 
 Please stick to the plan of every .md in AGENTS.md and the docs' folder .md (other .md and requirements, u could change for every progress), dont change those .md unless there is something that are genuinely needed a change, like for example the plan on some side does not align with the plant of the other side, which means we need to actually change the base plan, or maybe u can change if if u want to add more information, but dont change the initial plan if not needed
 

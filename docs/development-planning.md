@@ -141,11 +141,12 @@ Current backend progress snapshot:
    8. Doctor workflow X-Ray upload storage and mock AI prediction persistence
    9. Doctor note and AI feedback persistence
    10. PDF report generation and signed download access
+   11. Patient-owned examination history and detail report access endpoints
 2. In Progress
    1. Frontend auth form integration with backend endpoints
    2. Frontend dashboard integration with patient and doctor workflow endpoints
 3. Next
-   1. Patient examination history and patient report access
+   1. Frontend patient examination history and patient report access integration
    2. Full demo workflow testing
 
 1. Priority 1
