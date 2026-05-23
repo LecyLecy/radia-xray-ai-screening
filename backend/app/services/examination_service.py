@@ -208,6 +208,7 @@ async def create_stored_mock_prediction(
         "examination_id": examination_id,
         "prediction_result": prediction.prediction_result,
         "confidence_score": prediction.confidence_score,
+        "confidence_percentage": prediction.confidence_percentage,
         "gradcam_url": None,
         "model_name": prediction.model_name,
     }
