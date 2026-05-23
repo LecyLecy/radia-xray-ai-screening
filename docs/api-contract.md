@@ -185,6 +185,141 @@ Frontend notes:
 - Use this endpoint for patient dashboard/profile header data.
 - Do not pass patient id from frontend for the current user's own profile.
 
+### `GET /patients/me/examinations`
+
+Returns the current logged-in patient's own examination history. The backend
+resolves the patient profile from the bearer token and filters by that patient
+profile id.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Success response:
+
+```json
+[
+  {
+    "id": "examination_uuid",
+    "examination_date": "2026-05-23T07:54:03Z",
+    "status": "report_ready",
+    "doctor_name": "Doctor Name",
+    "prediction_result": "Pneumonia",
+    "confidence_percentage": 82,
+    "report_id": "report_uuid"
+  }
+]
+```
+
+Nullable fields:
+
+```text
+doctor_name
+prediction_result
+confidence_percentage
+report_id
+```
+
+Expected errors:
+
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not a patient.
+- `404`: patient profile row is missing.
+- `500`: examination history or related summary data could not be loaded.
+
+Frontend notes:
+
+- Use this endpoint for the patient examination history page.
+- `report_id` is present when a PDF report row exists for that examination.
+- Patients cannot request another patient's history by passing an id.
+
+### `GET /patients/me/examinations/{examination_id}`
+
+Returns one examination detail only if it belongs to the current logged-in
+patient. Related X-Ray, AI prediction, doctor feedback, and PDF report sections
+return `null` when they do not exist yet.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Success response:
+
+```json
+{
+  "id": "examination_uuid",
+  "patient_id": "patient_profile_uuid",
+  "doctor_id": "doctor_profile_uuid",
+  "created_by_user_id": "auth_user_uuid",
+  "examination_date": "2026-05-23T07:54:03Z",
+  "status": "report_ready",
+  "doctor_note": "Doctor clinical note.",
+  "doctor": {
+    "id": "doctor_profile_uuid",
+    "full_name": "Doctor Name",
+    "email": "doctor@example.com",
+    "specialization": "Radiology"
+  },
+  "xray_image": {
+    "id": "xray_image_uuid",
+    "image_url": "examination_uuid/20260523120000_uuid_xray.png",
+    "file_name": "xray.png",
+    "file_type": "image/png",
+    "uploaded_at": "2026-05-23T07:54:03Z"
+  },
+  "ai_prediction": {
+    "id": "ai_prediction_uuid",
+    "prediction_result": "Pneumonia",
+    "confidence_score": 0.82,
+    "confidence_percentage": 82,
+    "gradcam_url": null,
+    "model_name": "radia-mock-ai-v1",
+    "created_at": "2026-05-23T07:54:03Z"
+  },
+  "doctor_feedback": {
+    "id": "feedback_uuid",
+    "feedback_status": "correct",
+    "feedback_note": "AI result matches clinical review.",
+    "created_at": "2026-05-23T07:54:03Z"
+  },
+  "report": {
+    "id": "report_uuid",
+    "report_url": "reports/examination_uuid/20260523120000_radia_report.pdf",
+    "generated_at": "2026-05-23T07:54:03Z"
+  },
+  "disclaimer": "This AI assisted result is provided for clinical decision support only..."
+}
+```
+
+Nullable sections:
+
+```text
+doctor
+xray_image
+ai_prediction
+doctor_feedback
+report
+```
+
+Expected errors:
+
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not a patient.
+- `404`: patient profile is missing, examination does not exist, or examination belongs to another patient.
+- `500`: related examination detail data could not be loaded.
+
+Frontend notes:
+
+- Use `report.id` with `GET /reports/{report_id}/download` to open or download
+  the private PDF through a signed URL.
+- `xray_image.image_url` and `report.report_url` are private storage object
+  paths, not public URLs.
+- Always show the `disclaimer` near AI result details.
+
 ## Doctor Workflow
 
 These endpoints are for doctor/admin workflow screens. They require an
@@ -585,5 +720,4 @@ demo/security hardening.
 - Doctor/admin creation endpoints are not implemented yet.
 - Full role-based authorization beyond the current patient and doctor/admin
   checks is not implemented yet.
-- Patient examination history and patient-facing report list endpoints are not
-  implemented yet.
+- Frontend patient history/report integration is not implemented yet.
