@@ -201,12 +201,27 @@ not blocked.
 
 ## Current Priority
 
-Current priority is end-to-end MVP flow in small milestones:
+Current backend contracts are ready for frontend integration:
 
-1. Frontend auth forms connect to backend auth endpoints.
-2. Frontend patient dashboard/profile reads `GET /patients/me`.
-3. Frontend doctor patient list/detail/examination form reads the doctor workflow endpoints.
-4. X-Ray upload storage and mock AI result persistence.
-5. Doctor note, AI feedback, and examination status updates.
-6. PDF report generation.
-7. Full local demo test and documentation cleanup.
+1. Auth and current patient profile endpoints are implemented.
+2. Doctor/admin patient list, patient detail, and examination creation endpoints are implemented.
+3. X-Ray upload storage and mock AI prediction persistence are implemented.
+4. Doctor note, AI feedback, examination status updates, PDF report generation, and signed report download are implemented.
+5. Patient-owned examination history and detail report access endpoints are implemented.
+
+Nicholas should now wire frontend pages using `docs/api-contract.md` as the
+source of truth. The next frontend targets are auth, patient profile, doctor
+workflow, patient history/detail, and PDF download.
+
+## Frontend Integration Handoff
+
+- Login uses `POST /auth/login`; store `access_token`, `refresh_token`,
+  `user.user_id`, and `user.role`.
+- Patient profile uses `GET /patients/me`.
+- Patient history uses `GET /patients/me/examinations`.
+- Patient examination detail uses `GET /patients/me/examinations/{examination_id}`.
+- PDF download uses `GET /reports/{report_id}/download` with `report.id` from
+  patient detail/history data.
+- `xray_image.image_url` and `report.report_url` are private storage object
+  paths, not public URLs.
+- Show the AI medical disclaimer near AI result details.
