@@ -297,6 +297,96 @@ Expected errors:
 - `404`: patient was not found.
 - `500`: examination could not be created.
 
+### `PATCH /doctor/examinations/{examination_id}/note`
+
+Saves the doctor's clinical note on an examination.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+Request:
+
+```json
+{
+  "doctor_note": "Patient shows mild respiratory symptoms. Recommend follow-up."
+}
+```
+
+Success response:
+
+```json
+{
+  "id": "examination_uuid",
+  "patient_id": "patient_profile_uuid",
+  "doctor_id": "doctor_profile_uuid_or_null",
+  "created_by_user_id": "auth_user_uuid",
+  "examination_date": "2026-05-21T10:00:00Z",
+  "status": "pending_review",
+  "doctor_note": "Patient shows mild respiratory symptoms. Recommend follow-up."
+}
+```
+
+Expected errors:
+
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not doctor/admin.
+- `404`: examination was not found.
+- `422`: missing or empty `doctor_note`.
+- `500`: doctor note could not be saved.
+
+### `PATCH /doctor/examinations/{examination_id}/feedback`
+
+Saves or updates the doctor's validation of the AI result. Saving feedback marks
+the examination status as `reviewed`.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+Request:
+
+```json
+{
+  "feedback_status": "correct",
+  "feedback_note": "AI result matches clinical review."
+}
+```
+
+Allowed `feedback_status` values:
+
+```text
+correct
+incorrect
+uncertain
+```
+
+Success response:
+
+```json
+{
+  "id": "feedback_uuid",
+  "examination_id": "examination_uuid",
+  "doctor_id": "doctor_profile_uuid_or_null",
+  "feedback_status": "correct",
+  "feedback_note": "AI result matches clinical review."
+}
+```
+
+Expected errors:
+
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not doctor/admin.
+- `404`: examination was not found.
+- `422`: missing or invalid `feedback_status`.
+- `500`: doctor feedback could not be saved.
+
 ## AI Mock
 
 ### `POST /ai/predict/mock`

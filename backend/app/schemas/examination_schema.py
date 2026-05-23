@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 PredictionResult = Literal["Normal", "Pneumonia"]
 ExaminationStatus = Literal["pending_review", "reviewed", "report_ready"]
+FeedbackStatus = Literal["correct", "incorrect", "uncertain"]
 
 
 class MockAIPredictionResponse(BaseModel):
@@ -27,6 +28,23 @@ class StoredAIPredictionResponse(MockAIPredictionResponse):
 class CreateExaminationRequest(BaseModel):
     patient_id: str
     examination_date: datetime | None = None
+
+
+class UpdateDoctorNoteRequest(BaseModel):
+    doctor_note: str = Field(min_length=1)
+
+
+class DoctorFeedbackRequest(BaseModel):
+    feedback_status: FeedbackStatus
+    feedback_note: str | None = None
+
+
+class DoctorFeedbackResponse(BaseModel):
+    id: str
+    examination_id: str
+    doctor_id: str | None = None
+    feedback_status: FeedbackStatus
+    feedback_note: str | None = None
 
 
 class ExaminationResponse(BaseModel):
