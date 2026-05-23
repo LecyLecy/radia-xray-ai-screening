@@ -14,17 +14,17 @@ MEDICAL_AI_DISCLAIMER = (
 
 ALLOWED_XRAY_CONTENT_TYPES = {
     "image/jpeg",
-    "image/jpg",
     "image/png",
 }
 
 
 async def create_mock_prediction(
     xray_image: UploadFile,
-    examination_id: int | None = None,
+    examination_id: str | None = None,
+    file_bytes: bytes | None = None,
 ) -> MockAIPredictionResponse:
-    file_bytes = await xray_image.read()
-    seed_source = file_bytes or (xray_image.filename or "radia-mock").encode()
+    prediction_bytes = file_bytes if file_bytes is not None else await xray_image.read()
+    seed_source = prediction_bytes or (xray_image.filename or "radia-mock").encode()
     seed = int.from_bytes(sha256(seed_source).digest()[:2], "big")
 
     prediction_result = "Pneumonia" if seed % 2 else "Normal"

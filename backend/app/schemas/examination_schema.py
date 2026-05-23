@@ -9,13 +9,19 @@ ExaminationStatus = Literal["pending_review", "reviewed", "report_ready"]
 
 
 class MockAIPredictionResponse(BaseModel):
-    examination_id: int | None = None
+    examination_id: str | None = None
     prediction_result: PredictionResult
     confidence_score: float = Field(ge=0, le=1)
     confidence_percentage: int = Field(ge=0, le=100)
     model_name: str
     is_mock: bool
     disclaimer: str
+
+
+class StoredAIPredictionResponse(MockAIPredictionResponse):
+    xray_image_id: str
+    ai_prediction_id: str
+    image_url: str
 
 
 class CreateExaminationRequest(BaseModel):
