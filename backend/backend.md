@@ -33,11 +33,11 @@ uvicorn app.main:app --reload
 - `GET /doctor/patients/{patient_id}` returns one patient profile by `patient_profiles.id`.
 - `POST /doctor/examinations` creates an examination row for a selected patient.
 - `POST /ai/predict/mock` accepts a JPG/JPEG/PNG X-Ray file and returns a mock Normal/Pneumonia prediction.
-- `POST /doctor/examinations/{examination_id}/predict` is a workflow-shaped mock prediction endpoint for doctor examination screens.
+- `POST /doctor/examinations/{examination_id}/predict` stores a JPG/JPEG/PNG X-Ray image up to 10 MB, saves image metadata, runs mock AI prediction, and saves the prediction.
 
 ## Current Limitations
 
 - Frontend auth forms are still being connected to backend auth endpoints.
 - Doctor/admin accounts are still created manually in Supabase for MVP testing.
-- Mock AI endpoints do not store images or predictions in Supabase yet.
-- X-Ray upload storage, AI result persistence, doctor notes, feedback, and PDF generation are still planned.
+- Doctor notes, feedback, and PDF generation are still planned.
+- Real AI model inference is still planned; the workflow endpoint currently persists mock AI predictions.

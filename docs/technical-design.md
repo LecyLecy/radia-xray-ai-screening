@@ -178,6 +178,23 @@
    3. gradcam-results
    4. Pdf-reports
 
+3. Supabase bucket settings
+
+| Bucket | File size limit | Allowed MIME types |
+| ------ | --------------- | ------------------ |
+| profile-pictures | 2 MB | image/jpeg, image/png, image/webp |
+| xray-images | 10 MB | image/jpeg, image/png |
+| gradcam-results | 10 MB | image/jpeg, image/png |
+| pdf-reports | 10 MB | application/pdf |
+
+Uploaded X-Ray files must follow the `xray-images` bucket limits: JPG/JPEG or
+PNG only, maximum 10 MB. Backend validation should reject files outside these
+limits before storage.
+
+For MVP testing, doctor accounts are created manually across Supabase Auth,
+`profiles`, and `doctor_profiles`. The AI prediction enum in Supabase must
+accept `Normal` and `Pneumonia`, matching the backend API response contract.
+
 # AI Integration Strategy
 
 1. Alur

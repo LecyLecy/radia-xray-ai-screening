@@ -310,6 +310,7 @@ Request:
 Content-Type: multipart/form-data
 field: xray_image
 allowed file types: JPG, JPEG, PNG
+maximum file size: 10 MB
 ```
 
 Success response:
@@ -329,6 +330,7 @@ Success response:
 Expected errors:
 
 - `400`: unsupported file type.
+- `413`: file exceeds the 10 MB upload limit.
 - `422`: missing `xray_image` form field.
 
 Frontend notes:
@@ -339,7 +341,10 @@ Frontend notes:
 
 ### `POST /doctor/examinations/{examination_id}/predict`
 
-Workflow-shaped mock prediction endpoint for doctor examination screens.
+Workflow-shaped mock prediction endpoint for doctor examination screens. This
+endpoint validates and stores the X-Ray image in Supabase Storage, saves image
+metadata in `xray_images`, saves the mock AI result in `ai_predictions`, and
+returns the stored IDs.
 
 Request:
 
@@ -347,10 +352,51 @@ Request:
 Content-Type: multipart/form-data
 field: xray_image
 path param: examination_id
+allowed file types: JPG, JPEG, PNG
+maximum file size: 10 MB
 ```
 
-Response shape is the same as `POST /ai/predict/mock`, but `examination_id`
-will match the path parameter.
+Success response:
+
+```json
+{
+  "examination_id": "examination_uuid",
+  "xray_image_id": "xray_image_uuid",
+  "ai_prediction_id": "ai_prediction_uuid",
+  "image_url": "examination_uuid/20260523120000_uuid_xray.png",
+  "prediction_result": "Pneumonia",
+  "confidence_score": 0.82,
+  "confidence_percentage": 82,
+  "model_name": "radia-mock-ai-v1",
+  "is_mock": true,
+  "disclaimer": "This AI assisted result is provided for clinical decision support only..."
+}
+```
+
+Expected errors:
+
+- `400`: unsupported file type or empty upload.
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not doctor/admin.
+- `404`: examination was not found.
+- `413`: file exceeds the 10 MB upload limit.
+- `422`: missing `xray_image` form field.
+
+Frontend notes:
+
+- `image_url` is the private Supabase Storage object path, not a public file URL.
+- Show the disclaimer with the AI result.
+
+Manual testing notes:
+
+- Doctor/admin test users must exist in Supabase Auth, `profiles`, and
+  `doctor_profiles`; login role lookup reads `profiles.role`.
+- Supabase enum `prediction_result` must allow `Normal` and `Pneumonia`.
+- If upload succeeds but prediction persistence fails, the test can leave an
+  `xray_images` row and storage object for that examination. Delete those test
+  artifacts or use a fresh examination before retrying.
+- `ai_predictions.confidence_percentage` is required when that database column
+  is configured as non-null.
 
 ## Temporary Development Endpoint
 
