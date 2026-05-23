@@ -151,3 +151,6 @@ doctor/admin patient list/detail, examination creation, and mock AI prediction
 endpoints. The frontend has early auth and dashboard pages that are being wired
 to the backend contracts. The next MVP order is upload/storage, AI result
 persistence, doctor notes/feedback, PDF reports, then full workflow hardening.
+
+
+Please stick to the plan of every .md in AGENTS.md and the folder .md (other .md and requirements, u could change for every progress), dont change those .md unless there is something that are genuinely needed a change, like for example the plan on some side does not align with the plant of the other side, which means we need to actually change the base plan, or maybe u can change if if u want to add more information, but dont change the initial plan if not needed
