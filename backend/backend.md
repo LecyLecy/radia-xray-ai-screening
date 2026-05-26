@@ -47,6 +47,17 @@ The workflow validates:
 
 For AOL DevOps evidence, use screenshots of the `backend-ci` environment, the successful `Backend CI` run, the workflow file, and the Dockerfile. More details are documented in `docs/devops-pipeline.md`.
 
+## Supabase CLI Setup
+
+Supabase CLI project configuration is tracked at `supabase/config.toml`.
+Future database schema changes should be added as SQL migration files under
+`supabase/migrations/`, and local/demo seed data should go in
+`supabase/seed.sql`.
+
+The storage bucket limits for `profile-pictures`, `xray-images`,
+`gradcam-results`, and `pdf-reports` are declared in `supabase/config.toml` so
+the expected file size and MIME type rules are visible in code.
+
 ## Current MVP Endpoints
 
 - `GET /health` checks whether the API is running.

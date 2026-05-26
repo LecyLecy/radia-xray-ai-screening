@@ -54,6 +54,7 @@ The repository has a basic backend DevOps setup for AOL evidence:
 - GitHub Actions workflow: `.github/workflows/backend-ci.yml`
 - GitHub Environment: `backend-ci`
 - Backend Dockerfile: `backend/Dockerfile`
+- Supabase CLI config: `supabase/config.toml`
 - DevOps guide: `docs/devops-pipeline.md`
 
 The `Backend CI` workflow runs on pushes and pull requests to `backend`, `dev`, and `main`. It installs backend dependencies, compiles the FastAPI backend, and builds the backend Docker image with the tag `radia-backend:ci`.
@@ -65,6 +66,10 @@ For AOL screenshots, capture:
 - Successful run details showing `Compile backend` and `Build backend Docker image`
 - `.github/workflows/backend-ci.yml`
 - `backend/Dockerfile`
+
+Supabase CLI setup is tracked for future database migrations and storage bucket
+configuration. Remote database changes should be made through migration files
+under `supabase/migrations/` after local review/testing.
 
 Do not include secret values, access tokens, or signed download URLs in public screenshots or submitted documentation.
 

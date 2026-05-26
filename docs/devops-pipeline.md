@@ -68,6 +68,32 @@ Possible future variables:
 APP_ENV=ci
 ```
 
+## Supabase CLI Setup
+
+The repository is linked to the Supabase project through the Supabase CLI.
+Project-specific temporary link files live under `supabase/.temp` and are ignored
+by git.
+
+Tracked Supabase files:
+
+- `supabase/config.toml`: local Supabase project configuration.
+- `supabase/migrations/`: future database migration files.
+- `supabase/seed.sql`: future local seed data.
+
+Storage bucket settings are declared in `supabase/config.toml` so the expected
+bucket limits are visible in code:
+
+| Bucket | Public | File size limit | Allowed MIME types |
+| ------ | ------ | --------------- | ------------------ |
+| `profile-pictures` | false | 2 MiB | `image/jpeg`, `image/png`, `image/webp` |
+| `xray-images` | false | 10 MiB | `image/jpeg`, `image/png` |
+| `gradcam-results` | false | 10 MiB | `image/jpeg`, `image/png` |
+| `pdf-reports` | false | 10 MiB | `application/pdf` |
+
+Future database changes should be added as SQL migration files in
+`supabase/migrations/`. Do not change the remote production database directly
+unless the team explicitly approves it.
+
 ## Screenshot Evidence For Submission
 
 Use these screenshots for the AOL DevOps pipeline evidence:
@@ -94,6 +120,7 @@ Optional next improvements:
 
 - Add frontend CI with `npm install` and build/lint checks.
 - Add Docker Hub login and image push after adding safe repository secrets.
+- Add Supabase migration CI after migrations are generated and tested locally.
 - Add deployment steps for Render, Railway, or another backend host.
 - Add branch protection requiring `Backend CI` to pass before merging to `main`.
 

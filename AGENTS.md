@@ -101,6 +101,7 @@ The core workflow is:
 - Keep backend Docker setup in `backend/Dockerfile`.
 - The workflow should reference GitHub Environment `backend-ci`.
 - Current CI validates dependency install, backend compile, and Docker image build.
+- Keep Supabase project configuration in `supabase/config.toml` and future database changes in `supabase/migrations/`.
 - Do not add Docker Hub push or deployment secrets until the team agrees on account ownership and deployment target.
 - Do not screenshot or commit secret values, access tokens, Supabase service keys, or signed download URLs.
 
