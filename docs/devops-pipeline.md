@@ -4,14 +4,15 @@ This document explains the current DevOps evidence setup for the Radia AOL proje
 
 ## Current Setup
 
-Radia currently has a backend CI pipeline and Docker build validation.
+Radia currently has backend and frontend CI validation.
 
 - GitHub Actions workflow: `.github/workflows/backend-ci.yml`
+- GitHub Actions workflow: `.github/workflows/frontend-ci.yml`
 - GitHub Environment: `backend-ci`
 - Backend Dockerfile: `backend/Dockerfile`
-- Workflow name: `Backend CI`
+- Workflow names: `Backend CI`, `Frontend CI`
 
-The workflow runs on pushes and pull requests to `backend`, `dev`, and `main`, and can also be run manually with `workflow_dispatch`.
+The workflows run on pushes and pull requests to `backend`, `dev`, and `main`, and can also be run manually with `workflow_dispatch`.
 
 ## What The Pipeline Checks
 
@@ -24,6 +25,14 @@ The `Backend CI` workflow runs these steps:
 5. Build the backend Docker image with `docker build -t radia-backend:ci .`.
 
 This is a CI validation pipeline. It proves the backend can install dependencies, compile, and build a Docker image. It does not deploy the application yet and does not push the image to Docker Hub.
+
+The `Frontend CI` workflow runs these steps:
+
+1. Checkout repository.
+2. Setup Node.js 22.
+3. Install frontend dependencies with `npm ci`.
+4. Lint the frontend with `npm run lint`.
+5. Build the frontend with `npm run build`.
 
 ## Docker Setup
 
@@ -101,8 +110,10 @@ Use these screenshots for the AOL DevOps pipeline evidence:
 1. GitHub `Settings -> Environments -> backend-ci`.
 2. GitHub `Actions -> Backend CI` successful green run.
 3. Successful run detail showing the steps `Compile backend` and `Build backend Docker image`.
-4. The workflow file `.github/workflows/backend-ci.yml`.
-5. The Dockerfile `backend/Dockerfile`.
+4. GitHub `Actions -> Frontend CI` successful green run.
+5. Successful frontend run detail showing `Lint frontend` and `Build frontend`.
+6. The workflow files `.github/workflows/backend-ci.yml` and `.github/workflows/frontend-ci.yml`.
+7. The Dockerfile `backend/Dockerfile`.
 
 If an older workflow run is red, do not use it as the main evidence. Use the latest successful green run, or manually trigger a new run on the `backend` branch and screenshot the successful result.
 
@@ -118,7 +129,6 @@ Minimum final setup:
 
 Optional next improvements:
 
-- Add frontend CI with `npm install` and build/lint checks.
 - Add Docker Hub login and image push after adding safe repository secrets.
 - Add Supabase migration CI after migrations are generated and tested locally.
 - Add deployment steps for Render, Railway, or another backend host.

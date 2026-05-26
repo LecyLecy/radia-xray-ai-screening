@@ -54,17 +54,22 @@ The repository has a basic backend DevOps setup for AOL evidence:
 - GitHub Actions workflow: `.github/workflows/backend-ci.yml`
 - GitHub Environment: `backend-ci`
 - Backend Dockerfile: `backend/Dockerfile`
+- Frontend CI workflow: `.github/workflows/frontend-ci.yml`
 - Supabase CLI config: `supabase/config.toml`
 - DevOps guide: `docs/devops-pipeline.md`
 
 The `Backend CI` workflow runs on pushes and pull requests to `backend`, `dev`, and `main`. It installs backend dependencies, compiles the FastAPI backend, and builds the backend Docker image with the tag `radia-backend:ci`.
+The `Frontend CI` workflow installs frontend dependencies, runs lint, and builds the Vite app.
 
 For AOL screenshots, capture:
 
 - Settings -> Environments -> `backend-ci`
 - Actions -> `Backend CI` successful green run
 - Successful run details showing `Compile backend` and `Build backend Docker image`
+- Actions -> `Frontend CI` successful green run
+- Successful run details showing `Lint frontend` and `Build frontend`
 - `.github/workflows/backend-ci.yml`
+- `.github/workflows/frontend-ci.yml`
 - `backend/Dockerfile`
 
 Supabase CLI setup is tracked for future database migrations and storage bucket

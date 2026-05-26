@@ -98,6 +98,7 @@ The core workflow is:
 ## DevOps Conventions
 
 - Keep backend CI in `.github/workflows/backend-ci.yml`.
+- Keep frontend CI in `.github/workflows/frontend-ci.yml`.
 - Keep backend Docker setup in `backend/Dockerfile`.
 - The workflow should reference GitHub Environment `backend-ci`.
 - Current CI validates dependency install, backend compile, and Docker image build.
