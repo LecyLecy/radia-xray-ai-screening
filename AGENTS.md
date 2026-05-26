@@ -26,6 +26,7 @@ the relevant files in `docs/`:
 - `docs/testing-plan.md`: required unit, integration, system, and acceptance tests.
 - `docs/development-planning.md`: implementation order and coding conventions.
 - `docs/ui-prompt.md`: frontend visual style and required UI components.
+- `docs/devops-pipeline.md`: GitHub Actions, GitHub Environment, Docker, and AOL screenshot evidence.
 
 ## Intended Stack
 
@@ -35,6 +36,7 @@ the relevant files in `docs/`:
 - Storage: Supabase Storage.
 - AI: PyTorch model, DenseNet/CheXNet-style Normal/Pneumonia screening.
 - Reports: PDF generation with ReportLab or WeasyPrint.
+- DevOps: GitHub Actions backend CI, GitHub Environment `backend-ci`, backend Dockerfile.
 - Deployment target: Vercel for frontend, Render or Railway for backend.
 
 ## Main Roles
@@ -93,6 +95,15 @@ The core workflow is:
 - Never hardcode secrets, Supabase keys, JWT secrets, or model paths.
 - Use environment variables based on `.env.example`.
 
+## DevOps Conventions
+
+- Keep backend CI in `.github/workflows/backend-ci.yml`.
+- Keep backend Docker setup in `backend/Dockerfile`.
+- The workflow should reference GitHub Environment `backend-ci`.
+- Current CI validates dependency install, backend compile, and Docker image build.
+- Do not add Docker Hub push or deployment secrets until the team agrees on account ownership and deployment target.
+- Do not screenshot or commit secret values, access tokens, Supabase service keys, or signed download URLs.
+
 ## Frontend Conventions
 
 - Use React components with PascalCase.
@@ -129,6 +140,7 @@ Prioritize tests and manual verification in this order:
 7. PDF generation with required sections and disclaimer.
 8. Patient report download limited to own reports.
 9. Admin management workflow.
+10. Backend CI workflow and Docker image build remain green.
 
 Use the test cases and acceptance checklist in `docs/testing-plan.md` when
 adding or changing features.
@@ -153,9 +165,11 @@ storage and AI result persistence against Supabase for MVP testing. Doctor note
 and AI feedback persistence are also implemented and tested. PDF report
 generation and signed report download are implemented for reviewed examinations.
 Patient-owned examination history/detail report access endpoints are implemented
-on the backend. The frontend has early auth and dashboard pages that are being
-wired to the backend contracts. The next MVP order is frontend integration for
-patient history/report access, then full workflow hardening.
+on the backend. Backend CI and Docker image build validation are implemented
+through GitHub Actions and `backend/Dockerfile`. The frontend has early auth and
+dashboard pages that are being wired to the backend contracts. The next MVP
+order is frontend integration for patient history/report access, full workflow
+hardening, and keeping the CI evidence green for final submission.
 
 Please stick to the plan of every .md in AGENTS.md and the docs' folder .md (other .md and requirements, u could change for every progress), dont change those .md unless there is something that are genuinely needed a change, like for example the plan on some side does not align with the plant of the other side, which means we need to actually change the base plan, or maybe u can change if if u want to add more information, but dont change the initial plan if not needed
 
