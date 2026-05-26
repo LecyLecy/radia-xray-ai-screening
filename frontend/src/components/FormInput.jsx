@@ -1,4 +1,3 @@
-import React from 'react';
 import './components.css';
 
 export const FormInput = ({ label, type = 'text', name, value, onChange, placeholder, required = false, disabled = false }) => {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table } from '../../components/Table';
 import { StatusBadge } from '../../components/StatusBadge';

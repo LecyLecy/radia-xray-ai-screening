@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card } from '../../components/Card';
 import { Table } from '../../components/Table';
