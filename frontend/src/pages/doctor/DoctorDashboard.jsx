@@ -1,0 +1,96 @@
+import { useEffect, useState } from 'react';
+import { Card } from '../../components/Card';
+import { Table } from '../../components/Table';
+import { StatusBadge } from '../../components/StatusBadge';
+import { getAllPatients, getDoctorExaminations } from '../../services/examinationService';
+import '../styles/doctor.css';
+
+const formatDate = (value) => {
+  if (!value) return '-';
+  return new Date(value).toLocaleDateString();
+};
+
+export default function DoctorDashboard() {
+  const [patients, setPatients] = useState([]);
+  const [examinations, setExaminations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        setIsLoading(true);
+        const [patientRows, examinationRows] = await Promise.all([
+          getAllPatients(),
+          getDoctorExaminations(),
+        ]);
+
+        setPatients(patientRows);
+        setExaminations(examinationRows);
+      } catch (error) {
+        setErrorMessage(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboard();
+  }, []);
+
+  const pendingCount = examinations.filter((exam) => exam.status === 'pending_review').length;
+  const completedCount = examinations.filter((exam) => ['reviewed', 'report_ready'].includes(exam.status)).length;
+  const recentExaminations = examinations.slice(0, 5);
+
+  return (
+    <div className="doctor-panel">
+      <div className="section-title">
+        <h2>Clinical Metrics Dashboard</h2>
+        <p>Overview of current screening queues and workflow logs</p>
+      </div>
+
+      <div className="metrics-grid">
+        <div className="metric-card warning">
+          <span className="metric-label">Awaiting Evaluation</span>
+          <h2 className="metric-value">{pendingCount} Patients</h2>
+        </div>
+        <div className="metric-card primary">
+          <span className="metric-label">Processed Diagnostics</span>
+          <h2 className="metric-value">{completedCount} Cases</h2>
+        </div>
+        <div className="metric-card neutral">
+          <span className="metric-label">Registered Patients</span>
+          <h2 className="metric-value">{patients.length} Profiles</h2>
+        </div>
+      </div>
+
+      <Card title="Active Operational Queue">
+        {isLoading && <p className="empty-text">Loading dashboard data...</p>}
+        {errorMessage && <p className="error-text">{errorMessage}</p>}
+        {!isLoading && !errorMessage && recentExaminations.length === 0 && (
+          <p className="empty-text">No examinations have been created yet.</p>
+        )}
+        {!isLoading && !errorMessage && recentExaminations.length > 0 && (
+          <Table headers={["Exam ID", "Patient Target", "Screening Instance", "System Inference", "Status"]}>
+            {recentExaminations.map((exam) => (
+              <tr key={exam.id}>
+                <td><strong>{exam.id}</strong></td>
+                <td>{exam.patient_name || exam.patient_id}</td>
+                <td>{formatDate(exam.examination_date)}</td>
+                <td>
+                  {exam.prediction_result ? (
+                    <span className={`prediction-text ${exam.prediction_result.toLowerCase()}`}>
+                      {exam.prediction_result} ({exam.confidence_percentage ?? '-'}%)
+                    </span>
+                  ) : (
+                    '-'
+                  )}
+                </td>
+                <td><StatusBadge status={exam.status} /></td>
+              </tr>
+            ))}
+          </Table>
+        )}
+      </Card>
+    </div>
+  );
+}

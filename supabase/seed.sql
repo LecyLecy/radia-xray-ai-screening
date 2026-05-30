@@ -1,0 +1,3 @@
+-- Seed data for local Supabase development.
+-- Keep schema changes in supabase/migrations and use this file only for
+-- repeatable local demo data when the team agrees on safe seed records.

@@ -1,7 +1,12 @@
-from pydantic import BaseModel
+import os
+from dotenv import load_dotenv
 
-class Settings(BaseModel):
-    app_name: str = "Radia"
-    environment: str = "development"
+load_dotenv()
 
-settings = Settings()
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_SECRET_KEY = os.getenv("SUPABASE_SECRET_KEY")
+SUPABASE_PUBLISHABLE_KEY = os.getenv("SUPABASE_PUBLISHABLE_KEY")
+STORAGE_BUCKET_XRAY = os.getenv("STORAGE_BUCKET_XRAY", "xray-images")
+STORAGE_BUCKET_REPORT = os.getenv("STORAGE_BUCKET_REPORT", "pdf-reports")
+
+MAX_XRAY_UPLOAD_BYTES = int(os.getenv("MAX_XRAY_UPLOAD_BYTES", 10 * 1024 * 1024))
