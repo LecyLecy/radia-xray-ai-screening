@@ -13,6 +13,8 @@ Radia currently has backend and frontend CI validation.
 - Workflow names: `Backend CI`, `Frontend CI`
 
 The workflows run on pushes and pull requests to `backend`, `dev`, and `main`, and can also be run manually with `workflow_dispatch`.
+They also run on `frontend-ai` while that branch is used as the frontend
+integration branch.
 
 ## What The Pipeline Checks
 

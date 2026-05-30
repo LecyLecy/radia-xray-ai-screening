@@ -36,22 +36,26 @@ export default function PatientList() {
       {errorMessage && <div style={{ padding: '1rem', color: '#dc2626' }}>{errorMessage}</div>}
 
       {!isLoading && !errorMessage && (
-        <Table headers={['Patient ID', 'Full Name', 'Contact', 'Age', 'Gender', 'Action']}>
-          {patients.map((patient) => (
-            <tr key={patient.id}>
-              <td><strong>{patient.id}</strong></td>
-              <td>{patient.full_name}</td>
-              <td>{patient.phone_number || '-'}</td>
-              <td>{patient.age ?? '-'}</td>
-              <td>{patient.gender || '-'}</td>
-              <td>
-                <Button variant="primary" onClick={() => navigate(`/doctor/patient/${patient.id}`)}>
-                  Open Medical File
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </Table>
+        patients.length > 0 ? (
+          <Table headers={['Patient ID', 'Full Name', 'Contact', 'Age', 'Gender', 'Action']}>
+            {patients.map((patient) => (
+              <tr key={patient.id}>
+                <td><strong>{patient.id}</strong></td>
+                <td>{patient.full_name}</td>
+                <td>{patient.phone_number || '-'}</td>
+                <td>{patient.age ?? '-'}</td>
+                <td>{patient.gender || '-'}</td>
+                <td>
+                  <Button variant="primary" onClick={() => navigate(`/doctor/patient/${patient.id}`)}>
+                    Open Medical File
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </Table>
+        ) : (
+          <p className="empty-text">No patient profiles are available yet.</p>
+        )
       )}
     </div>
   );

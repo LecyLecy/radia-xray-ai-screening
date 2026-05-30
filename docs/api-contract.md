@@ -389,6 +389,48 @@ Expected errors:
 - `403`: authenticated user is not doctor/admin.
 - `404`: patient was not found.
 
+### `GET /doctor/examinations`
+
+Returns recent examination summary rows for doctor/admin dashboard screens.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Success response:
+
+```json
+[
+  {
+    "id": "examination_uuid",
+    "patient_id": "patient_profile_uuid",
+    "patient_name": "Patient Name",
+    "examination_date": "2026-05-23T07:54:03Z",
+    "status": "report_ready",
+    "prediction_result": "Normal",
+    "confidence_percentage": 74,
+    "report_id": "report_uuid"
+  }
+]
+```
+
+Nullable fields:
+
+```text
+patient_name
+prediction_result
+confidence_percentage
+report_id
+```
+
+Expected errors:
+
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not doctor/admin.
+- `500`: examination summary data could not be loaded.
+
 ### `POST /doctor/examinations`
 
 Creates a new examination record for a patient.
@@ -718,6 +760,5 @@ demo/security hardening.
 ## Current Limitations
 
 - Doctor/admin creation endpoints are not implemented yet.
-- Full role-based authorization beyond the current patient and doctor/admin
-  checks is not implemented yet.
-- Frontend patient history/report integration is not implemented yet.
+- Admin CRUD endpoints and admin UI are not implemented yet.
+- Real AI model inference and Grad-CAM remain future work; current stored predictions are mock AI results.

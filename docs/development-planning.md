@@ -142,12 +142,15 @@ Current backend progress snapshot:
    9. Doctor note and AI feedback persistence
    10. PDF report generation and signed download access
    11. Patient-owned examination history and detail report access endpoints
+   12. Frontend auth form integration with backend endpoints
+   13. Frontend patient dashboard, history, detail, and report download integration
+   14. Frontend doctor dashboard, patient list/detail, screening, review, and report generation integration
 2. In Progress
-   1. Frontend auth form integration with backend endpoints
-   2. Frontend dashboard integration with patient and doctor workflow endpoints
+   1. Full browser demo workflow testing
+   2. Documentation cleanup for final submission screenshots and demo runbook
 3. Next
-   1. Frontend patient examination history and patient report access integration
-   2. Full demo workflow testing
+   1. Merge `frontend-ai` into `dev` after CI and browser smoke testing
+   2. Decide whether admin stays future work or gets a minimal read-only demo page
 
 1. Priority 1
 

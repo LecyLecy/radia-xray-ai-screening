@@ -18,6 +18,15 @@ export const getDoctorPatient = async (patientId) => {
   }
 };
 
+export const getDoctorExaminations = async () => {
+  try {
+    const response = await api.get('/doctor/examinations');
+    return response.data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, 'Failed to load examination queue.'), { cause: error });
+  }
+};
+
 export const createExamination = async (patientId) => {
   try {
     const response = await api.post('/doctor/examinations', { patient_id: patientId });

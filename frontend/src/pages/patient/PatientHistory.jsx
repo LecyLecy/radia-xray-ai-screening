@@ -42,30 +42,34 @@ export default function PatientHistory() {
       {errorMessage && <div className="p-4" style={{ color: '#dc2626' }}>{errorMessage}</div>}
 
       {!isLoading && !errorMessage && (
-        <Table headers={['Exam ID', 'Date Checked', 'Radiologist', 'AI Assessment', 'Status', 'Actions']}>
-          {records.map((record) => (
-            <tr key={record.id}>
-              <td><strong>{record.id}</strong></td>
-              <td>{formatDate(record.examination_date)}</td>
-              <td>{record.doctor_name || '-'}</td>
-              <td>
-                {record.prediction_result ? (
-                  <span className={`prediction-text ${record.prediction_result.toLowerCase()}`}>
-                    {record.prediction_result} ({record.confidence_percentage ?? '-'}%)
-                  </span>
-                ) : (
-                  '-'
-                )}
-              </td>
-              <td><StatusBadge status={record.status} /></td>
-              <td>
-                <Button variant="secondary" onClick={() => navigate(`/patient/examination/${record.id}`)}>
-                  View Details
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </Table>
+        records.length > 0 ? (
+          <Table headers={['Exam ID', 'Date Checked', 'Radiologist', 'AI Assessment', 'Status', 'Actions']}>
+            {records.map((record) => (
+              <tr key={record.id}>
+                <td><strong>{record.id}</strong></td>
+                <td>{formatDate(record.examination_date)}</td>
+                <td>{record.doctor_name || '-'}</td>
+                <td>
+                  {record.prediction_result ? (
+                    <span className={`prediction-text ${record.prediction_result.toLowerCase()}`}>
+                      {record.prediction_result} ({record.confidence_percentage ?? '-'}%)
+                    </span>
+                  ) : (
+                    '-'
+                  )}
+                </td>
+                <td><StatusBadge status={record.status} /></td>
+                <td>
+                  <Button variant="secondary" onClick={() => navigate(`/patient/examination/${record.id}`)}>
+                    View Details
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </Table>
+        ) : (
+          <p className="empty-text">No examinations have been assigned to your profile yet.</p>
+        )
       )}
     </div>
   );

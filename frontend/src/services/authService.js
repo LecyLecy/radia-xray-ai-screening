@@ -26,6 +26,15 @@ export const registerPatient = async (payload) => {
   }
 };
 
+export const getCurrentPatientProfile = async () => {
+  try {
+    const response = await api.get('/patients/me');
+    return response.data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, 'Failed to load patient profile.'), { cause: error });
+  }
+};
+
 export const logoutUser = () => {
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');

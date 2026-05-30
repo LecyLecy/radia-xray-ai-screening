@@ -14,6 +14,25 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const hasToken = Boolean(localStorage.getItem('access_token'));
+    const isLoginRequest = error.config?.url?.includes('/auth/login');
+
+    if (error.response?.status === 401 && hasToken && !isLoginRequest) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userEmail');
+      window.location.assign('/login');
+    }
+
+    return Promise.reject(error);
+  },
+);
+
 export const getApiErrorMessage = (error, fallbackMessage) => {
   const detail = error.response?.data?.detail;
 

@@ -5,6 +5,7 @@ import {
   createExamination,
   generateReport,
   getDoctorPatient,
+  getReportDownload,
   predictExamination,
   saveDoctorFeedback,
   updateDoctorNote,
@@ -26,6 +27,7 @@ export default function DoctorPatientDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [isScreening, setIsScreening] = useState(false);
   const [isSavingReview, setIsSavingReview] = useState(false);
+  const [isDownloadingReport, setIsDownloadingReport] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
@@ -49,6 +51,16 @@ export default function DoctorPatientDetail() {
     const file = event.target.files?.[0];
 
     if (!file) return;
+
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      setErrorMessage('Only JPG and PNG X-Ray images are supported.');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setErrorMessage('X-Ray image must be 10 MB or smaller.');
+      return;
+    }
 
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
@@ -75,6 +87,22 @@ export default function DoctorPatientDetail() {
       setErrorMessage(error.message);
     } finally {
       setIsScreening(false);
+    }
+  };
+
+  const handleOpenReport = async () => {
+    if (!report?.id) return;
+
+    setIsDownloadingReport(true);
+    setErrorMessage('');
+
+    try {
+      const download = await getReportDownload(report.id);
+      window.open(download.download_url, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setIsDownloadingReport(false);
     }
   };
 
@@ -250,9 +278,17 @@ export default function DoctorPatientDetail() {
             </div>
 
             {report && (
-              <p style={{ marginTop: '1rem', color: '#059669', fontWeight: 600 }}>
-                Report ready: {report.id}
-              </p>
+              <div style={{ marginTop: '1rem', color: '#059669', fontWeight: 600 }}>
+                <p>Report ready: {report.id}</p>
+                <Button
+                  variant="secondary"
+                  onClick={handleOpenReport}
+                  disabled={isDownloadingReport}
+                  style={{ marginTop: '0.75rem', width: '100%' }}
+                >
+                  {isDownloadingReport ? 'Preparing Report...' : 'Open Generated PDF'}
+                </Button>
+              </div>
             )}
           </div>
         </div>

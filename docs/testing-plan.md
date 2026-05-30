@@ -235,8 +235,10 @@ foundation.
 | Doctor access control | Patient token is rejected from doctor endpoints with `403` | Passed |
 | Doctor patient list | Doctor token can read `GET /doctor/patients` | Passed |
 | Doctor patient detail | Doctor token can read `GET /doctor/patients/{patient_id}` | Passed |
+| Doctor examination summary | Doctor token can read `GET /doctor/examinations` for dashboard data | Not Tested |
 | Examination creation | Doctor token can create `POST /doctor/examinations` | Passed |
 | Backend syntax | `python -m compileall app` passes | Passed |
+| Frontend CI | GitHub Actions validates frontend lint and build | Passed on latest pushed `frontend-ai` before current changes |
 
 # Testing Log Format for Google Sheets
 

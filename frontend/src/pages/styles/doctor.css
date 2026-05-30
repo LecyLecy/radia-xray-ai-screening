@@ -1,7 +1,8 @@
-.metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+.metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
 .metric-card { padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); background: white; }
 .metric-card.warning { border-left: 4px solid var(--warning-text); }
 .metric-card.primary { border-left: 4px solid var(--primary-color); }
+.metric-card.neutral { border-left: 4px solid #64748b; }
 .metric-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
 .metric-value { font-size: 1.75rem; color: var(--text-main); margin-top: 0.5rem; }
 
@@ -33,6 +34,7 @@
 .decision-row button { flex: 1; font-size: 0.8rem; padding: 0.5rem; }
 
 .empty-text { font-size: 0.9rem; color: var(--text-muted); text-align: center; padding: 2rem 0; }
+.error-text { font-size: 0.9rem; color: var(--danger-text); background: var(--danger-bg); padding: 1rem; border-radius: 6px; }
 
 @media (max-width: 992px) {
   .metrics-grid {

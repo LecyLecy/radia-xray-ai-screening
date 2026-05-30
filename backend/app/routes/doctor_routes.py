@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.schemas.examination_schema import (
     CreateExaminationRequest,
+    DoctorExaminationSummary,
     DoctorFeedbackRequest,
     DoctorFeedbackResponse,
     ExaminationResponse,
@@ -13,6 +14,7 @@ from app.services.examination_service import (
     ExaminationServiceError,
     create_examination,
     get_patient_by_id,
+    list_doctor_examinations,
     list_patients,
     save_doctor_feedback,
     update_doctor_note,
@@ -57,6 +59,19 @@ def get_doctor_patient_detail(
 ) -> PatientProfileResponse:
     try:
         return get_patient_by_id(patient_id)
+    except ExaminationServiceError as error:
+        raise HTTPException(
+            status_code=error.status_code,
+            detail=error.message,
+        ) from error
+
+
+@router.get("/examinations", response_model=list[DoctorExaminationSummary])
+def get_doctor_examinations(
+    _: CurrentUserResponse = Depends(require_doctor_or_admin),
+) -> list[DoctorExaminationSummary]:
+    try:
+        return list_doctor_examinations()
     except ExaminationServiceError as error:
         raise HTTPException(
             status_code=error.status_code,

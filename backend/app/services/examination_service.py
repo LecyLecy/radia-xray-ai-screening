@@ -5,6 +5,7 @@ from postgrest.exceptions import APIError
 
 from app.schemas.examination_schema import (
     CreateExaminationRequest,
+    DoctorExaminationSummary,
     DoctorFeedbackRequest,
     DoctorFeedbackResponse,
     ExaminationResponse,
@@ -238,6 +239,71 @@ def _doctor_profiles_by_id(doctor_ids: list[str]) -> dict[str, dict]:
         ) from error
 
     return {row["id"]: row for row in response.data or []}
+
+
+def _patient_profiles_by_id(patient_ids: list[str]) -> dict[str, dict]:
+    if not patient_ids:
+        return {}
+
+    supabase = get_supabase_client()
+    try:
+        response = (
+            supabase.table("patient_profiles")
+            .select("id,full_name")
+            .in_("id", patient_ids)
+            .execute()
+        )
+    except Exception as error:
+        raise ExaminationServiceError(
+            message=_read_error_message(error) or "Patient profiles could not be loaded.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    return {row["id"]: row for row in response.data or []}
+
+
+def list_doctor_examinations() -> list[DoctorExaminationSummary]:
+    supabase = get_supabase_client()
+
+    try:
+        response = (
+            supabase.table("examinations")
+            .select("*")
+            .order("examination_date", desc=True)
+            .execute()
+        )
+    except Exception as error:
+        raise ExaminationServiceError(
+            message=_read_error_message(error) or "Examinations could not be loaded.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    examinations = response.data or []
+    examination_ids = [row["id"] for row in examinations]
+    patient_ids = list({row["patient_id"] for row in examinations if row.get("patient_id")})
+    patients = _patient_profiles_by_id(patient_ids)
+    predictions = _latest_related_rows("ai_predictions", examination_ids, "created_at")
+    reports = _latest_related_rows("pdf_reports", examination_ids, "generated_at")
+
+    return [
+        DoctorExaminationSummary(
+            id=examination["id"],
+            patient_id=examination["patient_id"],
+            patient_name=patients.get(examination.get("patient_id") or "", {}).get(
+                "full_name"
+            ),
+            examination_date=examination["examination_date"],
+            status=examination["status"],
+            prediction_result=predictions.get(examination["id"], {}).get(
+                "prediction_result"
+            ),
+            confidence_percentage=predictions.get(examination["id"], {}).get(
+                "confidence_percentage"
+            ),
+            report_id=reports.get(examination["id"], {}).get("id"),
+        )
+        for examination in examinations
+    ]
 
 
 def list_current_patient_examinations(
