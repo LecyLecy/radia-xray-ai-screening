@@ -22,3 +22,5 @@ reports
 *.h5
 
 model.pth.tar
+
+AGENTS.md
