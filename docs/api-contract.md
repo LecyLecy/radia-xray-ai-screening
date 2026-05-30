@@ -61,7 +61,8 @@ Request:
   "phone_number": "08123456789",
   "age": 30,
   "gender": "male",
-  "profile_picture_url": null
+  "profile_picture_url": "auth_user_uuid/20260531120000_uuid_profile.png",
+  "profile_picture_download_url": "https://..."
 }
 ```
 
@@ -184,6 +185,67 @@ Frontend notes:
 
 - Use this endpoint for patient dashboard/profile header data.
 - Do not pass patient id from frontend for the current user's own profile.
+- `profile_picture_url` is a private storage object path.
+- `profile_picture_download_url` is a temporary signed URL and may be `null`.
+
+### `PATCH /patients/me`
+
+Updates the current logged-in patient's editable profile fields. Email remains
+read-only because it belongs to the Supabase Auth identity.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+Request:
+
+```json
+{
+  "full_name": "Patient Name",
+  "phone_number": "08123456789",
+  "age": 30,
+  "gender": "male"
+}
+```
+
+Success response uses the same shape as `GET /patients/me`.
+
+Expected errors:
+
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not a patient.
+- `404`: patient profile row is missing.
+- `422`: missing or invalid editable field.
+- `500`: profile data could not be updated.
+
+### `POST /patients/me/profile-picture`
+
+Uploads the current logged-in patient's profile picture to the private
+`profile-pictures` Supabase Storage bucket and saves the object path in
+`patient_profiles.profile_picture_url`.
+
+Request:
+
+```text
+Content-Type: multipart/form-data
+field: profile_picture
+allowed file types: JPG, PNG, WEBP
+maximum file size: 2 MB
+```
+
+Success response uses the same shape as `GET /patients/me`.
+
+Expected errors:
+
+- `400`: unsupported file type or empty upload.
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not a patient.
+- `413`: file exceeds the 2 MB upload limit.
+- `422`: missing `profile_picture` form field.
+- `500`: profile picture could not be uploaded or saved.
 
 ### `GET /patients/me/examinations`
 

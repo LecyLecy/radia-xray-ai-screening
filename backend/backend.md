@@ -65,6 +65,8 @@ the expected file size and MIME type rules are visible in code.
 - `POST /auth/register/patient` creates a Supabase Auth user, a `profiles` row, and a `patient_profiles` row.
 - `POST /auth/login` signs in a user and returns session tokens with the role from `profiles`.
 - `GET /patients/me` returns the current authenticated patient's profile.
+- `PATCH /patients/me` updates the current authenticated patient's editable profile fields.
+- `POST /patients/me/profile-picture` uploads a JPG/PNG/WEBP profile picture up to 2 MB and saves the private storage path.
 - `GET /doctor/patients` lists patient profiles for authenticated doctor/admin users.
 - `GET /doctor/patients/{patient_id}` returns one patient profile by `patient_profiles.id`.
 - `GET /doctor/examinations` returns recent examination summary rows for doctor/admin dashboards.

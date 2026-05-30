@@ -136,15 +136,16 @@ Current backend progress snapshot:
    3. Supabase connection test endpoint
    4. Patient registration and login backend auth foundation
    5. Current patient profile endpoint
-   6. Doctor/admin patient list and examination creation endpoints
-   7. Mock AI prediction endpoints
-   8. Doctor workflow X-Ray upload storage and mock AI prediction persistence
-   9. Doctor note and AI feedback persistence
-   10. PDF report generation and signed download access
-   11. Patient-owned examination history and detail report access endpoints
-   12. Frontend auth form integration with backend endpoints
-   13. Frontend patient dashboard, history, detail, and report download integration
-   14. Frontend doctor dashboard, patient list/detail, screening, review, and report generation integration
+   6. Patient profile editing and profile picture upload endpoint
+   7. Doctor/admin patient list and examination creation endpoints
+   8. Mock AI prediction endpoints
+   9. Doctor workflow X-Ray upload storage and mock AI prediction persistence
+   10. Doctor note and AI feedback persistence
+   11. PDF report generation and signed download access
+   12. Patient-owned examination history and detail report access endpoints
+   13. Frontend auth form integration with backend endpoints
+   14. Frontend patient dashboard, profile edit, history, detail, and report download integration
+   15. Frontend doctor dashboard, patient list/detail, screening, review, and report generation integration
 2. In Progress
    1. Full browser demo workflow testing
    2. Documentation cleanup for final submission screenshots and demo runbook

@@ -231,6 +231,8 @@ foundation.
 | Patient auth | Patient registration creates auth, `profiles`, and `patient_profiles` rows | Passed |
 | Login | Login returns access token, refresh token, and role | Passed |
 | Patient profile | `GET /patients/me` returns current patient profile with bearer token | Passed |
+| Patient profile edit | `PATCH /patients/me` updates full name, phone, age, and gender | Not Tested |
+| Patient profile picture | `POST /patients/me/profile-picture` uploads JPG/PNG/WEBP up to 2 MB | Not Tested |
 | Patient access control | Missing/malformed token is rejected for protected patient route | Passed |
 | Doctor access control | Patient token is rejected from doctor endpoints with `403` | Passed |
 | Doctor patient list | Doctor token can read `GET /doctor/patients` | Passed |

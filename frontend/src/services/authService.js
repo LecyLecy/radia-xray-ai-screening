@@ -35,6 +35,29 @@ export const getCurrentPatientProfile = async () => {
   }
 };
 
+export const updateCurrentPatientProfile = async (payload) => {
+  try {
+    const response = await api.patch('/patients/me', payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, 'Failed to update patient profile.'), { cause: error });
+  }
+};
+
+export const uploadCurrentPatientProfilePicture = async (profilePicture) => {
+  try {
+    const formData = new FormData();
+    formData.append('profile_picture', profilePicture);
+
+    const response = await api.post('/patients/me/profile-picture', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, 'Failed to upload profile picture.'), { cause: error });
+  }
+};
+
 export const logoutUser = () => {
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');

@@ -2,16 +2,32 @@ import { useEffect, useState } from 'react';
 import { Card } from '../../components/Card';
 import { FormInput } from '../../components/FormInput';
 import { StatusBadge } from '../../components/StatusBadge';
-import { getCurrentPatientProfile } from '../../services/authService';
+import { Button } from '../../components/Button';
+import {
+  getCurrentPatientProfile,
+  updateCurrentPatientProfile,
+  uploadCurrentPatientProfilePicture,
+} from '../../services/authService';
 import { getMyExaminations } from '../../services/examinationService';
 import '../styles/patient.css';
 
+const emptyProfileForm = {
+  full_name: '',
+  phone_number: '',
+  age: '',
+  gender: '',
+};
+
 export default function PatientDashboard() {
   const [profile, setProfile] = useState(null);
+  const [profileForm, setProfileForm] = useState(emptyProfileForm);
   const [examinations, setExaminations] = useState([]);
   const [avatarPreview, setAvatarPreview] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isUploadingPicture, setIsUploadingPicture] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -23,8 +39,14 @@ export default function PatientDashboard() {
         ]);
 
         setProfile(profileData);
+        setProfileForm({
+          full_name: profileData.full_name || '',
+          phone_number: profileData.phone_number || '',
+          age: profileData.age ?? '',
+          gender: profileData.gender || '',
+        });
         setExaminations(examinationRows);
-        setAvatarPreview(profileData.profile_picture_url || '');
+        setAvatarPreview(profileData.profile_picture_download_url || '');
       } catch (error) {
         setErrorMessage(error.message);
       } finally {
@@ -35,10 +57,78 @@ export default function PatientDashboard() {
     fetchDashboard();
   }, []);
 
-  const handleAvatarChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const fileUrl = URL.createObjectURL(e.target.files[0]);
-      setAvatarPreview(fileUrl);
+  const handleProfileInputChange = (event) => {
+    const { name, value } = event.target;
+    setProfileForm((currentForm) => ({
+      ...currentForm,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveProfile = async () => {
+    if (!profileForm.full_name.trim()) {
+      setErrorMessage('Full name is required.');
+      return;
+    }
+
+    setIsSavingProfile(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    try {
+      const updatedProfile = await updateCurrentPatientProfile({
+        full_name: profileForm.full_name.trim(),
+        phone_number: profileForm.phone_number.trim() || null,
+        age: profileForm.age === '' ? null : Number(profileForm.age),
+        gender: profileForm.gender || null,
+      });
+
+      setProfile(updatedProfile);
+      setProfileForm({
+        full_name: updatedProfile.full_name || '',
+        phone_number: updatedProfile.phone_number || '',
+        age: updatedProfile.age ?? '',
+        gender: updatedProfile.gender || '',
+      });
+      setAvatarPreview(updatedProfile.profile_picture_download_url || avatarPreview);
+      setSuccessMessage('Profile updated successfully.');
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const handleAvatarChange = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setErrorMessage('Only JPG, PNG, and WEBP profile pictures are supported.');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setErrorMessage('Profile picture must be 2 MB or smaller.');
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarPreview(previewUrl);
+    setIsUploadingPicture(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    try {
+      const updatedProfile = await uploadCurrentPatientProfilePicture(file);
+      setProfile(updatedProfile);
+      setAvatarPreview(updatedProfile.profile_picture_download_url || previewUrl);
+      setSuccessMessage('Profile picture uploaded successfully.');
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setIsUploadingPicture(false);
+      event.target.value = '';
     }
   };
 
@@ -59,6 +149,9 @@ export default function PatientDashboard() {
         <p>Manage your account settings and credentials</p>
       </div>
 
+      {errorMessage && <p className="error-text">{errorMessage}</p>}
+      {successMessage && <p className="success-text">{successMessage}</p>}
+
       <div className="grid-profile">
         <Card title="Profile Picture">
           <div className="avatar-upload-block">
@@ -71,21 +164,69 @@ export default function PatientDashboard() {
             )}
             <div className="upload-action-box">
               <label className="file-upload-label">
-                Preview New Image
-                <input type="file" accept="image/*" onChange={handleAvatarChange} />
+                {isUploadingPicture ? 'Uploading...' : 'Upload New Image'}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleAvatarChange}
+                  disabled={isUploadingPicture}
+                />
               </label>
-              <p className="upload-tip">Preview only. Upload persistence is future work.</p>
+              <p className="upload-tip">Supports JPG, PNG, or WEBP. Max 2 MB.</p>
+              {profile.profile_picture_url && (
+                <p className="upload-tip">Stored path: {profile.profile_picture_url}</p>
+              )}
             </div>
           </div>
         </Card>
 
         <Card title="Personal Information">
           <div className="form-info-grid">
-            <FormInput label="Full Name" value={profile.full_name || ''} disabled />
+            <FormInput
+              label="Full Name"
+              name="full_name"
+              value={profileForm.full_name}
+              onChange={handleProfileInputChange}
+              required
+            />
             <FormInput label="Email Address" value={profile.email || ''} disabled />
-            <FormInput label="Phone Number" value={profile.phone_number || ''} disabled />
-            <FormInput label="Age" value={profile.age ?? ''} disabled />
-            <FormInput label="Gender" value={profile.gender || ''} disabled />
+            <FormInput
+              label="Phone Number"
+              name="phone_number"
+              value={profileForm.phone_number}
+              onChange={handleProfileInputChange}
+              placeholder="08123456789"
+            />
+            <FormInput
+              label="Age"
+              type="number"
+              name="age"
+              value={profileForm.age}
+              onChange={handleProfileInputChange}
+              placeholder="30"
+            />
+            <div className="radia-form-group">
+              <label className="radia-label">Gender</label>
+              <select
+                className="radia-input"
+                name="gender"
+                value={profileForm.gender}
+                onChange={handleProfileInputChange}
+              >
+                <option value="">Not set</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+          </div>
+          <div className="profile-actions">
+            <Button
+              variant="primary"
+              onClick={handleSaveProfile}
+              disabled={isSavingProfile}
+            >
+              {isSavingProfile ? 'Saving Profile...' : 'Save Profile'}
+            </Button>
           </div>
         </Card>
 

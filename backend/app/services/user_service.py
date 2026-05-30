@@ -1,8 +1,20 @@
 from fastapi import status
 from postgrest.exceptions import APIError
 
-from app.schemas.user_schema import CurrentUserResponse, PatientProfileResponse
+from fastapi import UploadFile
+
+from app.schemas.user_schema import (
+    CurrentUserResponse,
+    PatientProfileResponse,
+    UpdatePatientProfileRequest,
+)
 from app.services.supabase_service import get_supabase_client
+from app.services.storage_service import (
+    StorageServiceError,
+    create_profile_picture_signed_url,
+    read_valid_profile_picture_upload,
+    upload_profile_picture,
+)
 
 
 class UserServiceError(Exception):
@@ -80,7 +92,125 @@ def get_patient_profile(auth_user: CurrentUserResponse) -> PatientProfileRespons
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    return PatientProfileResponse(**response.data)
+    return _to_patient_profile_response(response.data)
+
+
+def _to_patient_profile_response(row: dict) -> PatientProfileResponse:
+    return PatientProfileResponse(
+        **row,
+        profile_picture_download_url=create_profile_picture_signed_url(
+            row.get("profile_picture_url")
+        ),
+    )
+
+
+def _get_current_patient_profile_row(auth_user: CurrentUserResponse) -> dict:
+    current_user = get_current_user_with_role(auth_user)
+    if current_user.role != "patient":
+        raise UserServiceError(
+            message="Only patient users can access this profile endpoint.",
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    supabase = get_supabase_client()
+    try:
+        response = (
+            supabase.table("patient_profiles")
+            .select(
+                "id,user_id,email,full_name,phone_number,age,gender,profile_picture_url"
+            )
+            .eq("user_id", current_user.user_id)
+            .single()
+            .execute()
+        )
+    except Exception as error:
+        raise UserServiceError(
+            message=_read_error_message(error) or "Patient profile was not found.",
+            status_code=status.HTTP_404_NOT_FOUND,
+        ) from error
+
+    if not response.data:
+        raise UserServiceError(
+            message="Patient profile was not found.",
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    return response.data
+
+
+def update_patient_profile(
+    auth_user: CurrentUserResponse,
+    payload: UpdatePatientProfileRequest,
+) -> PatientProfileResponse:
+    current_profile = _get_current_patient_profile_row(auth_user)
+    supabase = get_supabase_client()
+
+    update_row = {
+        "full_name": payload.full_name,
+        "phone_number": payload.phone_number,
+        "age": payload.age,
+        "gender": payload.gender,
+    }
+
+    try:
+        response = (
+            supabase.table("patient_profiles")
+            .update(update_row)
+            .eq("id", current_profile["id"])
+            .execute()
+        )
+    except Exception as error:
+        raise UserServiceError(
+            message=_read_error_message(error) or "Patient profile could not be updated.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    if not response.data:
+        raise UserServiceError(
+            message="Patient profile could not be updated.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    return _to_patient_profile_response(response.data[0])
+
+
+async def update_patient_profile_picture(
+    auth_user: CurrentUserResponse,
+    profile_picture: UploadFile,
+) -> PatientProfileResponse:
+    current_profile = _get_current_patient_profile_row(auth_user)
+
+    try:
+        upload_data = await read_valid_profile_picture_upload(profile_picture)
+        profile_picture_url = upload_profile_picture(auth_user.user_id, upload_data)
+    except StorageServiceError as error:
+        raise UserServiceError(
+            message=error.message,
+            status_code=error.status_code,
+        ) from error
+
+    supabase = get_supabase_client()
+    try:
+        response = (
+            supabase.table("patient_profiles")
+            .update({"profile_picture_url": profile_picture_url})
+            .eq("id", current_profile["id"])
+            .execute()
+        )
+    except Exception as error:
+        raise UserServiceError(
+            message=_read_error_message(error)
+            or "Patient profile picture could not be saved.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    if not response.data:
+        raise UserServiceError(
+            message="Patient profile picture could not be saved.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    return _to_patient_profile_response(response.data[0])
 
 
 def require_role(
