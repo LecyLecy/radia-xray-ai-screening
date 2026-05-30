@@ -25,3 +25,5 @@ model.pth.tar
 
 # Supabase local CLI cache/link metadata
 supabase/.temp
+
+AGENTS.md
