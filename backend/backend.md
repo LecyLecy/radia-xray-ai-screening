@@ -67,6 +67,7 @@ the expected file size and MIME type rules are visible in code.
 - `GET /patients/me` returns the current authenticated patient's profile.
 - `GET /doctor/patients` lists patient profiles for authenticated doctor/admin users.
 - `GET /doctor/patients/{patient_id}` returns one patient profile by `patient_profiles.id`.
+- `GET /doctor/examinations` returns recent examination summary rows for doctor/admin dashboards.
 - `POST /doctor/examinations` creates an examination row for a selected patient.
 - `PATCH /doctor/examinations/{examination_id}/note` saves the doctor's clinical note.
 - `PATCH /doctor/examinations/{examination_id}/feedback` saves AI validation feedback and marks the examination reviewed.
@@ -79,8 +80,7 @@ the expected file size and MIME type rules are visible in code.
 
 ## Current Limitations
 
-- Frontend auth forms are still being connected to backend auth endpoints.
 - Doctor/admin accounts are still created manually in Supabase for MVP testing.
-- Patient history frontend integration is still planned on the frontend branch.
 - Real AI model inference is still planned; the workflow endpoint currently persists mock AI predictions.
-- Current DevOps setup validates backend compile and Docker build only; it does not deploy or push Docker images yet.
+- Admin CRUD endpoints and admin UI are future work unless the final demo explicitly requires them.
+- Current DevOps setup validates backend compile, frontend lint/build, and backend Docker build only; it does not deploy or push Docker images yet.

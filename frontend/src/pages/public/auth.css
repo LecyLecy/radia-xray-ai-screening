@@ -61,4 +61,10 @@
   color: var(--primary-color);
   font-weight: 600;
 }
+.auth-error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  text-align: center;
+}
 .w-full { width: 100%; }

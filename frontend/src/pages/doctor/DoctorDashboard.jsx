@@ -1,12 +1,45 @@
+import { useEffect, useState } from 'react';
 import { Card } from '../../components/Card';
 import { Table } from '../../components/Table';
 import { StatusBadge } from '../../components/StatusBadge';
-import { mockExaminations } from '../../data/mockData';
+import { getAllPatients, getDoctorExaminations } from '../../services/examinationService';
 import '../styles/doctor.css';
 
+const formatDate = (value) => {
+  if (!value) return '-';
+  return new Date(value).toLocaleDateString();
+};
+
 export default function DoctorDashboard() {
-  const pendingCount = mockExaminations.filter(e => e.status === 'Pending Review').length;
-  const reviewedCount = mockExaminations.filter(e => e.status === 'Reviewed' || e.status === 'Report Ready').length;
+  const [patients, setPatients] = useState([]);
+  const [examinations, setExaminations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        setIsLoading(true);
+        const [patientRows, examinationRows] = await Promise.all([
+          getAllPatients(),
+          getDoctorExaminations(),
+        ]);
+
+        setPatients(patientRows);
+        setExaminations(examinationRows);
+      } catch (error) {
+        setErrorMessage(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboard();
+  }, []);
+
+  const pendingCount = examinations.filter((exam) => exam.status === 'pending_review').length;
+  const completedCount = examinations.filter((exam) => ['reviewed', 'report_ready'].includes(exam.status)).length;
+  const recentExaminations = examinations.slice(0, 5);
 
   return (
     <div className="doctor-panel">
@@ -22,26 +55,41 @@ export default function DoctorDashboard() {
         </div>
         <div className="metric-card primary">
           <span className="metric-label">Processed Diagnostics</span>
-          <h2 className="metric-value">{reviewedCount} Cases</h2>
+          <h2 className="metric-value">{completedCount} Cases</h2>
+        </div>
+        <div className="metric-card neutral">
+          <span className="metric-label">Registered Patients</span>
+          <h2 className="metric-value">{patients.length} Profiles</h2>
         </div>
       </div>
 
       <Card title="Active Operational Queue">
-        <Table headers={["Exam ID", "Patient Target", "Screening Instance", "System Inference", "Status"]}>
-          {mockExaminations.map((e) => (
-            <tr key={e.id}>
-              <td><strong>{e.id}</strong></td>
-              <td>{e.patientName}</td>
-              <td>{e.date}</td>
-              <td>
-                <span className={`prediction-text ${e.predictionResult.toLowerCase()}`}>
-                  {e.predictionResult} ({e.confidenceScore}%)
-                </span>
-              </td>
-              <td><StatusBadge status={e.status} /></td>
-            </tr>
-          ))}
-        </Table>
+        {isLoading && <p className="empty-text">Loading dashboard data...</p>}
+        {errorMessage && <p className="error-text">{errorMessage}</p>}
+        {!isLoading && !errorMessage && recentExaminations.length === 0 && (
+          <p className="empty-text">No examinations have been created yet.</p>
+        )}
+        {!isLoading && !errorMessage && recentExaminations.length > 0 && (
+          <Table headers={["Exam ID", "Patient Target", "Screening Instance", "System Inference", "Status"]}>
+            {recentExaminations.map((exam) => (
+              <tr key={exam.id}>
+                <td><strong>{exam.id}</strong></td>
+                <td>{exam.patient_name || exam.patient_id}</td>
+                <td>{formatDate(exam.examination_date)}</td>
+                <td>
+                  {exam.prediction_result ? (
+                    <span className={`prediction-text ${exam.prediction_result.toLowerCase()}`}>
+                      {exam.prediction_result} ({exam.confidence_percentage ?? '-'}%)
+                    </span>
+                  ) : (
+                    '-'
+                  )}
+                </td>
+                <td><StatusBadge status={exam.status} /></td>
+              </tr>
+            ))}
+          </Table>
+        )}
       </Card>
     </div>
   );

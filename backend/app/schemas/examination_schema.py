@@ -67,6 +67,17 @@ class PatientExaminationHistoryItem(BaseModel):
     report_id: str | None = None
 
 
+class DoctorExaminationSummary(BaseModel):
+    id: str
+    patient_id: str
+    patient_name: str | None = None
+    examination_date: datetime
+    status: ExaminationStatus
+    prediction_result: PredictionResult | None = None
+    confidence_percentage: int | None = Field(default=None, ge=0, le=100)
+    report_id: str | None = None
+
+
 class PatientDoctorSummary(BaseModel):
     id: str
     full_name: str | None = None

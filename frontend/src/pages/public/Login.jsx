@@ -3,25 +3,36 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Card } from '../../components/Card';
 import { FormInput } from '../../components/FormInput';
 import { Button } from '../../components/Button';
+import { loginUser } from '../../services/authService';
 import './auth.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('patient'); // default role selector
+  const [role, setRole] = useState('patient');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (email && password) {
-      localStorage.setItem('userRole', role);
-      localStorage.setItem('userId', role === 'doctor' ? 'D001' : 'P001');
-      
-      if (role === 'doctor') {
+
+    setIsSubmitting(true);
+    setErrorMessage('');
+
+    try {
+      const session = await loginUser(email, password);
+      const actualRole = session.user.role;
+
+      if (actualRole === 'doctor' || actualRole === 'admin') {
         navigate('/doctor/dashboard');
       } else {
         navigate('/patient/dashboard');
       }
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -62,7 +73,10 @@ export default function Login() {
               required
             />
             
-            <Button type="submit" variant="primary" className="w-full">Sign In</Button>
+            <Button type="submit" variant="primary" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? 'Signing In...' : 'Sign In'}
+            </Button>
+            {errorMessage && <p className="auth-error">{errorMessage}</p>}
           </form>
           {role === 'patient' && (
             <div className="auth-redirect">
