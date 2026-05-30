@@ -12,6 +12,7 @@ This repository is prepared for the Software Engineering AOL project and Git ver
 - Database and storage integration
 - PDF report generation
 - Project documentation
+- Backend CI pipeline and Docker image build
 
 ## Project Status
 
@@ -22,9 +23,10 @@ Current MVP foundation progress:
 - Backend Supabase connection test is available.
 - Patient registration and login backend auth foundation is available.
 - Current patient profile endpoint is available for authenticated patient dashboard data.
-- Doctor/admin patient list, patient detail, and examination creation endpoints are available.
-- Mock AI prediction endpoints are available so frontend upload/result pages can connect before the real model workflow is complete.
-- Frontend login, register, and dashboard pages are in progress; auth UI integration with backend endpoints is still being connected.
+- Doctor/admin patient list, examination workflow, X-Ray upload storage, mock AI persistence, doctor review, PDF report generation, and signed report download are available on the backend branch.
+- Patient-owned examination history/detail report access endpoints are available on the backend branch.
+- Backend CI is available through GitHub Actions and builds the backend Docker image for validation.
+- Frontend login, register, and dashboard pages are in progress; frontend integration with the backend endpoints is still being connected.
 
 Implemented backend endpoints include:
 
@@ -33,14 +35,52 @@ Implemented backend endpoints include:
 - `POST /auth/register/patient`
 - `POST /auth/login`
 - `GET /patients/me`
+- `GET /patients/me/examinations`
+- `GET /patients/me/examinations/{examination_id}`
 - `GET /doctor/patients`
 - `GET /doctor/patients/{patient_id}`
 - `POST /doctor/examinations`
+- `PATCH /doctor/examinations/{examination_id}/note`
+- `PATCH /doctor/examinations/{examination_id}/feedback`
 - `POST /ai/predict/mock`
 - `POST /doctor/examinations/{examination_id}/predict`
+- `POST /doctor/examinations/{examination_id}/report`
+- `GET /reports/{report_id}/download`
+
+## DevOps Pipeline
+
+The repository has a basic backend DevOps setup for AOL evidence:
+
+- GitHub Actions workflow: `.github/workflows/backend-ci.yml`
+- GitHub Environment: `backend-ci`
+- Backend Dockerfile: `backend/Dockerfile`
+- Frontend CI workflow: `.github/workflows/frontend-ci.yml`
+- Supabase CLI config: `supabase/config.toml`
+- DevOps guide: `docs/devops-pipeline.md`
+
+The `Backend CI` workflow runs on pushes and pull requests to `backend`, `dev`, and `main`. It installs backend dependencies, compiles the FastAPI backend, and builds the backend Docker image with the tag `radia-backend:ci`.
+The `Frontend CI` workflow installs frontend dependencies, runs lint, and builds the Vite app.
+
+For AOL screenshots, capture:
+
+- Settings -> Environments -> `backend-ci`
+- Actions -> `Backend CI` successful green run
+- Successful run details showing `Compile backend` and `Build backend Docker image`
+- Actions -> `Frontend CI` successful green run
+- Successful run details showing `Lint frontend` and `Build frontend`
+- `.github/workflows/backend-ci.yml`
+- `.github/workflows/frontend-ci.yml`
+- `backend/Dockerfile`
+
+Supabase CLI setup is tracked for future database migrations and storage bucket
+configuration. Remote database changes should be made through migration files
+under `supabase/migrations/` after local review/testing.
+
+Do not include secret values, access tokens, or signed download URLs in public screenshots or submitted documentation.
 
 ## Contributors
+
 - Nicholas
-- Saladin
-- Oslando
-- Davinus
+- Saladin Zhalifunnas Ahfar
+- Oslando Fristian Sipayung
+- Davinus Libran

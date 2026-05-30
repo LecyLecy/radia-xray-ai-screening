@@ -17,6 +17,7 @@
 .radia-btn-secondary:hover { background-color: #e2e8f0; }
 .radia-btn-danger { background-color: var(--danger-bg); color: var(--danger-text); }
 .radia-btn-danger:hover { background-color: #fecaca; }
+.radia-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* Form Controls */
 .radia-form-group { margin-bottom: 1.2rem; display: flex; flex-direction: column; width: 100%; }

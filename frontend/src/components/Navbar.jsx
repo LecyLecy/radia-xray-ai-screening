@@ -1,13 +1,12 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { logoutUser } from '../services/authService';
 import './components.css';
 
 export const Navbar = ({ userRole, userName }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('userId');
+    logoutUser();
     navigate('/login');
   };
 

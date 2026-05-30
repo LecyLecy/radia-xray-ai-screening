@@ -1,9 +1,25 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card } from '../../components/Card';
 import { FormInput } from '../../components/FormInput';
 import { Button } from '../../components/Button';
+import { registerPatient } from '../../services/authService';
 import './auth.css';
+
+const calculateAge = (dateOfBirth) => {
+  if (!dateOfBirth) return null;
+
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthOffset = today.getMonth() - birthDate.getMonth();
+
+  if (monthOffset < 0 || (monthOffset === 0 && today.getDate() < birthDate.getDate())) {
+    age -= 1;
+  }
+
+  return Number.isFinite(age) ? age : null;
+};
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -13,16 +29,35 @@ export default function Register() {
     dob: '',
     password: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    alert('Registration simulated successfully! Redirecting to login.');
-    navigate('/login');
+    setIsSubmitting(true);
+    setErrorMessage('');
+
+    try {
+      await registerPatient({
+        email: formData.email,
+        password: formData.password,
+        full_name: formData.name,
+        phone_number: formData.phone || null,
+        age: calculateAge(formData.dob),
+      });
+
+      alert('Registration successful. Please sign in.');
+      navigate('/login');
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -76,7 +111,10 @@ export default function Register() {
               placeholder="Create strong password"
               required
             />
-            <Button type="submit" variant="primary" className="w-full">Complete Registration</Button>
+            <Button type="submit" variant="primary" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? 'Creating Account...' : 'Complete Registration'}
+            </Button>
+            {errorMessage && <p className="auth-error">{errorMessage}</p>}
           </form>
           <div className="auth-redirect">
             Already registered? <Link to="/login">Sign in here</Link>

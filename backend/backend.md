@@ -22,6 +22,42 @@ PDF report generator
 uvicorn app.main:app --reload
 ```
 
+## Docker Setup
+
+The backend has a Dockerfile at `backend/Dockerfile`.
+
+From the `backend` folder:
+
+```powershell
+docker build -t radia-backend:ci .
+docker run --env-file .env -p 8000:8000 radia-backend:ci
+```
+
+The Docker image starts FastAPI with Uvicorn on port `8000`. Do not copy or commit `.env` values into the Dockerfile.
+
+## CI Pipeline
+
+The backend CI pipeline is defined at `.github/workflows/backend-ci.yml` and uses the GitHub Environment `backend-ci`.
+
+The workflow validates:
+
+- Python 3.11 dependency installation.
+- Backend compile check with `python -m compileall app`.
+- Backend Docker image build with `docker build -t radia-backend:ci .`.
+
+For AOL DevOps evidence, use screenshots of the `backend-ci` environment, the successful `Backend CI` run, the workflow file, and the Dockerfile. More details are documented in `docs/devops-pipeline.md`.
+
+## Supabase CLI Setup
+
+Supabase CLI project configuration is tracked at `supabase/config.toml`.
+Future database schema changes should be added as SQL migration files under
+`supabase/migrations/`, and local/demo seed data should go in
+`supabase/seed.sql`.
+
+The storage bucket limits for `profile-pictures`, `xray-images`,
+`gradcam-results`, and `pdf-reports` are declared in `supabase/config.toml` so
+the expected file size and MIME type rules are visible in code.
+
 ## Current MVP Endpoints
 
 - `GET /health` checks whether the API is running.
@@ -47,3 +83,4 @@ uvicorn app.main:app --reload
 - Doctor/admin accounts are still created manually in Supabase for MVP testing.
 - Patient history frontend integration is still planned on the frontend branch.
 - Real AI model inference is still planned; the workflow endpoint currently persists mock AI predictions.
+- Current DevOps setup validates backend compile and Docker build only; it does not deploy or push Docker images yet.
