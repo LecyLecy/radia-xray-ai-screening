@@ -13,7 +13,7 @@ export const loginUser = async (email, password) => {
 
     return session;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Login failed.'));
+    throw new Error(getApiErrorMessage(error, 'Login failed.'), { cause: error });
   }
 };
 
@@ -22,7 +22,7 @@ export const registerPatient = async (payload) => {
     const response = await api.post('/auth/register/patient', payload);
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Patient registration failed.'));
+    throw new Error(getApiErrorMessage(error, 'Patient registration failed.'), { cause: error });
   }
 };
 

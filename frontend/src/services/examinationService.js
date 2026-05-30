@@ -5,7 +5,7 @@ export const getAllPatients = async () => {
     const response = await api.get('/doctor/patients');
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to load patients.'));
+    throw new Error(getApiErrorMessage(error, 'Failed to load patients.'), { cause: error });
   }
 };
 
@@ -14,7 +14,7 @@ export const getDoctorPatient = async (patientId) => {
     const response = await api.get(`/doctor/patients/${patientId}`);
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to load patient detail.'));
+    throw new Error(getApiErrorMessage(error, 'Failed to load patient detail.'), { cause: error });
   }
 };
 
@@ -23,7 +23,7 @@ export const createExamination = async (patientId) => {
     const response = await api.post('/doctor/examinations', { patient_id: patientId });
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to create examination.'));
+    throw new Error(getApiErrorMessage(error, 'Failed to create examination.'), { cause: error });
   }
 };
 
@@ -40,7 +40,7 @@ export const predictExamination = async (examinationId, xrayImage) => {
 
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to run AI prediction.'));
+    throw new Error(getApiErrorMessage(error, 'Failed to run AI prediction.'), { cause: error });
   }
 };
 
@@ -51,7 +51,7 @@ export const updateDoctorNote = async (examinationId, doctorNote) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to save doctor note.'));
+    throw new Error(getApiErrorMessage(error, 'Failed to save doctor note.'), { cause: error });
   }
 };
 
@@ -63,7 +63,7 @@ export const saveDoctorFeedback = async (examinationId, feedbackStatus, feedback
     });
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to save doctor feedback.'));
+    throw new Error(getApiErrorMessage(error, 'Failed to save doctor feedback.'), { cause: error });
   }
 };
 
@@ -72,7 +72,7 @@ export const generateReport = async (examinationId) => {
     const response = await api.post(`/doctor/examinations/${examinationId}/report`);
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to generate report.'));
+    throw new Error(getApiErrorMessage(error, 'Failed to generate report.'), { cause: error });
   }
 };
 
@@ -81,7 +81,7 @@ export const getMyExaminations = async () => {
     const response = await api.get('/patients/me/examinations');
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to load examination history.'));
+    throw new Error(getApiErrorMessage(error, 'Failed to load examination history.'), { cause: error });
   }
 };
 
@@ -90,7 +90,7 @@ export const getMyExaminationDetail = async (examinationId) => {
     const response = await api.get(`/patients/me/examinations/${examinationId}`);
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to load examination detail.'));
+    throw new Error(getApiErrorMessage(error, 'Failed to load examination detail.'), { cause: error });
   }
 };
 
@@ -99,6 +99,6 @@ export const getReportDownload = async (reportId) => {
     const response = await api.get(`/reports/${reportId}/download`);
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to get report download link.'));
+    throw new Error(getApiErrorMessage(error, 'Failed to get report download link.'), { cause: error });
   }
 };
