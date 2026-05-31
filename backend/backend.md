@@ -14,8 +14,9 @@ PDF report generator
 
 1. Create `backend/.env` from `backend/.env.example`.
 2. Fill Supabase URL and keys in `backend/.env`.
-3. Do not commit `backend/.env`, virtual environments, generated caches, uploads, reports, or model checkpoints.
-4. Start the backend from the `backend` folder:
+3. Set `CORS_ALLOW_ORIGINS` to the allowed frontend origins, separated by commas.
+4. Do not commit `backend/.env`, virtual environments, generated caches, uploads, reports, or model checkpoints.
+5. Start the backend from the `backend` folder:
 
 ```powershell
 .\.venv\Scripts\activate
