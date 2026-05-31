@@ -149,9 +149,51 @@ Frontend notes:
 - Use one shared sign-in form for all roles. Do not ask the user to choose
   patient, medical staff, or admin before login.
 - Redirect by returned role:
-  - `patient` -> `/patient/dashboard`
+  - `patient` -> `/patient/history`
   - `doctor` -> `/doctor/dashboard`
-  - `admin` -> `/doctor/dashboard` until a dedicated admin UI exists.
+  - `admin` -> `/doctor/dashboard`, with admin-only medical staff menu access.
+
+## Users
+
+### `GET /users/me/profile`
+
+Returns a read-only profile summary for the authenticated user. This endpoint
+feeds the top-right profile menu for patient, doctor, and admin users.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Success response:
+
+```json
+{
+  "user_id": "auth_user_uuid",
+  "email": "user@example.com",
+  "role": "doctor",
+  "full_name": "Doctor Name",
+  "phone_number": "08123456789",
+  "age": 35,
+  "gender": "male",
+  "profile_picture_url": "auth_user_uuid/path.png",
+  "profile_picture_download_url": "https://...",
+  "license_number": "DOC-001",
+  "specialization": "Radiology"
+}
+```
+
+Expected errors:
+
+- `401`: missing, malformed, or invalid bearer token.
+- `404`: profile role is missing or invalid.
+
+Frontend notes:
+
+- Use this for the shared navbar profile menu.
+- The app displays profiles as read-only for all roles in the current MVP.
+- Admin users use a default avatar even if no admin profile picture exists.
 
 ## Patient
 
@@ -188,7 +230,7 @@ Expected errors:
 
 Frontend notes:
 
-- Use this endpoint for patient dashboard/profile header data.
+- Use this endpoint for patient-owned profile data when needed.
 - Do not pass patient id from frontend for the current user's own profile.
 - `profile_picture_url` is a private storage object path.
 - `profile_picture_download_url` is a temporary signed URL and may be `null`.
@@ -197,6 +239,10 @@ Frontend notes:
 
 Updates the current logged-in patient's editable profile fields. Email remains
 read-only because it belongs to the Supabase Auth identity.
+
+Current frontend note: patient profile editing is not exposed in the UI while
+the MVP uses read-only shared profile menus. This endpoint remains available
+for backend compatibility.
 
 Headers:
 
@@ -231,6 +277,10 @@ Expected errors:
 Uploads the current logged-in patient's profile picture to the private
 `profile-pictures` Supabase Storage bucket and saves the object path in
 `patient_profiles.profile_picture_url`.
+
+Current frontend note: profile picture editing is not exposed in the UI while
+the MVP uses read-only shared profile menus. Existing stored patient pictures
+may still be displayed.
 
 Request:
 
@@ -826,7 +876,7 @@ demo/security hardening.
 
 ## Current Limitations
 
-- Admin medical staff listing and doctor account creation are implemented.
+- Admin medical staff listing and patient-to-doctor promotion are implemented.
 - Other admin CRUD endpoints are not implemented yet.
 
 ## Admin Workflow
@@ -868,10 +918,10 @@ Expected errors:
 - `403`: authenticated user is not admin.
 - `500`: doctor profiles could not be loaded.
 
-### `POST /admin/doctors`
+### `GET /admin/patients/search`
 
-Creates a Supabase Auth doctor user, `profiles` row with role `doctor`, and
-matching `doctor_profiles` row.
+Searches patient profiles by email so an admin can promote an existing patient
+account into medical staff. The user must already have registered as a patient.
 
 Headers:
 
@@ -879,16 +929,57 @@ Headers:
 Authorization: Bearer <access_token>
 ```
 
+Query parameters:
+
+```text
+email=patient@example.com
+```
+
+Success response:
+
+```json
+[
+  {
+    "id": "patient_profile_uuid",
+    "user_id": "auth_user_uuid",
+    "email": "patient@example.com",
+    "full_name": "Patient Name",
+    "phone_number": "08123456789",
+    "age": 30,
+    "gender": "male",
+    "profile_picture_url": "auth_user_uuid/path.png",
+    "profile_picture_download_url": "https://..."
+  }
+]
+```
+
+Expected errors:
+
+- `400`: email query is empty.
+- `401`: missing or invalid bearer token.
+- `403`: authenticated user is not admin.
+- `422`: missing `email` query parameter.
+- `500`: patient profiles could not be searched.
+
+### `POST /admin/doctors/promote`
+
+Promotes an existing patient account to medical staff. This updates
+`profiles.role` from `patient` to `doctor`, creates or updates the matching
+`doctor_profiles` row, and copies basic profile fields from `patient_profiles`.
+The original patient profile row is kept for historical identity/data.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
 Request:
 
 ```json
 {
-  "email": "doctor@example.com",
-  "password": "Doctor12345",
-  "full_name": "Doctor Name",
-  "phone_number": "08123456789",
-  "age": 35,
-  "gender": "male",
+  "patient_id": "patient_profile_uuid",
   "license_number": "DOC-001",
   "specialization": "Radiology"
 }
@@ -897,9 +988,7 @@ Request:
 Required fields:
 
 ```text
-email
-password
-full_name
+patient_id
 ```
 
 Success response:
@@ -913,7 +1002,7 @@ Success response:
   "phone_number": "08123456789",
   "age": 35,
   "gender": "male",
-  "profile_picture_url": null,
+  "profile_picture_url": "auth_user_uuid/path.png",
   "license_number": "DOC-001",
   "specialization": "Radiology"
 }
@@ -921,9 +1010,11 @@ Success response:
 
 Expected errors:
 
-- `400`: Supabase Auth rejected the account creation, usually duplicate email or invalid password.
+- `400`: selected user is not promotable.
 - `401`: missing or invalid bearer token.
 - `403`: authenticated user is not admin.
 - `422`: missing or invalid request field.
-- `500`: profile rows could not be saved.
-- Real AI model inference and Grad-CAM remain future work; current stored predictions are mock AI results.
+- `500`: role/profile rows could not be updated.
+
+Real AI model inference and Grad-CAM remain future work; current stored
+predictions are mock AI results.

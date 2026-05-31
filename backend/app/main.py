@@ -9,6 +9,7 @@ from app.routes.examination_routes import router as examination_router
 from app.routes.patient_routes import router as patient_router
 from app.routes.report_routes import router as report_router
 from app.routes.supabase_routes import router as supabase_router
+from app.routes.user_routes import router as user_router
 
 app = FastAPI(title="Radia API")
 
@@ -40,3 +41,4 @@ app.include_router(patient_router)
 app.include_router(doctor_router)
 app.include_router(admin_router)
 app.include_router(report_router)
+app.include_router(user_router)

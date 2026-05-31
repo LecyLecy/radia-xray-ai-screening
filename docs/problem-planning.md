@@ -290,15 +290,15 @@ Di fasilitas kesehatan dengan sumber daya terbatas, proses pemeriksaan chest X-R
 | Register own account             | Yes                    | No                | No       |
 | Login                            | Yes                    | Yes               | Yes      |
 | View own profile                 | Yes                    | Yes               | Basic    |
-| Edit own profile picture         | Yes                    | Yes               | Optional |
-| Edit own identity data           | No                     | Optional          | Yes      |
+| Edit own profile picture         | No                     | No                | No       |
+| Edit own identity data           | No                     | No                | No       |
 | View all patients                | No                     | Yes               | Yes      |
 | View own examination history     | Yes                    | No                | No       |
 | View patient examination history | No                     | Yes               | Yes      |
 | Create patient account           | Patient self-registers | Optional          | Yes      |
 | Edit patient data                | No                     | Optional          | Yes      |
-| Create doctor account            | No                     | No                | Yes      |
-| Edit doctor data                 | No                     | Optional own data | Yes      |
+| Promote patient to doctor        | No                     | No                | Yes      |
+| Edit doctor data                 | No                     | No                | Yes      |
 | Create examination record        | No                     | Yes               | Yes      |
 | Upload X-Ray                     | No                     | Yes               | Yes      |
 | Run AI prediction                | No                     | Yes               | Yes      |

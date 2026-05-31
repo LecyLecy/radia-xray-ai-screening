@@ -1,7 +1,9 @@
 from fastapi import status
 from postgrest.exceptions import APIError
 
-from app.schemas.admin_schema import CreateDoctorRequest, DoctorProfileResponse
+from app.schemas.admin_schema import DoctorProfileResponse, PromotePatientToDoctorRequest
+from app.schemas.user_schema import PatientProfileResponse
+from app.services.storage_service import create_profile_picture_signed_url
 from app.services.supabase_service import get_supabase_client
 
 
@@ -40,71 +42,175 @@ def list_doctors() -> list[DoctorProfileResponse]:
     return [DoctorProfileResponse(**row) for row in response.data or []]
 
 
-def create_doctor(payload: CreateDoctorRequest) -> DoctorProfileResponse:
+def search_patients_by_email(email: str) -> list[PatientProfileResponse]:
     supabase = get_supabase_client()
-
-    try:
-        created_user = supabase.auth.admin.create_user(
-            {
-                "email": payload.email,
-                "password": payload.password,
-                "email_confirm": True,
-                "user_metadata": {
-                    "full_name": payload.full_name,
-                    "role": "doctor",
-                },
-            }
-        )
-    except Exception as error:
+    normalized_email = email.strip()
+    if not normalized_email:
         raise AdminServiceError(
-            message=_read_error_message(error) or "Doctor auth account could not be created.",
+            message="Email search query is required.",
             status_code=status.HTTP_400_BAD_REQUEST,
-        ) from error
-
-    user = created_user.user
-    if not user or not user.id or not user.email:
-        raise AdminServiceError(
-            message="Supabase did not return a created doctor user.",
-            status_code=status.HTTP_502_BAD_GATEWAY,
         )
 
     try:
-        supabase.table("profiles").insert(
-            {
-                "user_id": user.id,
-                "email": user.email,
-                "role": "doctor",
-            }
-        ).execute()
-
-        doctor_response = (
-            supabase.table("doctor_profiles")
-            .insert(
-                {
-                    "user_id": user.id,
-                    "email": user.email,
-                    "full_name": payload.full_name,
-                    "phone_number": payload.phone_number,
-                    "age": payload.age,
-                    "gender": payload.gender,
-                    "license_number": payload.license_number,
-                    "specialization": payload.specialization,
-                    "profile_picture_url": None,
-                }
+        response = (
+            supabase.table("patient_profiles")
+            .select(
+                "id,user_id,email,full_name,phone_number,age,gender,profile_picture_url"
             )
+            .ilike("email", f"%{normalized_email}%")
+            .order("email")
+            .limit(10)
             .execute()
         )
     except Exception as error:
         raise AdminServiceError(
-            message=_read_error_message(error)
-            or "Doctor account was created, but profile data could not be saved.",
+            message=_read_error_message(error) or "Patient profiles could not be searched.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    return [
+        PatientProfileResponse(
+            **row,
+            profile_picture_download_url=create_profile_picture_signed_url(
+                row.get("profile_picture_url")
+            ),
+        )
+        for row in response.data or []
+    ]
+
+
+def promote_patient_to_doctor(
+    payload: PromotePatientToDoctorRequest,
+) -> DoctorProfileResponse:
+    supabase = get_supabase_client()
+
+    try:
+        patient_response = (
+            supabase.table("patient_profiles")
+            .select(
+                "id,user_id,email,full_name,phone_number,age,gender,profile_picture_url"
+            )
+            .eq("id", payload.patient_id)
+            .single()
+            .execute()
+        )
+    except Exception as error:
+        raise AdminServiceError(
+            message=_read_error_message(error) or "Patient profile was not found.",
+            status_code=status.HTTP_404_NOT_FOUND,
+        ) from error
+
+    patient = patient_response.data
+    if not patient:
+        raise AdminServiceError(
+            message="Patient profile was not found.",
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    try:
+        profile_response = (
+            supabase.table("profiles")
+            .select("id,user_id,email,role")
+            .eq("user_id", patient["user_id"])
+            .single()
+            .execute()
+        )
+    except Exception as error:
+        raise AdminServiceError(
+            message=_read_error_message(error) or "User role profile was not found.",
+            status_code=status.HTTP_404_NOT_FOUND,
+        ) from error
+
+    role = profile_response.data.get("role") if profile_response.data else None
+    if role not in {"patient", "doctor"}:
+        raise AdminServiceError(
+            message="Only patient users can be promoted to medical staff.",
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        existing_doctor_response = (
+            supabase.table("doctor_profiles")
+            .select(
+                "id,user_id,email,full_name,phone_number,age,gender,"
+                "profile_picture_url,license_number,specialization"
+            )
+            .eq("user_id", patient["user_id"])
+            .execute()
+        )
+    except Exception as error:
+        raise AdminServiceError(
+            message=_read_error_message(error) or "Doctor profile could not be checked.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    doctor_row = {
+        "user_id": patient["user_id"],
+        "email": patient["email"],
+        "full_name": patient["full_name"],
+        "phone_number": patient.get("phone_number"),
+        "age": patient.get("age"),
+        "gender": patient.get("gender"),
+        "profile_picture_url": patient.get("profile_picture_url"),
+        "license_number": payload.license_number,
+        "specialization": payload.specialization,
+    }
+
+    try:
+        if role == "patient":
+            supabase.table("profiles").update({"role": "doctor"}).eq(
+                "user_id",
+                patient["user_id"],
+            ).execute()
+
+        existing_rows = existing_doctor_response.data or []
+        if existing_rows:
+            doctor_response = (
+                supabase.table("doctor_profiles")
+                .update(doctor_row)
+                .eq("id", existing_rows[0]["id"])
+                .execute()
+            )
+        else:
+            doctor_response = (
+                supabase.table("doctor_profiles")
+                .insert(doctor_row)
+                .execute()
+            )
+    except Exception as error:
+        raise AdminServiceError(
+            message=_read_error_message(error) or "Patient could not be promoted.",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         ) from error
 
     if not doctor_response.data:
+        try:
+            doctor_response = (
+                supabase.table("doctor_profiles")
+                .select(
+                    "id,user_id,email,full_name,phone_number,age,gender,"
+                    "profile_picture_url,license_number,specialization"
+                )
+                .eq("user_id", patient["user_id"])
+                .single()
+                .execute()
+            )
+        except Exception as error:
+            raise AdminServiceError(
+                message=_read_error_message(error)
+                or "Promoted doctor profile could not be loaded.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            ) from error
+
+    if not doctor_response.data:
         raise AdminServiceError(
-            message="Doctor profile could not be saved.",
+            message="Promoted doctor profile could not be saved.",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-    return DoctorProfileResponse(**doctor_response.data[0])
+    row = (
+        doctor_response.data[0]
+        if isinstance(doctor_response.data, list)
+        else doctor_response.data
+    )
+    return DoctorProfileResponse(**row)

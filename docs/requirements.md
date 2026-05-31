@@ -136,7 +136,7 @@ Tujuan phase ini adalah mendefinisikan apa yang harus dilakukan sistem Radia, si
 | US-11 View AI Result   | System displays Normal/Pneumonia result and confidence score after prediction.                                         |
 | US-13 Doctor Note      | Doctor can add and save clinical note; note appears in examination detail and PDF report.                              |
 | US-15 Generate PDF     | PDF includes patient data, doctor data, examination date, AI result, doctor note, and disclaimer.                      |
-| US-17 Manage Doctor    | Admin can create, edit, and view doctor accounts.                                                                      |
+| US-17 Manage Doctor    | Admin can search registered patient accounts, promote them to doctor role, and view medical staff accounts.            |
 | US-20 Generate Reports | Admin can generate/download reports for examination records.                                                           |
 
 # MoSCoW Prioritization
@@ -165,7 +165,7 @@ Tujuan phase ini adalah mendefinisikan apa yang harus dilakukan sistem Radia, si
 8. Could Have
 9. Grad-CAM visualization
 10. Search patient by name/email
-11. Admin creates doctor accounts
+11. Admin promotes patient accounts into doctor accounts
 12. PDF storage in cloud storage
 13. Better UI polish
 14. Won’t Have

@@ -191,9 +191,11 @@ Uploaded X-Ray files must follow the `xray-images` bucket limits: JPG/JPEG or
 PNG only, maximum 10 MB. Backend validation should reject files outside these
 limits before storage.
 
-For MVP testing, doctor accounts are created manually across Supabase Auth,
-`profiles`, and `doctor_profiles`. The AI prediction enum in Supabase must
-accept `Normal` and `Pneumonia`, matching the backend API response contract.
+For MVP testing, doctor accounts are promoted from existing patient accounts by
+an admin. The user first registers as patient, then admin updates `profiles.role`
+to `doctor` through the backend promotion endpoint and creates/updates the
+matching `doctor_profiles` row. The AI prediction enum in Supabase must accept
+`Normal` and `Pneumonia`, matching the backend API response contract.
 
 # AI Integration Strategy
 
@@ -258,7 +260,7 @@ accept `Normal` and `Pneumonia`, matching the backend API response contract.
    2. Patient
    3. POST /patients/register
    4. GET /patients/me
-   5. PATCH /patients/me/profile-picture
+   5. GET /users/me/profile
    6. GET /patients/me/examinations
    7. GET /patients/me/examinations/{id}
    8. Doctor
@@ -275,13 +277,14 @@ accept `Normal` and `Pneumonia`, matching the backend API response contract.
    19. POST /admin/patients
    20. PATCH /admin/patients/{id}
    21. GET /admin/doctors
-   22. POST /admin/doctors
-   23. PATCH /admin/doctors/{id}
-   24. GET /admin/examinations
-   25. PATCH /admin/examinations/{id}
-   26. DELETE /admin/examinations/{id}
-   27. Report
-   28. GET /reports/{id}/download
+   22. GET /admin/patients/search
+   23. POST /admin/doctors/promote
+   24. PATCH /admin/doctors/{id}
+   25. GET /admin/examinations
+   26. PATCH /admin/examinations/{id}
+   27. DELETE /admin/examinations/{id}
+   28. Report
+   29. GET /reports/{id}/download
 
 2. Temporary / Development Endpoints
    1. GET /supabase/test

@@ -4,6 +4,7 @@ from postgrest.exceptions import APIError
 from fastapi import UploadFile
 
 from app.schemas.user_schema import (
+    CurrentUserProfileResponse,
     CurrentUserResponse,
     PatientProfileResponse,
     UpdatePatientProfileRequest,
@@ -101,6 +102,58 @@ def _to_patient_profile_response(row: dict) -> PatientProfileResponse:
         profile_picture_download_url=create_profile_picture_signed_url(
             row.get("profile_picture_url")
         ),
+    )
+
+
+def get_current_user_profile(auth_user: CurrentUserResponse) -> CurrentUserProfileResponse:
+    current_user = get_current_user_with_role(auth_user)
+    supabase = get_supabase_client()
+
+    table_by_role = {
+        "patient": "patient_profiles",
+        "doctor": "doctor_profiles",
+        "admin": "admin_profiles",
+    }
+    table_name = table_by_role[current_user.role]
+    if current_user.role == "admin":
+        selected_columns = "id,user_id,email,full_name"
+    else:
+        selected_columns = (
+            "id,user_id,email,full_name,phone_number,age,gender,profile_picture_url"
+        )
+    if current_user.role == "doctor":
+        selected_columns += ",license_number,specialization"
+
+    try:
+        response = (
+            supabase.table(table_name)
+            .select(selected_columns)
+            .eq("user_id", current_user.user_id)
+            .single()
+            .execute()
+        )
+        row = response.data or {}
+    except Exception:
+        row = {}
+
+    return CurrentUserProfileResponse(
+        user_id=current_user.user_id,
+        email=row.get("email") or current_user.email,
+        role=current_user.role,
+        full_name=row.get("full_name"),
+        phone_number=row.get("phone_number"),
+        age=row.get("age"),
+        gender=row.get("gender"),
+        profile_picture_url=(
+            row.get("profile_picture_url") if current_user.role != "admin" else None
+        ),
+        profile_picture_download_url=(
+            create_profile_picture_signed_url(row.get("profile_picture_url"))
+            if current_user.role != "admin"
+            else None
+        ),
+        license_number=row.get("license_number"),
+        specialization=row.get("specialization"),
     )
 
 

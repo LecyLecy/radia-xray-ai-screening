@@ -34,11 +34,9 @@ Create or confirm these records in Supabase before the demo:
 
 - Use the same frontend sign-in page for patient, doctor, and admin accounts.
 - Public registration creates patient accounts only.
-- One doctor user in Supabase Auth.
-- Matching doctor row in `profiles` with role `doctor`.
-- Matching row in `doctor_profiles`.
-- Admin users are created manually for the MVP. Medical staff users can be
-  created from the admin `Medical Staff` screen.
+- Doctor/medical staff users start as registered patient accounts.
+- Admin users are created manually for the MVP. Medical staff users are
+  promoted from existing patient accounts in the admin `Medical Staff` screen.
 - One patient user created through the frontend register page or backend
   `POST /auth/register/patient`.
 - Private storage buckets:
@@ -67,8 +65,11 @@ Optional admin check:
 
 1. Login as admin.
 2. Open Medical Staff.
-3. Create a doctor account.
-4. Confirm the new user appears in the medical staff table and can sign in.
+3. Search an existing patient email.
+4. Fill license number and specialization.
+5. Promote the patient to medical staff.
+6. Logout and login as that same user again.
+7. Confirm the user lands in the medical staff workspace and appears in the medical staff table.
 
 ## Expected Evidence
 

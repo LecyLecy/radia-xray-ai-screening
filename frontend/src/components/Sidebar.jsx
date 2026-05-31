@@ -23,9 +23,6 @@ export const Sidebar = ({ role }) => {
           </>
         ) : (
           <>
-            <NavLink to="/patient/dashboard" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
-              My Profile
-            </NavLink>
             <NavLink to="/patient/history" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
               Examination History
             </NavLink>

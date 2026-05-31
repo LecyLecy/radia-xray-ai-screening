@@ -1,8 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.schemas.admin_schema import CreateDoctorRequest, DoctorProfileResponse
-from app.schemas.user_schema import CurrentUserResponse
-from app.services.admin_service import AdminServiceError, create_doctor, list_doctors
+from app.schemas.admin_schema import DoctorProfileResponse, PromotePatientToDoctorRequest
+from app.schemas.user_schema import CurrentUserResponse, PatientProfileResponse
+from app.services.admin_service import (
+    AdminServiceError,
+    list_doctors,
+    promote_patient_to_doctor,
+    search_patients_by_email,
+)
 from app.services.user_service import UserServiceError, require_role
 from app.utils.security import get_current_auth_user
 
@@ -35,13 +40,27 @@ def get_admin_doctors(
         ) from error
 
 
-@router.post("/doctors", response_model=DoctorProfileResponse)
-def create_admin_doctor(
-    payload: CreateDoctorRequest,
+@router.get("/patients/search", response_model=list[PatientProfileResponse])
+def search_admin_patients(
+    email: str = Query(min_length=1),
+    _: CurrentUserResponse = Depends(require_admin),
+) -> list[PatientProfileResponse]:
+    try:
+        return search_patients_by_email(email)
+    except AdminServiceError as error:
+        raise HTTPException(
+            status_code=error.status_code,
+            detail=error.message,
+        ) from error
+
+
+@router.post("/doctors/promote", response_model=DoctorProfileResponse)
+def promote_admin_patient_to_doctor(
+    payload: PromotePatientToDoctorRequest,
     _: CurrentUserResponse = Depends(require_admin),
 ) -> DoctorProfileResponse:
     try:
-        return create_doctor(payload)
+        return promote_patient_to_doctor(payload)
     except AdminServiceError as error:
         raise HTTPException(
             status_code=error.status_code,

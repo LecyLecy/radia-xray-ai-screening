@@ -65,9 +65,10 @@ the expected file size and MIME type rules are visible in code.
 - `GET /supabase/test` verifies backend connectivity to the `profiles` table. This is a development-only test endpoint.
 - `POST /auth/register/patient` creates a Supabase Auth user, a `profiles` row, and a `patient_profiles` row.
 - `POST /auth/login` signs in a user and returns session tokens with the role from `profiles`.
+- `GET /users/me/profile` returns a read-only profile summary for patient, doctor, and admin navbar menus.
 - `GET /patients/me` returns the current authenticated patient's profile.
-- `PATCH /patients/me` updates the current authenticated patient's editable profile fields.
-- `POST /patients/me/profile-picture` uploads a JPG/PNG/WEBP profile picture up to 2 MB and saves the private storage path.
+- `PATCH /patients/me` updates patient profile fields for backend compatibility; this edit UI is hidden in the MVP.
+- `POST /patients/me/profile-picture` uploads a JPG/PNG/WEBP profile picture up to 2 MB for backend compatibility; this edit UI is hidden in the MVP.
 - `GET /doctor/patients` lists patient profiles for authenticated doctor/admin users.
 - `GET /doctor/patients/{patient_id}` returns one patient profile by `patient_profiles.id`.
 - `GET /doctor/examinations` returns recent examination summary rows for doctor/admin dashboards.
@@ -81,13 +82,15 @@ the expected file size and MIME type rules are visible in code.
 - `GET /patients/me/examinations` returns the current patient's own examination history.
 - `GET /patients/me/examinations/{examination_id}` returns the current patient's owned examination detail with related AI/report metadata.
 - `GET /admin/doctors` lists medical staff accounts for authenticated admin users.
-- `POST /admin/doctors` creates a Supabase Auth doctor user, `profiles` row, and `doctor_profiles` row for authenticated admin users.
+- `GET /admin/patients/search` searches existing patient accounts by email for authenticated admin users.
+- `POST /admin/doctors/promote` promotes an existing patient account to medical staff by updating `profiles.role` and creating/updating `doctor_profiles`.
 
 ## Current Limitations
 
 - Admin accounts are still created manually in Supabase for MVP testing.
 - The frontend uses one shared sign-in page for patient, doctor, and admin users. Public registration creates patient accounts only.
-- Medical staff accounts can be created from the admin UI.
+- Medical staff accounts are created by registering as patient first, then having an admin promote that existing account from the `Medical Staff` screen.
+- Patient, doctor, and admin profiles are displayed from the navbar profile menu and are read-only in the current MVP.
 - Real AI model inference is still planned; the workflow endpoint currently persists mock AI predictions.
 - Admin CRUD endpoints and admin UI are future work unless the final demo explicitly requires them.
 - Current DevOps setup validates backend compile, frontend lint/build, and backend Docker build only; it does not deploy or push Docker images yet.

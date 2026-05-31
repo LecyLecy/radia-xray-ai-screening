@@ -25,6 +25,20 @@ class PatientProfileResponse(BaseModel):
     profile_picture_download_url: str | None = None
 
 
+class CurrentUserProfileResponse(BaseModel):
+    user_id: str
+    email: str
+    role: UserRole
+    full_name: str | None = None
+    phone_number: str | None = None
+    age: int | None = None
+    gender: Gender | None = None
+    profile_picture_url: str | None = None
+    profile_picture_download_url: str | None = None
+    license_number: str | None = None
+    specialization: str | None = None
+
+
 class UpdatePatientProfileRequest(BaseModel):
     full_name: str = Field(min_length=1)
     phone_number: str | None = None

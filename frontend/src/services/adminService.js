@@ -9,11 +9,22 @@ export const getDoctors = async () => {
   }
 };
 
-export const createDoctor = async (payload) => {
+export const searchPatientsByEmail = async (email) => {
   try {
-    const response = await api.post('/admin/doctors', payload);
+    const response = await api.get('/admin/patients/search', {
+      params: { email },
+    });
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to create medical staff account.'), { cause: error });
+    throw new Error(getApiErrorMessage(error, 'Failed to search patients.'), { cause: error });
+  }
+};
+
+export const promotePatientToDoctor = async (payload) => {
+  try {
+    const response = await api.post('/admin/doctors/promote', payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, 'Failed to promote patient to medical staff.'), { cause: error });
   }
 };

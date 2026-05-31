@@ -26,7 +26,7 @@ export default function Login() {
       if (actualRole === 'doctor' || actualRole === 'admin') {
         navigate('/doctor/dashboard');
       } else {
-        navigate('/patient/dashboard');
+        navigate('/patient/history');
       }
     } catch (error) {
       setErrorMessage(error.message);

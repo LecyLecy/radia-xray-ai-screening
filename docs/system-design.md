@@ -486,18 +486,17 @@ UI Wireframe / Page Structure
    2. Login Page
    3. Patient Register Page
 2. Patient Pages
-3. Patient Dashboard
-4. My Profile
-5. My Examination History
-6. Examination Detail
-7. PDF Report Download Page
-8. Doctor Pages
-9. Doctor Dashboard
-10. Patient List
-11. Patient Detail
-12. Create Examination
-13. Upload X-Ray
-14. Examination Result
+3. Patient Examination History
+4. Examination Detail
+5. PDF Report Download Page
+6. Shared Navbar Profile Menu
+7. Doctor Pages
+8. Doctor Dashboard
+9. Patient List
+10. Patient Detail
+11. Create Examination
+12. Upload X-Ray
+13. Examination Result
 15. Examination History
 16. Generate Report
 17. Admin Pages

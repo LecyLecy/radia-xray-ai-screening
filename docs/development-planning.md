@@ -144,8 +144,9 @@ Current backend progress snapshot:
    11. PDF report generation and signed download access
    12. Patient-owned examination history and detail report access endpoints
    13. Frontend auth form integration with backend endpoints
-   14. Frontend patient dashboard, profile edit, history, detail, and report download integration
+   14. Frontend patient history, detail, report download, and shared read-only profile menu integration
    15. Frontend doctor dashboard, patient list/detail, screening, review, and report generation integration
+   16. Admin patient-to-medical-staff promotion workflow
 2. In Progress
    1. Full browser demo workflow testing
    2. Documentation cleanup for final submission screenshots and demo runbook

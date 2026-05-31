@@ -23,12 +23,12 @@ Current MVP foundation progress:
 - Backend Supabase connection test is available.
 - Patient registration and login backend auth foundation is available.
 - Frontend auth uses one shared sign-in page for patient, doctor, and admin users. Public registration creates patient users only.
-- Current patient profile endpoint is available for authenticated patient dashboard data.
+- Shared read-only profile menu data is available for authenticated users.
 - Doctor/admin patient list, examination summary, examination workflow, X-Ray upload storage, mock AI persistence, doctor review, PDF report generation, and signed report download are available.
-- Admin medical staff listing and doctor account creation are available.
+- Admin medical staff listing and patient-to-medical-staff promotion are available.
 - Patient-owned examination history/detail report access endpoints are available.
 - Backend CI is available through GitHub Actions and builds the backend Docker image for validation.
-- Frontend login, register, patient dashboard/history/detail, doctor dashboard/workflow, and admin medical staff pages are connected to backend endpoints.
+- Frontend login, register, patient history/detail, doctor dashboard/workflow, shared profile menu, and admin medical staff pages are connected to backend endpoints.
 
 Implemented backend endpoints include:
 
@@ -36,6 +36,7 @@ Implemented backend endpoints include:
 - `GET /supabase/test`
 - `POST /auth/register/patient`
 - `POST /auth/login`
+- `GET /users/me/profile`
 - `GET /patients/me`
 - `GET /patients/me/examinations`
 - `GET /patients/me/examinations/{examination_id}`
@@ -50,7 +51,8 @@ Implemented backend endpoints include:
 - `POST /doctor/examinations/{examination_id}/report`
 - `GET /reports/{report_id}/download`
 - `GET /admin/doctors`
-- `POST /admin/doctors`
+- `GET /admin/patients/search`
+- `POST /admin/doctors/promote`
 
 ## DevOps Pipeline
 

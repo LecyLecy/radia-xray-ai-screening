@@ -4,7 +4,6 @@ import Register from '../pages/public/Register';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 
 // Patient Section Imports
-import PatientDashboard from '../pages/patient/PatientDashboard';
 import PatientHistory from '../pages/patient/PatientHistory';
 import PatientExaminationDetail from '../pages/patient/PatientExaminationDetail';
 
@@ -23,7 +22,7 @@ const RoleRoute = ({ allowedRoles, children }) => {
   }
 
   if (!allowedRoles.includes(role)) {
-    const fallbackPath = role === 'patient' ? '/patient/dashboard' : '/doctor/dashboard';
+    const fallbackPath = role === 'patient' ? '/patient/history' : '/doctor/dashboard';
     return <Navigate to={fallbackPath} replace />;
   }
 
@@ -40,7 +39,7 @@ export const AppRoutes = () => {
       {/* Protected Combined Medical Portal Layout */}
       <Route element={<DashboardLayout />}>
         {/* Role: Patient Context Channels */}
-        <Route path="/patient/dashboard" element={<RoleRoute allowedRoles={['patient']}><PatientDashboard /></RoleRoute>} />
+        <Route path="/patient/dashboard" element={<RoleRoute allowedRoles={['patient']}><Navigate to="/patient/history" replace /></RoleRoute>} />
         <Route path="/patient/history" element={<RoleRoute allowedRoles={['patient']}><PatientHistory /></RoleRoute>} />
         <Route path="/patient/examination/:id" element={<RoleRoute allowedRoles={['patient']}><PatientExaminationDetail /></RoleRoute>} />
 
