@@ -41,6 +41,7 @@ Implemented backend endpoints include:
 - `GET /patients/me/examinations`
 - `GET /patients/me/examinations/{examination_id}`
 - `GET /doctor/patients`
+- `GET /doctor/patients/search`
 - `GET /doctor/patients/{patient_id}`
 - `GET /doctor/examinations`
 - `POST /doctor/examinations`

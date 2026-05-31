@@ -61,6 +61,33 @@ def list_patients() -> list[PatientProfileResponse]:
     return [PatientProfileResponse(**row) for row in response.data or []]
 
 
+def search_patients(email: str) -> list[PatientProfileResponse]:
+    supabase = get_supabase_client()
+    normalized_email = email.strip()
+    if not normalized_email:
+        raise ExaminationServiceError(
+            message="Email search query is required.",
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        response = (
+            supabase.table("patient_profiles")
+            .select("id,user_id,email,full_name,phone_number,age,gender,profile_picture_url")
+            .ilike("email", f"%{normalized_email}%")
+            .order("email")
+            .limit(10)
+            .execute()
+        )
+    except Exception as error:
+        raise ExaminationServiceError(
+            message=_read_error_message(error) or "Patients could not be searched.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    return [PatientProfileResponse(**row) for row in response.data or []]
+
+
 def get_patient_by_id(patient_id: str) -> PatientProfileResponse:
     supabase = get_supabase_client()
 

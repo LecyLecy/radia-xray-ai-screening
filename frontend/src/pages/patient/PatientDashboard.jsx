@@ -173,9 +173,6 @@ export default function PatientDashboard() {
                 />
               </label>
               <p className="upload-tip">Supports JPG, PNG, or WEBP. Max 2 MB.</p>
-              {profile.profile_picture_url && (
-                <p className="upload-tip">Stored path: {profile.profile_picture_url}</p>
-              )}
             </div>
           </div>
         </Card>

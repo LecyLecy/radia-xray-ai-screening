@@ -9,6 +9,17 @@ export const getAllPatients = async () => {
   }
 };
 
+export const searchDoctorPatientsByEmail = async (email) => {
+  try {
+    const response = await api.get('/doctor/patients/search', {
+      params: { email },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, 'Failed to search patients.'), { cause: error });
+  }
+};
+
 export const getDoctorPatient = async (patientId) => {
   try {
     const response = await api.get(`/doctor/patients/${patientId}`);

@@ -70,6 +70,7 @@ the expected file size and MIME type rules are visible in code.
 - `PATCH /patients/me` updates patient profile fields for backend compatibility; this edit UI is hidden in the MVP.
 - `POST /patients/me/profile-picture` uploads a JPG/PNG/WEBP profile picture up to 2 MB for backend compatibility; this edit UI is hidden in the MVP.
 - `GET /doctor/patients` lists patient profiles for authenticated doctor/admin users.
+- `GET /doctor/patients/search` searches registered patient profiles by email before starting a scan workflow.
 - `GET /doctor/patients/{patient_id}` returns one patient profile by `patient_profiles.id`.
 - `GET /doctor/examinations` returns recent examination summary rows for doctor/admin dashboards.
 - `POST /doctor/examinations` creates an examination row for a selected patient.

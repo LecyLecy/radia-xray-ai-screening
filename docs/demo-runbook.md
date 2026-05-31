@@ -52,14 +52,15 @@ URLs in screenshots.
 
 1. Login as doctor.
 2. Open Patient Registry.
-3. Select the demo patient.
-4. Upload a JPG or PNG X-Ray image under 10 MB.
-5. Run AI classification.
-6. Save doctor note and AI feedback.
-7. Generate and open the PDF report.
-8. Login as the patient.
-9. Open Examination History.
-10. Open the examination detail and download the PDF report.
+3. Search the registered patient email if needed.
+4. Select the demo patient.
+5. Upload a JPG or PNG X-Ray image under 10 MB.
+6. Run AI classification.
+7. Save doctor note and AI feedback.
+8. Generate and open the PDF report.
+9. Login as the patient.
+10. Open Examination History.
+11. Open the examination detail and download the PDF report.
 
 Optional admin check:
 

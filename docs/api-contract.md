@@ -475,6 +475,39 @@ Expected errors:
 - `403`: authenticated user is not doctor/admin.
 - `500`: patient list could not be loaded.
 
+### `GET /doctor/patients/search`
+
+Searches registered patient profiles by email so doctor/admin users can find a
+newly registered patient before starting a scan workflow.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Query parameters:
+
+```text
+email=patient@example.com
+```
+
+Success response uses the same row shape as `GET /doctor/patients`.
+
+Expected errors:
+
+- `400`: email query is empty.
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not doctor/admin.
+- `422`: missing `email` query parameter.
+- `500`: patient search could not be loaded.
+
+Frontend notes:
+
+- If no row matches, tell the doctor the patient must register first.
+- After selecting a patient, use `POST /doctor/examinations` or the existing
+  screening flow to create the examination before uploading the scan.
+
 ### `GET /doctor/patients/{patient_id}`
 
 Returns one patient profile by `patient_profiles.id`.

@@ -265,26 +265,27 @@ matching `doctor_profiles` row. The AI prediction enum in Supabase must accept
    7. GET /patients/me/examinations/{id}
    8. Doctor
    9. GET /doctor/patients
-   10. GET /doctor/patients/{id}
-   11. POST /doctor/examinations
-   12. POST /doctor/examinations/{id}/upload-xray
-   13. POST /doctor/examinations/{id}/predict
-   14. PATCH /doctor/examinations/{id}/note
-   15. PATCH /doctor/examinations/{id}/feedback
-   16. POST /doctor/examinations/{id}/report
-   17. Admin
-   18. GET /admin/patients
-   19. POST /admin/patients
-   20. PATCH /admin/patients/{id}
-   21. GET /admin/doctors
-   22. GET /admin/patients/search
-   23. POST /admin/doctors/promote
-   24. PATCH /admin/doctors/{id}
-   25. GET /admin/examinations
-   26. PATCH /admin/examinations/{id}
-   27. DELETE /admin/examinations/{id}
-   28. Report
-   29. GET /reports/{id}/download
+   10. GET /doctor/patients/search
+   11. GET /doctor/patients/{id}
+   12. POST /doctor/examinations
+   13. POST /doctor/examinations/{id}/upload-xray
+   14. POST /doctor/examinations/{id}/predict
+   15. PATCH /doctor/examinations/{id}/note
+   16. PATCH /doctor/examinations/{id}/feedback
+   17. POST /doctor/examinations/{id}/report
+   18. Admin
+   19. GET /admin/patients
+   20. POST /admin/patients
+   21. PATCH /admin/patients/{id}
+   22. GET /admin/doctors
+   23. GET /admin/patients/search
+   24. POST /admin/doctors/promote
+   25. PATCH /admin/doctors/{id}
+   26. GET /admin/examinations
+   27. PATCH /admin/examinations/{id}
+   28. DELETE /admin/examinations/{id}
+   29. Report
+   30. GET /reports/{id}/download
 
 2. Temporary / Development Endpoints
    1. GET /supabase/test
@@ -302,10 +303,11 @@ matching `doctor_profiles` row. The AI prediction enum in Supabase must accept
    4. POST /auth/login
    5. GET /patients/me
    6. GET /doctor/patients
-   7. GET /doctor/patients/{patient_id}
-   8. POST /doctor/examinations
-   9. POST /ai/predict/mock
-   10. POST /doctor/examinations/{examination_id}/predict
+   7. GET /doctor/patients/search
+   8. GET /doctor/patients/{patient_id}
+   9. POST /doctor/examinations
+   10. POST /ai/predict/mock
+   11. POST /doctor/examinations/{examination_id}/predict
 
 # Repository Structure
 
