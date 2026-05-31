@@ -41,22 +41,11 @@
    3. **	**Only merge tested code here
 2. dev
 3. **	**Development integration branch
-4. **	**Feature branches are merged here first
-5. **	**Used for active development
-6. Feature-auth
-7. **	**Login register logout role access
-8. Feature-patient
-9. **	**Patient portal profile history report access
-10. Feature-doctor
-11. **	**Doctor workspace examination upload AI result report
-12. Feature-admin
-13. **	**Admin workspace manage users and examinations
-14. Feature-ai
-15. **	**AI model integration prediction confidence Grad CAM optional
-16. Feature-report
-17. **	**PDF report generation and download
-18. Feature-testing
-19. **	**Test cases bug fixing demo polish
+4. **	**Use for active development and integration testing
+5. Current workflow
+6. **	**Only `dev` and `main` are maintained branches
+7. **	**Develop and test on `dev`
+8. **	**Merge or fast-forward stable demo snapshots to `main`
 
 # Commit Convention
 
@@ -178,17 +167,15 @@
 
 1. GitHub commit history
 
-   1. **	**Each member has commits if possible
+   1. **	**Show meaningful project commits
 2. Branch history
-3. **	**Feature branches show work separation
+3. **	**Show maintained `dev` and `main` branch flow
 4. Pull requests
 5. **	**Optional but good for evidence
 6. README contribution section
-7. **	**Explain member roles
-8. Google Sheets responsibility matrix
-9. **	**Show planned responsibility
-10. Google Sheets progress log
-11. **	**Show actual progress
+7. **	**List project contributors only
+8. Google Sheets progress log
+9. **	**Show actual progress
 
 # Code Review Rule
 
@@ -200,13 +187,13 @@
 
 # Git Workflow
 
-1. Start from main
-   1. **	**Create feature branch
+1. Start from dev
+   1. **	**Pull latest `dev`
    2. **	**Implement feature
    3. **	**Test locally
    4. **	**Commit changes
-   5. **	**Push branch
-   6. **	**Merge to dev or main after test
+   5. **	**Push `dev`
+   6. **	**Merge stable demo changes to `main`
    7. **	**Update Google Sheets task status
    8. **	**Update testing log if needed
 

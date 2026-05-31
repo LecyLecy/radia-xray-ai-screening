@@ -28,7 +28,7 @@ Current MVP foundation progress:
 - Admin medical staff listing and doctor account creation are available.
 - Patient-owned examination history/detail report access endpoints are available.
 - Backend CI is available through GitHub Actions and builds the backend Docker image for validation.
-- Frontend login, register, patient dashboard/history/detail, and doctor dashboard/workflow pages are connected to backend endpoints on `frontend-ai`.
+- Frontend login, register, patient dashboard/history/detail, doctor dashboard/workflow, and admin medical staff pages are connected to backend endpoints.
 
 Implemented backend endpoints include:
 
@@ -63,7 +63,7 @@ The repository has a basic backend DevOps setup for AOL evidence:
 - Supabase CLI config: `supabase/config.toml`
 - DevOps guide: `docs/devops-pipeline.md`
 
-The `Backend CI` workflow runs on pushes and pull requests to `backend`, `dev`, and `main`. It installs backend dependencies, compiles the FastAPI backend, and builds the backend Docker image with the tag `radia-backend:ci`.
+The `Backend CI` workflow runs on pushes and pull requests to `dev` and `main`. It installs backend dependencies, compiles the FastAPI backend, and builds the backend Docker image with the tag `radia-backend:ci`.
 The `Frontend CI` workflow installs frontend dependencies, runs lint, and builds the Vite app.
 
 For AOL screenshots, capture:

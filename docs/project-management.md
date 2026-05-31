@@ -11,7 +11,7 @@ Tujuan phase ini adalah membuat rencana kerja supaya project bisa dikontrol, dib
 
 # Project Management Tools
 
-1. Google Sheets: Digunakan untuk project tracking, Gantt chart, task list, responsibility matrix, risk register, dan testing log.
+1. Google Sheets: Digunakan untuk project tracking, Gantt chart, task list, risk register, dan testing log.
 2. Google Docs: Digunakan sebagai pusat dokumentasi formal project.
 
 Project Duration
@@ -109,7 +109,7 @@ Project Duration
 | Period           | Phase                             | Main Focus                                                               | Deliverable                        |
 | ---------------- | --------------------------------- | ------------------------------------------------------------------------ | ---------------------------------- |
 | 3 Feb – 16 Feb  | Initiation & Problem Planning     | Define problem, users, scope, project title                              | Problem statement, scope boundary  |
-| 17 Feb – 2 Mar  | SDLC & Project Planning           | Choose SDLC, create WBS, timeline, responsibility matrix                 | SDLC plan, WBS, Gantt draft        |
+| 17 Feb – 2 Mar  | SDLC & Project Planning           | Choose SDLC, create WBS, and timeline                                    | SDLC plan, WBS, Gantt draft        |
 | 3 Mar – 23 Mar  | Requirement Engineering           | Define FR, NFR, user stories, acceptance criteria                        | Requirement specification          |
 | 24 Mar – 13 Apr | System Design                     | UML, ERD, architecture, UI flow                                          | Design documentation               |
 | 14 Apr – 27 Apr | Technical Preparation             | Tech stack decision, database planning, AI feasibility check             | Tech design, AI feasibility result |
@@ -124,11 +124,10 @@ Project Duration
 2. Gantt Chart
 3. WBS
 4. Task Tracker
-5. Responsibility Matrix
-6. Risk Register
-7. Testing Log
-8. Bug Log
-9. Meeting / Progress Log
+5. Risk Register
+6. Testing Log
+7. Bug Log
+8. Meeting / Progress Log
 
 # Milestones
 
@@ -142,7 +141,7 @@ Project Duration
 3. Date Range
 4. 17 Feb – 2 Mar
 5. Output:
-6. Modified Waterfall plan, WBS, Gantt chart, responsibility matrix.
+6. Modified Waterfall plan, WBS, and Gantt chart.
 7. Milestone 3 — Core System Implemented
 8. Date Range
 9. 3 Mar – 23 Mar

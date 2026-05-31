@@ -240,7 +240,7 @@ foundation.
 | Doctor examination summary | Doctor token can read `GET /doctor/examinations` for dashboard data | Not Tested |
 | Examination creation | Doctor token can create `POST /doctor/examinations` | Passed |
 | Backend syntax | `python -m compileall app` passes | Passed |
-| Frontend CI | GitHub Actions validates frontend lint and build | Passed on latest pushed `frontend-ai` before current changes |
+| Frontend CI | GitHub Actions validates frontend lint and build | Passed locally with `npm run lint` and `npm run build`; GitHub Actions runs on `dev` and `main` |
 
 # Testing Log Format for Google Sheets
 

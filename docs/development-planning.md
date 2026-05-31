@@ -150,8 +150,8 @@ Current backend progress snapshot:
    1. Full browser demo workflow testing
    2. Documentation cleanup for final submission screenshots and demo runbook
 3. Next
-   1. Merge `frontend-ai` into `dev` after CI and browser smoke testing
-   2. Decide whether admin stays future work or gets a minimal read-only demo page
+   1. Keep `dev` as the integration branch and `main` as the stable demo branch
+   2. Continue final browser smoke testing and documentation cleanup
 
 1. Priority 1
 

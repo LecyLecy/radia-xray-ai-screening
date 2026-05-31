@@ -12,9 +12,8 @@ Radia currently has backend and frontend CI validation.
 - Backend Dockerfile: `backend/Dockerfile`
 - Workflow names: `Backend CI`, `Frontend CI`
 
-The workflows run on pushes and pull requests to `backend`, `dev`, and `main`, and can also be run manually with `workflow_dispatch`.
-They also run on `frontend-ai` while that branch is used as the frontend
-integration branch.
+The workflows run on pushes and pull requests to `dev` and `main`, and can
+also be run manually with `workflow_dispatch`.
 
 ## What The Pipeline Checks
 
@@ -117,7 +116,7 @@ Use these screenshots for the AOL DevOps pipeline evidence:
 6. The workflow files `.github/workflows/backend-ci.yml` and `.github/workflows/frontend-ci.yml`.
 7. The Dockerfile `backend/Dockerfile`.
 
-If an older workflow run is red, do not use it as the main evidence. Use the latest successful green run, or manually trigger a new run on the `backend` branch and screenshot the successful result.
+If an older workflow run is red, do not use it as the main evidence. Use the latest successful green run, or manually trigger a new run on `dev` or `main` and screenshot the successful result.
 
 ## Future DevOps Tasks
 
@@ -125,7 +124,7 @@ Before final submission or deployment, decide whether to keep CI-only validation
 
 Minimum final setup:
 
-- Keep `Backend CI` green on `backend`, `dev`, and `main`.
+- Keep `Backend CI` green on `dev` and `main`.
 - Keep Docker build validation passing.
 - Capture updated screenshots for the final report.
 
