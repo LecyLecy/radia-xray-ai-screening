@@ -7,7 +7,7 @@ from app.schemas.user_schema import PatientProfileResponse
 
 
 PredictionResult = Literal["Normal", "Pneumonia"]
-ExaminationStatus = Literal["pending_review", "reviewed", "report_ready"]
+ExaminationStatus = Literal["not_ready", "ready"]
 FeedbackStatus = Literal["correct", "incorrect", "uncertain"]
 
 
@@ -99,6 +99,7 @@ class PatientDoctorSummary(BaseModel):
 class PatientXraySummary(BaseModel):
     id: str
     image_url: str
+    image_download_url: str | None = None
     file_name: str | None = None
     file_type: str | None = None
     uploaded_at: datetime | None = None

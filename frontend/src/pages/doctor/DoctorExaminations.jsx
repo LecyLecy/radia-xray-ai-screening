@@ -68,7 +68,7 @@ export default function DoctorExaminations() {
                 <td>{exam.confidence_percentage ?? '-'}%</td>
                 <td>
                   <Button variant="secondary" onClick={() => navigate(`/doctor/examinations/${exam.id}`)}>
-                    {exam.status === 'pending_review' ? 'Review' : 'Open'}
+                    {exam.status === 'ready' ? 'Open' : 'Review'}
                   </Button>
                 </td>
               </tr>

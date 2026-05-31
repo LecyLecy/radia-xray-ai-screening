@@ -60,7 +60,11 @@ export default function PatientExaminationDetail() {
     return <div className="p-4" style={{ color: '#dc2626' }}>{errorMessage || 'Examination log not found.'}</div>;
   }
 
-  const isFinalized = ['reviewed', 'report_ready'].includes(exam.status);
+  const isFinalized = exam.status === 'ready';
+  const finalDiagnosis = isFinalized ? exam.final_diagnosis_result || '-' : 'Still under review';
+  const finalDoctorNote = isFinalized
+    ? exam.final_doctor_note || '-'
+    : 'Your scan is still being checked by the designated medical specialist.';
 
   return (
     <div className="patient-panel">
@@ -78,10 +82,13 @@ export default function PatientExaminationDetail() {
       <div className="grid-detail-view">
         <Card title="Acquired Chest X-Ray Specimen">
           <div className="xray-frame">
-            {exam.xray_image?.image_url ? (
-              <p className="clinical-notes">
-                Private storage path: {exam.xray_image.image_url}
-              </p>
+            {exam.xray_image?.image_download_url ? (
+              <img
+                src={exam.xray_image.image_download_url}
+                alt={exam.xray_image.file_name || 'Chest X-Ray specimen'}
+              />
+            ) : exam.xray_image?.file_name ? (
+              <p className="clinical-notes">{exam.xray_image.file_name}</p>
             ) : (
               <p className="clinical-notes">No X-Ray image metadata is available yet.</p>
             )}
@@ -117,17 +124,13 @@ export default function PatientExaminationDetail() {
             <div className="meta-item border-top">
               <span className="label">Final Diagnosis</span>
               <span className={`val thick ${exam.final_diagnosis_result?.toLowerCase() || ''}`}>
-                {isFinalized ? exam.final_diagnosis_result || '-' : 'Still under review'}
+                {finalDiagnosis}
               </span>
             </div>
           </Card>
 
           <Card title="Doctor Evaluation Note">
-            <p className="clinical-notes">
-              {isFinalized
-                ? exam.final_doctor_note || 'Final doctor note is not available yet.'
-                : 'Your scan is still being checked by the designated medical specialist.'}
-            </p>
+            <p className="clinical-notes">{finalDoctorNote}</p>
             <div className="signature-block">
               <p>Attending Radiologist,</p>
               <h4>{exam.doctor?.full_name || exam.doctor?.email || '-'}</h4>

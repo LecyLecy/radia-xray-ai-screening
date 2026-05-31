@@ -30,8 +30,8 @@ export default function DoctorDashboard() {
     fetchDashboard();
   }, []);
 
-  const pendingCount = examinations.filter((exam) => exam.status === 'pending_review').length;
-  const completedCount = examinations.filter((exam) => ['reviewed', 'report_ready'].includes(exam.status)).length;
+  const pendingCount = examinations.filter((exam) => exam.status !== 'ready').length;
+  const completedCount = examinations.filter((exam) => exam.status === 'ready').length;
   const recentExaminations = examinations.slice(0, 5);
 
   return (

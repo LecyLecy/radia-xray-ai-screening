@@ -141,12 +141,6 @@ def _require_doctor_owns_examination(
 
 
 def _require_review_ready(examination: dict, feedback: dict) -> None:
-    if examination.get("status") not in {"reviewed", "report_ready"}:
-        raise ReportServiceError(
-            message="Final doctor review is required before generating a report.",
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
-
     if not (examination.get("final_doctor_note") or examination.get("doctor_note") or "").strip():
         raise ReportServiceError(
             message="Final doctor note is required before generating a report.",
@@ -213,7 +207,10 @@ def _build_report_pdf(
 
     add_heading("Examination Information")
     add_line("Examination Date", examination.get("examination_date"))
-    add_line("Status", examination.get("status"))
+    report_status = (
+        "ready" if examination.get("status") in {"ready", "report_ready"} else "not_ready"
+    )
+    add_line("Status", report_status)
     add_line("X-Ray File", xray_image.get("file_name"))
     add_line("X-Ray Storage Path", xray_image.get("image_url"))
 
@@ -314,7 +311,7 @@ def generate_examination_report(
         )
 
     try:
-        supabase.table("examinations").update({"status": "report_ready"}).eq(
+        supabase.table("examinations").update({"status": "ready"}).eq(
             "id", examination_id
         ).execute()
     except Exception as error:

@@ -190,3 +190,26 @@ def create_profile_picture_signed_url(object_path: str | None) -> str | None:
         "signedURL",
         None,
     )
+
+
+def create_xray_signed_url(object_path: str | None) -> str | None:
+    if not object_path:
+        return None
+
+    supabase = get_supabase_client()
+    try:
+        signed_response = supabase.storage.from_(STORAGE_BUCKET_XRAY).create_signed_url(
+            object_path,
+            60 * 10,
+        )
+    except Exception:
+        return None
+
+    if isinstance(signed_response, dict):
+        return signed_response.get("signedURL") or signed_response.get("signed_url")
+
+    return getattr(signed_response, "signed_url", None) or getattr(
+        signed_response,
+        "signedURL",
+        None,
+    )

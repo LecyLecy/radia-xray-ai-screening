@@ -82,7 +82,7 @@ Optional admin check:
 - Doctor UI shows AI result/confidence as decision support, final diagnosis,
   final note, feedback, and report ready state.
 - Patient UI never shows AI result or confidence. Pending patients only see the
-  temporary summary; reviewed patients see the doctor's final diagnosis and
+  temporary summary; ready reports show the doctor's final diagnosis and
   final note.
 - Supabase `xray_images`, `ai_predictions`, `doctor_feedbacks`, and
   `pdf_reports` tables contain rows for the examination.

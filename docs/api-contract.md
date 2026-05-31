@@ -321,7 +321,7 @@ Success response:
   {
     "id": "examination_uuid",
     "examination_date": "2026-05-23T07:54:03Z",
-    "status": "report_ready",
+    "status": "ready",
     "doctor_name": "Doctor Name",
     "final_diagnosis_result": "Pneumonia",
     "report_id": "report_uuid"
@@ -354,8 +354,8 @@ Frontend notes:
 
 Returns one examination detail only if it belongs to the current logged-in
 patient. Patients never receive AI result or confidence. While status is
-`pending_review`, patients see doctor/date/status/scan/symptoms/preliminary
-solution only. After status is `reviewed` or `report_ready`, patients also see
+`not_ready`, patients see doctor/date/status/scan/symptoms/preliminary
+solution only. After status is `ready`, patients also see
 the doctor's final diagnosis and final note.
 
 Headers:
@@ -373,7 +373,7 @@ Success response:
   "doctor_id": "doctor_profile_uuid",
   "created_by_user_id": "auth_user_uuid",
   "examination_date": "2026-05-23T07:54:03Z",
-  "status": "report_ready",
+  "status": "ready",
   "doctor_note": "Doctor clinical note.",
   "symptoms_description": "Persistent cough and fever.",
   "preliminary_solution": "Rest, hydration, and await final radiologist review.",
@@ -558,7 +558,7 @@ Success response:
     "patient_name": "Patient Name",
     "patient_email": "patient@example.com",
     "examination_date": "2026-05-23T07:54:03Z",
-    "status": "report_ready",
+    "status": "ready",
     "prediction_result": "Normal",
     "confidence_percentage": 74,
     "report_id": "report_uuid"
@@ -588,7 +588,7 @@ Starts the doctor-owned examination flow in one request. The patient must
 already be registered. The backend finds `patient_profiles` by email, creates
 an examination owned by the logged-in doctor, uploads the X-Ray to
 `xray-images`, runs AI prediction, stores `xray_images` and
-`ai_predictions`, and leaves the examination status as `pending_review`.
+`ai_predictions`, and leaves the examination status as `not_ready`.
 
 Headers:
 
@@ -656,7 +656,7 @@ Expected errors:
 ### `PATCH /doctor/examinations/{examination_id}/final-review`
 
 Saves the doctor's final patient-facing diagnosis and note, stores AI feedback,
-and marks the examination as `reviewed`.
+and keeps the examination `not_ready` until the PDF report is generated.
 
 Headers:
 
@@ -742,7 +742,7 @@ Success response:
   "doctor_id": "doctor_profile_uuid_or_null",
   "created_by_user_id": "auth_user_uuid",
   "examination_date": "2026-05-21T10:00:00Z",
-  "status": "pending_review",
+  "status": "not_ready",
   "doctor_note": null
 }
 ```
@@ -782,7 +782,7 @@ Success response:
   "doctor_id": "doctor_profile_uuid_or_null",
   "created_by_user_id": "auth_user_uuid",
   "examination_date": "2026-05-21T10:00:00Z",
-  "status": "pending_review",
+  "status": "not_ready",
   "doctor_note": "Patient shows mild respiratory symptoms. Recommend follow-up."
 }
 ```
@@ -798,7 +798,7 @@ Expected errors:
 ### `PATCH /doctor/examinations/{examination_id}/feedback`
 
 Saves or updates the doctor's validation of the AI result. Saving feedback marks
-the examination status as `reviewed`.
+the examination status as `not_ready` until the PDF report is generated.
 
 Headers:
 
@@ -846,10 +846,10 @@ Expected errors:
 
 ### `POST /doctor/examinations/{examination_id}/report`
 
-Generates or regenerates a PDF report for a reviewed examination. The backend
+Generates or regenerates a PDF report for a final-reviewed examination. The backend
 stores the generated PDF in the private `pdf-reports` Supabase Storage bucket,
 saves report metadata in `pdf_reports`, and marks the examination as
-`report_ready`.
+`ready`.
 
 Headers:
 

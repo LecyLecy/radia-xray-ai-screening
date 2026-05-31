@@ -183,7 +183,7 @@ Di fasilitas kesehatan dengan sumber daya terbatas, proses pemeriksaan chest X-R
 1. Email notification when report is ready
 2. Follow-up examination date
 3. Admin audit log
-4. Simple status label: waiting review / reviewed / report ready
+4. Simple status label: not ready / ready
 5. Basic dashboard cards, not statistics-heavy
 
 * Won’t Have:

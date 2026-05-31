@@ -160,7 +160,7 @@ Tujuan phase ini adalah mendefinisikan apa yang harus dilakukan sistem Radia, si
 3. Profile picture upload
 4. AI feedback: correct / incorrect / uncertain
 5. Admin full access to manage data
-6. Examination status: pending review / reviewed / report ready
+6. Examination status: not ready / ready
 7. Image format validation
 8. Could Have
 9. Grad-CAM visualization

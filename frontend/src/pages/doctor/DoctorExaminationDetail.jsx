@@ -96,7 +96,7 @@ export default function DoctorExaminationDetail() {
       const report = await generateReport(id);
       setExam((current) => ({
         ...current,
-        status: 'report_ready',
+        status: 'ready',
         report,
       }));
     } catch (error) {
@@ -131,7 +131,7 @@ export default function DoctorExaminationDetail() {
   }
 
   const aiPrediction = exam.ai_prediction;
-  const isReviewed = ['reviewed', 'report_ready'].includes(exam.status);
+  const canGenerateReport = Boolean(exam.final_diagnosis_result && exam.final_doctor_note);
 
   return (
     <div className="doctor-panel">
@@ -244,7 +244,7 @@ export default function DoctorExaminationDetail() {
             <Button variant="primary" onClick={handleSaveReview} disabled={isSaving}>
               {isSaving ? 'Saving...' : 'Save Final Review'}
             </Button>
-            <Button variant="secondary" onClick={handleGenerateReport} disabled={!isReviewed || isGenerating}>
+            <Button variant="secondary" onClick={handleGenerateReport} disabled={!canGenerateReport || isGenerating}>
               {isGenerating ? 'Generating...' : 'Generate PDF'}
             </Button>
             {exam.report?.id && (

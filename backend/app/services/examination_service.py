@@ -26,6 +26,7 @@ from app.services.ai_service import MEDICAL_AI_DISCLAIMER, create_mock_predictio
 from app.services.supabase_service import get_supabase_client
 from app.services.storage_service import (
     StorageServiceError,
+    create_xray_signed_url,
     read_valid_xray_upload,
     upload_xray_image,
 )
@@ -42,6 +43,19 @@ def _read_error_message(error: Exception) -> str:
     if isinstance(error, APIError):
         return error.message
     return str(error)
+
+
+def _public_examination_status(status_value: str | None, report: dict | None = None) -> str:
+    if report or status_value in {"ready", "report_ready"}:
+        return "ready"
+    return "not_ready"
+
+
+def _with_public_status(row: dict, report: dict | None = None) -> dict:
+    return {
+        **row,
+        "status": _public_examination_status(row.get("status"), report),
+    }
 
 
 def list_patients() -> list[PatientProfileResponse]:
@@ -315,6 +329,16 @@ def _latest_related_rows(
     return latest_by_examination
 
 
+def _patient_xray_summary(row: dict | None) -> PatientXraySummary | None:
+    if not row:
+        return None
+
+    return PatientXraySummary(
+        **row,
+        image_download_url=create_xray_signed_url(row.get("image_url")),
+    )
+
+
 def _doctor_profiles_by_id(doctor_ids: list[str]) -> dict[str, dict]:
     if not doctor_ids:
         return {}
@@ -399,7 +423,10 @@ def list_doctor_examinations(
                 "email"
             ),
             examination_date=examination["examination_date"],
-            status=examination["status"],
+            status=_public_examination_status(
+                examination.get("status"),
+                reports.get(examination["id"]),
+            ),
             prediction_result=predictions.get(examination["id"], {}).get(
                 "prediction_result"
             ),
@@ -442,13 +469,20 @@ def list_current_patient_examinations(
         PatientExaminationHistoryItem(
             id=examination["id"],
             examination_date=examination["examination_date"],
-            status=examination["status"],
+            status=_public_examination_status(
+                examination.get("status"),
+                reports.get(examination["id"]),
+            ),
             doctor_name=doctors.get(examination.get("doctor_id") or "", {}).get(
                 "full_name"
             ),
             final_diagnosis_result=(
                 examination.get("final_diagnosis_result")
-                if examination.get("status") in {"reviewed", "report_ready"}
+                if _public_examination_status(
+                    examination.get("status"),
+                    reports.get(examination["id"]),
+                )
+                == "ready"
                 else None
             ),
             report_id=reports.get(examination["id"], {}).get("id"),
@@ -500,7 +534,7 @@ def get_current_patient_examination_detail(
         examination_id
     )
     doctor = doctors.get(examination.get("doctor_id") or "")
-    is_finalized = examination.get("status") in {"reviewed", "report_ready"}
+    is_finalized = _public_examination_status(examination.get("status"), report) == "ready"
 
     return PatientExaminationDetailResponse(
         id=examination["id"],
@@ -508,7 +542,7 @@ def get_current_patient_examination_detail(
         doctor_id=examination.get("doctor_id"),
         created_by_user_id=examination["created_by_user_id"],
         examination_date=examination["examination_date"],
-        status=examination["status"],
+        status=_public_examination_status(examination.get("status"), report),
         doctor_note=examination.get("doctor_note") if is_finalized else None,
         symptoms_description=examination.get("symptoms_description"),
         preliminary_solution=examination.get("preliminary_solution"),
@@ -517,7 +551,7 @@ def get_current_patient_examination_detail(
         ),
         final_doctor_note=examination.get("final_doctor_note") if is_finalized else None,
         doctor=PatientDoctorSummary(**doctor) if doctor else None,
-        xray_image=PatientXraySummary(**xray_image) if xray_image else None,
+        xray_image=_patient_xray_summary(xray_image),
         ai_prediction=None,
         doctor_feedback=None,
         report=PatientReportSummary(**report) if report else None,
@@ -557,7 +591,7 @@ def get_doctor_examination_detail(
         doctor_id=examination.get("doctor_id"),
         created_by_user_id=examination["created_by_user_id"],
         examination_date=examination["examination_date"],
-        status=examination["status"],
+        status=_public_examination_status(examination.get("status"), report),
         doctor_note=examination.get("doctor_note"),
         symptoms_description=examination.get("symptoms_description"),
         preliminary_solution=examination.get("preliminary_solution"),
@@ -565,7 +599,7 @@ def get_doctor_examination_detail(
         final_doctor_note=examination.get("final_doctor_note"),
         patient=PatientProfileResponse(**patient) if patient else None,
         doctor=PatientDoctorSummary(**doctor) if doctor else None,
-        xray_image=PatientXraySummary(**xray_image) if xray_image else None,
+        xray_image=_patient_xray_summary(xray_image),
         ai_prediction=PatientPredictionSummary(**prediction) if prediction else None,
         doctor_feedback=PatientFeedbackSummary(**feedback) if feedback else None,
         report=PatientReportSummary(**report) if report else None,
@@ -588,7 +622,7 @@ def create_examination(
         "doctor_id": doctor_id,
         "created_by_user_id": current_user.user_id,
         "examination_date": examination_date.isoformat(),
-        "status": "pending_review",
+        "status": "not_ready",
         "doctor_note": None,
         "symptoms_description": None,
         "preliminary_solution": None,
@@ -610,7 +644,7 @@ def create_examination(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-    return ExaminationResponse(**response.data[0])
+    return ExaminationResponse(**_with_public_status(response.data[0]))
 
 
 async def start_doctor_examination(
@@ -649,7 +683,7 @@ async def start_doctor_examination(
         "doctor_id": doctor_id,
         "created_by_user_id": current_user.user_id,
         "examination_date": examination_date.isoformat(),
-        "status": "pending_review",
+        "status": "not_ready",
         "doctor_note": None,
         "symptoms_description": cleaned_symptoms,
         "preliminary_solution": cleaned_preliminary_solution,
@@ -786,7 +820,7 @@ def update_doctor_note(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-    return ExaminationResponse(**response.data[0])
+    return ExaminationResponse(**_with_public_status(response.data[0]))
 
 
 def save_doctor_feedback(
@@ -844,7 +878,7 @@ def save_doctor_feedback(
         )
 
     try:
-        supabase.table("examinations").update({"status": "reviewed"}).eq(
+        supabase.table("examinations").update({"status": "not_ready"}).eq(
             "id", examination_id
         ).execute()
     except Exception as error:
@@ -895,7 +929,7 @@ def save_final_doctor_review(
                     "final_diagnosis_result": payload.final_diagnosis_result,
                     "final_doctor_note": payload.final_doctor_note,
                     "doctor_note": payload.final_doctor_note,
-                    "status": "reviewed",
+                    "status": "not_ready",
                 }
             )
             .eq("id", examination_id)
@@ -913,4 +947,4 @@ def save_final_doctor_review(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-    return ExaminationResponse(**response.data[0])
+    return ExaminationResponse(**_with_public_status(response.data[0]))

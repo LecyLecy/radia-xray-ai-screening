@@ -397,7 +397,7 @@ End
 50. created_at
 51. Updated_at
 52. Status
-53. pending_review
+53. not_ready
 54. reviewed
 55. Report_ready
 56. xray_images
