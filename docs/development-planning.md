@@ -192,8 +192,8 @@ Current backend progress snapshot:
    29. **	**Generate report
    30. **	**Include patient data
    31. **	**Include doctor data
-   32. **	**Include AI result
-   33. **	**Include doctor note
+   32. **	**Include final diagnosis
+   33. **	**Include final doctor note
    34. **	**Include disclaimer
 2. Priority 2
 3. Profile Picture
@@ -536,11 +536,11 @@ chore
 1. Demo Flow
    1. **	**Patient registers account
    2. **	**Doctor logs in
-   3. **	**Doctor selects patient
-   4. **	**Doctor creates examination
+   3. **	**Doctor enters registered patient email
+   4. **	**Doctor creates doctor-owned examination with symptoms and preliminary solution
    5. **	**Doctor uploads X Ray
-   6. **	**System shows AI result
-   7. **	**Doctor adds note
+   6. **	**System shows AI result to doctor
+   7. **	**Doctor saves final diagnosis and final note
    8. **	**Doctor generates PDF report
    9. **	**Patient logs in
    10. **	**Patient opens examination history

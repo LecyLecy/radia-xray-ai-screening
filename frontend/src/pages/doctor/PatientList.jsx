@@ -6,6 +6,8 @@ import { getAllPatients, searchDoctorPatientsByEmail } from '../../services/exam
 
 export default function PatientList() {
   const navigate = useNavigate();
+  const role = localStorage.getItem('userRole');
+  const isAdmin = role === 'admin';
   const [patients, setPatients] = useState([]);
   const [searchEmail, setSearchEmail] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -89,8 +91,12 @@ export default function PatientList() {
   return (
     <div className="doctor-panel">
       <div className="section-title">
-        <h2>Patient Registry</h2>
-        <p>Search a registered patient, open their file, then upload the scan</p>
+        <h2>{isAdmin ? 'All Patients' : 'Patient Registry'}</h2>
+        <p>
+          {isAdmin
+            ? 'View every registered patient account in the system'
+            : 'Search a registered patient or start a scan from the doctor workspace'}
+        </p>
       </div>
 
       <form className="patient-search-bar" onSubmit={handleSearch}>
@@ -115,7 +121,7 @@ export default function PatientList() {
 
       {!isLoading && !errorMessage && (
         patients.length > 0 ? (
-          <Table headers={['Patient ID', 'Full Name', 'Email', 'Contact', 'Age', 'Gender', 'Action']}>
+          <Table headers={isAdmin ? ['Patient ID', 'Full Name', 'Email', 'Contact', 'Age', 'Gender'] : ['Patient ID', 'Full Name', 'Email', 'Contact', 'Age', 'Gender', 'Action']}>
             {patients.map((patient) => (
               <tr key={patient.id}>
                 <td><strong>{patient.id}</strong></td>
@@ -124,11 +130,13 @@ export default function PatientList() {
                 <td>{patient.phone_number || '-'}</td>
                 <td>{patient.age ?? '-'}</td>
                 <td>{patient.gender || '-'}</td>
-                <td>
-                  <Button variant="primary" onClick={() => navigate(`/doctor/patient/${patient.id}`)}>
-                    Start Scan
-                  </Button>
-                </td>
+                {!isAdmin && (
+                  <td>
+                    <Button variant="primary" onClick={() => navigate(`/doctor/patient/${patient.id}`)}>
+                      Start Scan
+                    </Button>
+                  </td>
+                )}
               </tr>
             ))}
           </Table>

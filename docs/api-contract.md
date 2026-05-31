@@ -323,8 +323,7 @@ Success response:
     "examination_date": "2026-05-23T07:54:03Z",
     "status": "report_ready",
     "doctor_name": "Doctor Name",
-    "prediction_result": "Pneumonia",
-    "confidence_percentage": 82,
+    "final_diagnosis_result": "Pneumonia",
     "report_id": "report_uuid"
   }
 ]
@@ -334,8 +333,7 @@ Nullable fields:
 
 ```text
 doctor_name
-prediction_result
-confidence_percentage
+final_diagnosis_result
 report_id
 ```
 
@@ -355,8 +353,10 @@ Frontend notes:
 ### `GET /patients/me/examinations/{examination_id}`
 
 Returns one examination detail only if it belongs to the current logged-in
-patient. Related X-Ray, AI prediction, doctor feedback, and PDF report sections
-return `null` when they do not exist yet.
+patient. Patients never receive AI result or confidence. While status is
+`pending_review`, patients see doctor/date/status/scan/symptoms/preliminary
+solution only. After status is `reviewed` or `report_ready`, patients also see
+the doctor's final diagnosis and final note.
 
 Headers:
 
@@ -375,6 +375,10 @@ Success response:
   "examination_date": "2026-05-23T07:54:03Z",
   "status": "report_ready",
   "doctor_note": "Doctor clinical note.",
+  "symptoms_description": "Persistent cough and fever.",
+  "preliminary_solution": "Rest, hydration, and await final radiologist review.",
+  "final_diagnosis_result": "Pneumonia",
+  "final_doctor_note": "Final instruction for patient.",
   "doctor": {
     "id": "doctor_profile_uuid",
     "full_name": "Doctor Name",
@@ -388,15 +392,7 @@ Success response:
     "file_type": "image/png",
     "uploaded_at": "2026-05-23T07:54:03Z"
   },
-  "ai_prediction": {
-    "id": "ai_prediction_uuid",
-    "prediction_result": "Pneumonia",
-    "confidence_score": 0.82,
-    "confidence_percentage": 82,
-    "gradcam_url": null,
-    "model_name": "radia-mock-ai-v1",
-    "created_at": "2026-05-23T07:54:03Z"
-  },
+  "ai_prediction": null,
   "doctor_feedback": {
     "id": "feedback_uuid",
     "feedback_status": "correct",
@@ -435,7 +431,8 @@ Frontend notes:
   the private PDF through a signed URL.
 - `xray_image.image_url` and `report.report_url` are private storage object
   paths, not public URLs.
-- Always show the `disclaimer` near AI result details.
+- Do not render AI result or confidence in patient UI. AI metadata is reserved
+  for doctor decision support.
 
 ## Doctor Workflow
 
@@ -541,7 +538,9 @@ Expected errors:
 
 ### `GET /doctor/examinations`
 
-Returns recent examination summary rows for doctor/admin dashboard screens.
+Returns examination summary rows for doctor/admin dashboard screens. Doctor
+users only receive examinations where `doctor_id` matches their own doctor
+profile. Admin users can see all examinations.
 
 Headers:
 
@@ -557,6 +556,7 @@ Success response:
     "id": "examination_uuid",
     "patient_id": "patient_profile_uuid",
     "patient_name": "Patient Name",
+    "patient_email": "patient@example.com",
     "examination_date": "2026-05-23T07:54:03Z",
     "status": "report_ready",
     "prediction_result": "Normal",
@@ -570,6 +570,7 @@ Nullable fields:
 
 ```text
 patient_name
+patient_email
 prediction_result
 confidence_percentage
 report_id
@@ -581,9 +582,138 @@ Expected errors:
 - `403`: authenticated user is not doctor/admin.
 - `500`: examination summary data could not be loaded.
 
+### `POST /doctor/examinations/start`
+
+Starts the doctor-owned examination flow in one request. The patient must
+already be registered. The backend finds `patient_profiles` by email, creates
+an examination owned by the logged-in doctor, uploads the X-Ray to
+`xray-images`, runs the mock AI prediction, stores `xray_images` and
+`ai_predictions`, and leaves the examination status as `pending_review`.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+Content-Type: multipart/form-data
+```
+
+Form fields:
+
+```text
+patient_email=patient@example.com
+symptoms_description=Persistent cough and fever.
+preliminary_solution=Rest, hydration, and await final radiologist review.
+xray_image=@scan.png
+```
+
+Success response:
+
+```json
+{
+  "examination_id": "examination_uuid",
+  "prediction_result": "Pneumonia",
+  "confidence_score": 0.82,
+  "confidence_percentage": 82,
+  "model_name": "radia-mock-cxr-v1",
+  "is_mock": true,
+  "disclaimer": "AI result is for decision support only...",
+  "xray_image_id": "xray_image_uuid",
+  "ai_prediction_id": "ai_prediction_uuid",
+  "image_url": "examination_uuid/20260601010000_scan.png"
+}
+```
+
+Expected errors:
+
+- `400`: required form values are empty or file type is not JPG/PNG.
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not a doctor.
+- `404`: patient email or doctor profile was not found.
+- `413`: X-Ray image is larger than 10 MB.
+- `500`: examination, image metadata, upload, or prediction could not be saved.
+
+### `GET /doctor/examinations/{examination_id}`
+
+Returns one examination detail for doctor review. Doctor users can only read
+their own examinations; admin users can read all examinations.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Success response includes patient info, symptoms, preliminary solution, scan
+metadata, AI result/confidence, final review fields, feedback, and report
+metadata.
+
+Expected errors:
+
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not doctor/admin, or a doctor is accessing another doctor's examination.
+- `404`: examination was not found.
+
+### `PATCH /doctor/examinations/{examination_id}/final-review`
+
+Saves the doctor's final patient-facing diagnosis and note, stores AI feedback,
+and marks the examination as `reviewed`.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+Request:
+
+```json
+{
+  "final_diagnosis_result": "Pneumonia",
+  "final_doctor_note": "Final instruction for patient.",
+  "feedback_status": "correct",
+  "feedback_note": "AI result was clinically aligned."
+}
+```
+
+Allowed values:
+
+```text
+final_diagnosis_result: Normal, Pneumonia
+feedback_status: correct, incorrect, uncertain
+```
+
+Success response:
+
+```json
+{
+  "id": "examination_uuid",
+  "patient_id": "patient_profile_uuid",
+  "doctor_id": "doctor_profile_uuid",
+  "created_by_user_id": "auth_user_uuid",
+  "examination_date": "2026-06-01T01:00:00Z",
+  "status": "reviewed",
+  "doctor_note": "Final instruction for patient.",
+  "symptoms_description": "Persistent cough and fever.",
+  "preliminary_solution": "Rest, hydration, and await final radiologist review.",
+  "final_diagnosis_result": "Pneumonia",
+  "final_doctor_note": "Final instruction for patient."
+}
+```
+
+Expected errors:
+
+- `401`: missing, malformed, or invalid bearer token.
+- `403`: authenticated user is not doctor/admin, or a doctor is reviewing another doctor's examination.
+- `404`: examination was not found.
+- `422`: missing or invalid final diagnosis, final note, or feedback status.
+- `500`: final review could not be saved.
+
 ### `POST /doctor/examinations`
 
-Creates a new examination record for a patient.
+Legacy compatibility endpoint. Creates a new examination record for a patient
+without upload or AI prediction. Prefer `POST /doctor/examinations/start` for
+the current doctor-owned examination flow.
 
 Headers:
 

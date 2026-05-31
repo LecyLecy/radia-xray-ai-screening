@@ -35,13 +35,13 @@ Di phase ini kita mulai mengubah requirement Radia menjadi blueprint teknis: sis
    7. Download own PDF report
 2. Doctor
 3. Login
-4. View patient list
-5. View patient detail
-6. Create examination record
+4. Start new scan for registered patient by email
+5. View own examinations
+6. Create doctor-owned examination record
 7. Upload X-Ray image
 8. Run AI-assisted pneumonia screening
-9. View prediction result and confidence score
-10. Add doctor note
+9. View prediction result and confidence score as decision support
+10. Add final doctor note
 11. Validate AI result
 12. Generate PDF report
 13. View patient examination history
@@ -69,13 +69,13 @@ Di phase ini kita mulai mengubah requirement Radia menjadi blueprint teknis: sis
       7. Download PDF Report
    2. Doctor
    3. Login
-   4. View Patient List
-   5. View Patient Detail
-   6. Create Examination Record
+   4. Start New Scan
+   5. View My Examinations
+   6. Create Doctor-Owned Examination Record
    7. Upload X-Ray
    8. Run AI Screening
    9. View AI Result
-   10. Add Doctor Note
+   10. Add Final Doctor Note
    11. Validate AI Prediction
    12. Generate PDF Report
    13. View Patient Examination History
@@ -90,8 +90,8 @@ Di phase ini kita mulai mengubah requirement Radia menjadi blueprint teknis: sis
    22. Download PDF Report
    23. Relasi include/extend yang bisa dipakai
    24. Run AI Screening includes Upload X-Ray
-   25. Generate PDF Report includes Add Doctor Note
-   26. View Examination Detail includes View AI Result
+   25. Generate PDF Report includes Save Final Doctor Review
+   26. Doctor View Examination Detail includes View AI Result
    27. Download PDF Report includes View Examination Detail
    28. Validate AI Prediction extends View AI Result
 
@@ -109,11 +109,11 @@ System checks user role
 
 ↓
 
-Doctor/Admin selects patient
+Doctor searches registered patient by email
 
 ↓
 
-Doctor/Admin creates examination record
+Doctor creates doctor-owned examination record
 
 ↓
 
@@ -147,7 +147,7 @@ System displays result
 
 ↓
 
-Doctor/Admin adds doctor note
+Doctor/Admin saves final diagnosis and final doctor note
 
 ↓
 
@@ -155,7 +155,7 @@ Doctor/Admin validates AI result
 
 ↓
 
-System saves examination result
+System saves final review and AI feedback
 
 ↓
 
@@ -545,7 +545,7 @@ UI Wireframe / Page Structure
 
 ↓
 
-10. System generates PDF report
+10. System generates PDF report with final doctor result
 
 ↓
 
@@ -563,7 +563,7 @@ UI Wireframe / Page Structure
 2. Modularity
 3. Each feature is implemented as a separate module to make development, testing, and maintenance easier.
 4. Information Hiding
-5. AI model processing details are hidden behind an inference API, so frontend only receives prediction result and confidence score.
+5. AI model processing details are hidden behind an inference API. Doctor/admin screens receive prediction result and confidence score for decision support; patient screens receive only pending summary and final doctor result.
 6. Low Coupling
 7. Frontend does not directly access the database or AI model. It communicates through backend API.
 8. High Cohesion

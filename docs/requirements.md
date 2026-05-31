@@ -22,8 +22,8 @@ Tujuan phase ini adalah mendefinisikan apa yang harus dilakukan sistem Radia, si
 
 | Stakeholder      | Description                                                         | Main Interest                                                 |
 | ---------------- | ------------------------------------------------------------------- | ------------------------------------------------------------- |
-| Patient          | User who receives X-Ray examination and accesses examination report | Can view own history and download PDF report                  |
-| Doctor           | Medical user who performs/reviews examination                       | Can upload X-Ray, review AI result, add note, validate result |
+| Patient          | User who receives X-Ray examination and accesses examination report | Can view own history, pending summary, final doctor result, and download PDF report |
+| Doctor           | Medical user who performs/reviews examination                       | Can start scans, upload X-Ray, review AI support, add final note, validate result |
 | Admin            | Operational user who manages system data                            | Can manage users, patients, doctors, and examination records  |
 | Development Team | Team building Radia                                                 | Build, test, document, and maintain the system                |
 
@@ -59,14 +59,14 @@ Tujuan phase ini adalah mendefinisikan apa yang harus dilakukan sistem Radia, si
 3. Doctor adalah user internal yang melakukan pemeriksaan dan validasi klinis.
 4. Doctor Dapat
 5. Login
-6. View patient list
-7. View patient detail
+6. Start new scan for a registered patient by email
+7. View own examination queue
 8. Create examination record
 9. Upload X-Ray
 10. Run AI-assisted pneumonia screening
-11. View AI prediction result and confidence score
+11. View AI prediction result and confidence score as decision support
 12. View Grad-CAM if available
-13. Add doctor note
+13. Add final doctor note
 14. Validate AI result
 15. Generate PDF report
 16. View patient examination history
@@ -133,9 +133,9 @@ Tujuan phase ini adalah mendefinisikan apa yang harus dilakukan sistem Radia, si
 | US-01 Patient Register | Patient can submit registration form with valid data; account is created; patient can log in after registration.       |
 | US-05 View History     | Patient can see only their own examination records; no other patient records are visible.                              |
 | US-10 Upload X-Ray     | Doctor can upload JPG/PNG image; invalid file format is rejected; uploaded image is linked to the correct examination. |
-| US-11 View AI Result   | System displays Normal/Pneumonia result and confidence score after prediction.                                         |
-| US-13 Doctor Note      | Doctor can add and save clinical note; note appears in examination detail and PDF report.                              |
-| US-15 Generate PDF     | PDF includes patient data, doctor data, examination date, AI result, doctor note, and disclaimer.                      |
+| US-11 View AI Result   | System displays Normal/Pneumonia result and confidence score to doctor/admin only after prediction.                    |
+| US-13 Doctor Note      | Doctor can add and save final clinical note; final note appears in patient detail and PDF report after review.         |
+| US-15 Generate PDF     | PDF includes patient data, doctor data, examination date, final diagnosis, final doctor note, and disclaimer.          |
 | US-17 Manage Doctor    | Admin can search registered patient accounts, promote them to doctor role, and view medical staff accounts.            |
 | US-20 Generate Reports | Admin can generate/download reports for examination records.                                                           |
 
@@ -153,7 +153,7 @@ Tujuan phase ini adalah mendefinisikan apa yang harus dilakukan sistem Radia, si
    8. Upload X-Ray image
    9. AI prediction result: Normal/Pneumonia
    10. Confidence score
-   11. Doctor note
+   11. Final doctor note
    12. PDF report generation
    13. Patient PDF download
 2. Should Have
@@ -193,7 +193,7 @@ Tujuan phase ini adalah mendefinisikan apa yang harus dilakukan sistem Radia, si
 | FR-14  | Upload X-Ray              | Doctor       | Upload Feature     | Integration, System |
 | FR-15  | Run AI screening          | Doctor       | AI Prediction      | Integration         |
 | FR-16  | Display prediction        | Doctor/Admin | Result Page        | System              |
-| FR-19  | Add doctor note           | Doctor       | Examination Detail | System              |
+| FR-19  | Add final doctor note     | Doctor       | Examination Detail | System              |
 | FR-20  | Validate AI output        | Doctor       | AI Feedback        | System              |
 | FR-23  | Admin manage patient      | Admin        | Admin Workspace    | System              |
 | FR-24  | Admin manage doctor       | Admin        | Admin Workspace    | System              |

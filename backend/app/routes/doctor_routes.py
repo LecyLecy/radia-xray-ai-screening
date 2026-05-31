@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 
 from app.schemas.examination_schema import (
     CreateExaminationRequest,
+    DoctorExaminationDetailResponse,
     DoctorExaminationSummary,
     DoctorFeedbackRequest,
     DoctorFeedbackResponse,
     ExaminationResponse,
+    FinalDoctorReviewRequest,
+    StoredAIPredictionResponse,
     UpdateDoctorNoteRequest,
 )
 from app.schemas.report_schema import ReportResponse
@@ -13,11 +16,14 @@ from app.schemas.user_schema import CurrentUserResponse, PatientProfileResponse
 from app.services.examination_service import (
     ExaminationServiceError,
     create_examination,
+    get_doctor_examination_detail,
     get_patient_by_id,
     list_doctor_examinations,
     list_patients,
+    save_final_doctor_review,
     save_doctor_feedback,
     search_patients,
+    start_doctor_examination,
     update_doctor_note,
 )
 from app.services.report_service import ReportServiceError, generate_examination_report
@@ -83,10 +89,33 @@ def get_doctor_patient_detail(
 
 @router.get("/examinations", response_model=list[DoctorExaminationSummary])
 def get_doctor_examinations(
-    _: CurrentUserResponse = Depends(require_doctor_or_admin),
+    current_user: CurrentUserResponse = Depends(require_doctor_or_admin),
 ) -> list[DoctorExaminationSummary]:
     try:
-        return list_doctor_examinations()
+        return list_doctor_examinations(current_user)
+    except ExaminationServiceError as error:
+        raise HTTPException(
+            status_code=error.status_code,
+            detail=error.message,
+        ) from error
+
+
+@router.post("/examinations/start", response_model=StoredAIPredictionResponse)
+async def start_new_doctor_examination(
+    patient_email: str = Form(...),
+    symptoms_description: str = Form(...),
+    preliminary_solution: str = Form(...),
+    xray_image: UploadFile = File(...),
+    current_user: CurrentUserResponse = Depends(require_doctor_or_admin),
+) -> StoredAIPredictionResponse:
+    try:
+        return await start_doctor_examination(
+            patient_email=patient_email,
+            symptoms_description=symptoms_description,
+            preliminary_solution=preliminary_solution,
+            xray_image=xray_image,
+            current_user=current_user,
+        )
     except ExaminationServiceError as error:
         raise HTTPException(
             status_code=error.status_code,
@@ -108,6 +137,23 @@ def create_doctor_examination(
         ) from error
 
 
+@router.get(
+    "/examinations/{examination_id}",
+    response_model=DoctorExaminationDetailResponse,
+)
+def get_doctor_examination(
+    examination_id: str,
+    current_user: CurrentUserResponse = Depends(require_doctor_or_admin),
+) -> DoctorExaminationDetailResponse:
+    try:
+        return get_doctor_examination_detail(examination_id, current_user)
+    except ExaminationServiceError as error:
+        raise HTTPException(
+            status_code=error.status_code,
+            detail=error.message,
+        ) from error
+
+
 @router.patch(
     "/examinations/{examination_id}/note",
     response_model=ExaminationResponse,
@@ -115,10 +161,28 @@ def create_doctor_examination(
 def update_doctor_examination_note(
     examination_id: str,
     payload: UpdateDoctorNoteRequest,
-    _: CurrentUserResponse = Depends(require_doctor_or_admin),
+    current_user: CurrentUserResponse = Depends(require_doctor_or_admin),
 ) -> ExaminationResponse:
     try:
-        return update_doctor_note(examination_id, payload)
+        return update_doctor_note(examination_id, payload, current_user)
+    except ExaminationServiceError as error:
+        raise HTTPException(
+            status_code=error.status_code,
+            detail=error.message,
+        ) from error
+
+
+@router.patch(
+    "/examinations/{examination_id}/final-review",
+    response_model=ExaminationResponse,
+)
+def save_doctor_examination_final_review(
+    examination_id: str,
+    payload: FinalDoctorReviewRequest,
+    current_user: CurrentUserResponse = Depends(require_doctor_or_admin),
+) -> ExaminationResponse:
+    try:
+        return save_final_doctor_review(examination_id, payload, current_user)
     except ExaminationServiceError as error:
         raise HTTPException(
             status_code=error.status_code,

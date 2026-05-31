@@ -160,11 +160,11 @@ Testing Levels
 4. **	**	Patient sees own profile
 5. **	**Doctor examination workflow
 6. **	**	Doctor logs in
-7. **	**	Doctor selects patient
-8. **	**	Doctor creates examination
+7. **	**	Doctor enters registered patient email
+8. **	**	Doctor creates doctor-owned examination
 9. **	**	Doctor uploads X Ray
 10. **	**	Doctor runs AI prediction
-11. **	**	Doctor adds note
+11. **	**	Doctor saves final review
 12. **	**	Doctor generates report
 13. **	**Patient report access workflow
 14. **	**	Patient logs in
@@ -214,8 +214,8 @@ Testing Levels
 | ----------- | --------------------------------------------- | ---------- |
 | AC-01       | Patient can register and log in               | Not Tested |
 | AC-02       | Patient can only view own examination history | Not Tested |
-| AC-03       | Doctor can upload X-Ray and receive AI result | Not Tested |
-| AC-04       | Doctor can add note and generate PDF report   | Not Tested |
+| AC-03       | Doctor can start scan, upload X-Ray, and receive AI result | Not Tested |
+| AC-04       | Doctor can save final review and generate PDF report       | Not Tested |
 | AC-05       | PDF report contains disclaimer                | Not Tested |
 | AC-06       | Admin can manage patient and doctor data      | Not Tested |
 
@@ -267,7 +267,7 @@ foundation.
 | Test ID | Test Type   | Feature         | Test Scenario                     | Expected Result                 | Actual Result | Status     |
 | ------- | ----------- | --------------- | --------------------------------- | ------------------------------- | ------------- | ---------- |
 | UT-01   | Unit        | File Validation | Upload PDF file as X-Ray          | File rejected                   | ``     | Not Tested |
-| IT-04   | Integration | AI Prediction   | Run prediction after X-Ray upload | Prediction and confidence shown | ``     | Not Tested |
+| IT-04   | Integration | AI Prediction   | Run prediction after X-Ray upload | Prediction and confidence shown to doctor/admin | ``     | Not Tested |
 | ST-02   | System      | Doctor Workflow | Complete examination workflow     | Report generated                | ``     | Not Tested |
 | AT-03   | Acceptance  | Patient Report  | Patient downloads own PDF         | PDF downloaded                  | ``     | Not Tested |
 
@@ -316,10 +316,10 @@ foundation.
    2. **	**Doctor login
    3. **	**Admin login
    4. **	**Role based access
-   5. **	**Create examination
+   5. **	**Start doctor-owned examination
    6. **	**Upload X Ray
    7. **	**Run AI prediction
-   8. **	**Save examination result
+   8. **	**Save final doctor review
    9. **	**Generate PDF report
    10. **	**Patient download own report
 2. Should Test
@@ -346,11 +346,11 @@ foundation.
 | IT-04   | Integration | AI Prediction           | Send uploaded image to AI service                               | Prediction and confidence are returned   | Not Tested |
 | IT-05   | Integration | PDF Report              | Generate report from examination data                           | PDF file is generated and linked         | Not Tested |
 | ST-01   | System      | Patient Flow            | Register login view profile                                     | Patient dashboard works                  | Not Tested |
-| ST-02   | System      | Doctor Flow             | Create examination upload X-Ray run AI add note generate report | End-to-end doctor workflow works         | Not Tested |
-| ST-03   | System      | Patient Report          | Patient opens history and downloads PDF                         | Patient can access own report            | Not Tested |
+| ST-02   | System      | Doctor Flow             | Start scan by patient email upload X-Ray run AI save final review generate report | End-to-end doctor workflow works         | Not Tested |
+| ST-03   | System      | Patient Report          | Patient opens history and downloads PDF                         | Patient sees final doctor result without AI confidence | Not Tested |
 | ST-04   | System      | Access Control          | Patient attempts to access another patient record               | Access is denied                         | Not Tested |
 | ST-05   | System      | Admin Flow              | Admin views and manages records                                 | Admin workflow works                     | Not Tested |
 | AT-01   | Acceptance  | MVP Workflow            | Complete from doctor examination to patient report download     | MVP scenario succeeds                    | Not Tested |
-| AT-02   | Acceptance  | Ethics                  | PDF and result page show AI disclaimer                          | AI is not presented as final diagnosis   | Not Tested |
+| AT-02   | Acceptance  | Ethics                  | Doctor result page shows AI disclaimer and patient/PDF omit AI confidence | AI is not presented as final diagnosis to patient | Not Tested |
 
 **

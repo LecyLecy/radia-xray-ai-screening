@@ -79,6 +79,28 @@ def search_patients_by_email(email: str) -> list[PatientProfileResponse]:
     ]
 
 
+def _patient_has_ongoing_examination(patient_id: str) -> bool:
+    supabase = get_supabase_client()
+
+    try:
+        response = (
+            supabase.table("examinations")
+            .select("id,status")
+            .eq("patient_id", patient_id)
+            .in_("status", ["pending_review", "reviewed"])
+            .limit(1)
+            .execute()
+        )
+    except Exception as error:
+        raise AdminServiceError(
+            message=_read_error_message(error)
+            or "Patient examination status could not be checked.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    return bool(response.data)
+
+
 def promote_patient_to_doctor(
     payload: PromotePatientToDoctorRequest,
 ) -> DoctorProfileResponse:
@@ -105,6 +127,15 @@ def promote_patient_to_doctor(
         raise AdminServiceError(
             message="Patient profile was not found.",
             status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    if _patient_has_ongoing_examination(patient["id"]):
+        raise AdminServiceError(
+            message=(
+                "This patient has an ongoing examination. Complete the examination "
+                "and generate the report before promoting them to medical staff."
+            ),
+            status_code=status.HTTP_409_CONFLICT,
         )
 
     try:

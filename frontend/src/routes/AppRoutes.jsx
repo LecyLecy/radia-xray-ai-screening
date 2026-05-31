@@ -11,7 +11,11 @@ import PatientExaminationDetail from '../pages/patient/PatientExaminationDetail'
 import DoctorDashboard from '../pages/doctor/DoctorDashboard';
 import PatientList from '../pages/doctor/PatientList';
 import DoctorPatientDetail from '../pages/doctor/DoctorPatientDetail';
-import AdminDoctors from '../pages/admin/AdminDoctors';
+import StartNewScan from '../pages/doctor/StartNewScan';
+import DoctorExaminations from '../pages/doctor/DoctorExaminations';
+import DoctorExaminationDetail from '../pages/doctor/DoctorExaminationDetail';
+import AdminDirectory from '../pages/admin/AdminDirectory';
+import AdminAddMedicalStaff from '../pages/admin/AdminAddMedicalStaff';
 
 const RoleRoute = ({ allowedRoles, children }) => {
   const token = localStorage.getItem('access_token');
@@ -45,9 +49,15 @@ export const AppRoutes = () => {
 
         {/* Role: Medical Specialist Context Channels */}
         <Route path="/doctor/dashboard" element={<RoleRoute allowedRoles={['doctor', 'admin']}><DoctorDashboard /></RoleRoute>} />
-        <Route path="/doctor/patients" element={<RoleRoute allowedRoles={['doctor', 'admin']}><PatientList /></RoleRoute>} />
-        <Route path="/doctor/patient/:id" element={<RoleRoute allowedRoles={['doctor', 'admin']}><DoctorPatientDetail /></RoleRoute>} />
-        <Route path="/admin/doctors" element={<RoleRoute allowedRoles={['admin']}><AdminDoctors /></RoleRoute>} />
+        <Route path="/doctor/start-scan" element={<RoleRoute allowedRoles={['doctor']}><StartNewScan /></RoleRoute>} />
+        <Route path="/doctor/examinations" element={<RoleRoute allowedRoles={['doctor']}><DoctorExaminations /></RoleRoute>} />
+        <Route path="/doctor/examinations/:id" element={<RoleRoute allowedRoles={['doctor']}><DoctorExaminationDetail /></RoleRoute>} />
+        <Route path="/doctor/patients" element={<RoleRoute allowedRoles={['doctor']}><PatientList /></RoleRoute>} />
+        <Route path="/doctor/patient/:id" element={<RoleRoute allowedRoles={['doctor']}><DoctorPatientDetail /></RoleRoute>} />
+        <Route path="/admin/patients" element={<RoleRoute allowedRoles={['admin']}><AdminDirectory /></RoleRoute>} />
+        <Route path="/admin/doctors" element={<RoleRoute allowedRoles={['admin']}><AdminDirectory /></RoleRoute>} />
+        <Route path="/admin/directory" element={<RoleRoute allowedRoles={['admin']}><AdminDirectory /></RoleRoute>} />
+        <Route path="/admin/add-medical-staff" element={<RoleRoute allowedRoles={['admin']}><AdminAddMedicalStaff /></RoleRoute>} />
       </Route>
 
       {/* Wildcard Guard Catching Unmapped Trailing Routes */}

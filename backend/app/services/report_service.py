@@ -110,10 +110,52 @@ def _get_doctor_profile(examination: dict, current_user: CurrentUserResponse) ->
     return response.data[0] if response.data else None
 
 
-def _require_review_ready(examination: dict, feedback: dict) -> None:
-    if not (examination.get("doctor_note") or "").strip():
+def _require_doctor_owns_examination(
+    examination: dict,
+    current_user: CurrentUserResponse,
+) -> None:
+    if current_user.role != "doctor":
+        return
+
+    supabase = get_supabase_client()
+    try:
+        response = (
+            supabase.table("doctor_profiles")
+            .select("id")
+            .eq("user_id", current_user.user_id)
+            .limit(1)
+            .execute()
+        )
+    except Exception as error:
         raise ReportServiceError(
-            message="Doctor note is required before generating a report.",
+            message=_read_error_message(error) or "Doctor profile could not be loaded.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        ) from error
+
+    doctor_id = response.data[0]["id"] if response.data else None
+    if not doctor_id or doctor_id != examination.get("doctor_id"):
+        raise ReportServiceError(
+            message="Doctor users can only generate reports for their own examinations.",
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+
+def _require_review_ready(examination: dict, feedback: dict) -> None:
+    if examination.get("status") not in {"reviewed", "report_ready"}:
+        raise ReportServiceError(
+            message="Final doctor review is required before generating a report.",
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not (examination.get("final_doctor_note") or examination.get("doctor_note") or "").strip():
+        raise ReportServiceError(
+            message="Final doctor note is required before generating a report.",
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not examination.get("final_diagnosis_result"):
+        raise ReportServiceError(
+            message="Final diagnosis is required before generating a report.",
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -134,8 +176,6 @@ def _build_report_pdf(
     patient: dict,
     doctor: dict | None,
     xray_image: dict,
-    prediction: dict,
-    feedback: dict,
 ) -> bytes:
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4, title="Radia X-Ray Examination Report")
@@ -177,17 +217,12 @@ def _build_report_pdf(
     add_line("X-Ray File", xray_image.get("file_name"))
     add_line("X-Ray Storage Path", xray_image.get("image_url"))
 
-    add_heading("AI Result")
-    add_line("Prediction Result", prediction.get("prediction_result"))
-    add_line("Confidence Score", prediction.get("confidence_score"))
-    add_line("Confidence Percentage", prediction.get("confidence_percentage"))
-    add_line("Model Name", prediction.get("model_name"))
-    add_line("Mock Result", prediction.get("is_mock"))
-
     add_heading("Doctor Review")
-    add_line("Doctor Note", examination.get("doctor_note"))
-    add_line("AI Feedback Status", feedback.get("feedback_status"))
-    add_line("Feedback Note", feedback.get("feedback_note"))
+    add_line("Final Diagnosis", examination.get("final_diagnosis_result"))
+    add_line(
+        "Final Doctor Note",
+        examination.get("final_doctor_note") or examination.get("doctor_note"),
+    )
 
     add_heading("Medical Disclaimer")
     story.append(Paragraph(MEDICAL_AI_DISCLAIMER, styles["BodyText"]))
@@ -226,6 +261,7 @@ def generate_examination_report(
 ) -> ReportResponse:
     supabase = get_supabase_client()
     examination = _get_single("examinations", examination_id, "Examination was not found.")
+    _require_doctor_owns_examination(examination, current_user)
     patient = _get_patient_profile(examination["patient_id"])
     doctor = _get_doctor_profile(examination, current_user)
     xray_image = _get_latest("xray_images", "examination_id", examination_id, "uploaded_at")
@@ -238,8 +274,6 @@ def generate_examination_report(
         patient=patient,
         doctor=doctor,
         xray_image=xray_image,
-        prediction=prediction,
-        feedback=feedback,
     )
     report_url = _upload_report_pdf(examination_id, pdf_bytes)
 

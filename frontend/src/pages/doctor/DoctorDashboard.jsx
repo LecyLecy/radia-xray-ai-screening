@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Card } from '../../components/Card';
 import { Table } from '../../components/Table';
 import { StatusBadge } from '../../components/StatusBadge';
-import { getAllPatients, getDoctorExaminations } from '../../services/examinationService';
+import { getDoctorExaminations } from '../../services/examinationService';
 import '../styles/doctor.css';
 
 const formatDate = (value) => {
@@ -11,7 +11,6 @@ const formatDate = (value) => {
 };
 
 export default function DoctorDashboard() {
-  const [patients, setPatients] = useState([]);
   const [examinations, setExaminations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
@@ -20,13 +19,7 @@ export default function DoctorDashboard() {
     const fetchDashboard = async () => {
       try {
         setIsLoading(true);
-        const [patientRows, examinationRows] = await Promise.all([
-          getAllPatients(),
-          getDoctorExaminations(),
-        ]);
-
-        setPatients(patientRows);
-        setExaminations(examinationRows);
+        setExaminations(await getDoctorExaminations());
       } catch (error) {
         setErrorMessage(error.message);
       } finally {
@@ -58,8 +51,8 @@ export default function DoctorDashboard() {
           <h2 className="metric-value">{completedCount} Cases</h2>
         </div>
         <div className="metric-card neutral">
-          <span className="metric-label">Registered Patients</span>
-          <h2 className="metric-value">{patients.length} Profiles</h2>
+          <span className="metric-label">My Queue</span>
+          <h2 className="metric-value">{examinations.length} Scans</h2>
         </div>
       </div>
 
@@ -70,11 +63,12 @@ export default function DoctorDashboard() {
           <p className="empty-text">No examinations have been created yet.</p>
         )}
         {!isLoading && !errorMessage && recentExaminations.length > 0 && (
-          <Table headers={["Exam ID", "Patient Target", "Screening Instance", "System Inference", "Status"]}>
+          <Table headers={["Exam ID", "Patient", "Email", "Screening Instance", "System Inference", "Status"]}>
             {recentExaminations.map((exam) => (
               <tr key={exam.id}>
                 <td><strong>{exam.id}</strong></td>
                 <td>{exam.patient_name || exam.patient_id}</td>
+                <td>{exam.patient_email || '-'}</td>
                 <td>{formatDate(exam.examination_date)}</td>
                 <td>
                   {exam.prediction_result ? (

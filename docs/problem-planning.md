@@ -72,8 +72,8 @@ Di fasilitas kesehatan dengan sumber daya terbatas, proses pemeriksaan chest X-R
 * Report generator
 * laporan hasil pemeriksaan
 * data pasien
-* hasil AI
-* catatan dokter
+* diagnosis final dokter
+* catatan final dokter
 * disclaimer
 * tanggal pemeriksaan
 * Riwayat pemeriksaan pasien
@@ -142,9 +142,10 @@ Di fasilitas kesehatan dengan sumber daya terbatas, proses pemeriksaan chest X-R
    - view patient detail
 6. X-Ray examination record
 
-   - select patient
+   - search registered patient by email
    - select/extract doctor from logged-in doctor
    - upload X-Ray
+   - save symptoms and preliminary solution
    - save examination date
 7. AI-assisted prediction
 
@@ -153,7 +154,8 @@ Di fasilitas kesehatan dengan sumber daya terbatas, proses pemeriksaan chest X-R
    - Grad-CAM if feasible
 8. Doctor validation
 
-   - doctor note
+   - final doctor note
+   - final diagnosis
    - AI result marked as correct / incorrect / uncertain
 9. Examination history
 
@@ -164,8 +166,8 @@ Di fasilitas kesehatan dengan sumber daya terbatas, proses pemeriksaan chest X-R
 - patient data
 - doctor data
 - examination date
-- AI result
-- doctor note
+- final diagnosis
+- final doctor note
 - disclaimer
 
 * Should Have:
@@ -235,8 +237,8 @@ Di fasilitas kesehatan dengan sumber daya terbatas, proses pemeriksaan chest X-R
    - download own PDF reports
 6. Doctor workspace
 
-   - view patients
-   - create examination records
+   - search registered patients by email
+   - create doctor-owned examination records
    - upload chest X-Ray
    - run AI-assisted pneumonia screening
    - view AI prediction and confidence score
@@ -262,10 +264,8 @@ Di fasilitas kesehatan dengan sumber daya terbatas, proses pemeriksaan chest X-R
    - patient information
    - doctor information
    - examination date
-   - X-Ray result
-   - AI prediction
-   - confidence score
-   - doctor note
+   - final diagnosis
+   - final doctor note
    - disclaimer
 
 * Out of Scope
@@ -302,7 +302,7 @@ Di fasilitas kesehatan dengan sumber daya terbatas, proses pemeriksaan chest X-R
 | Create examination record        | No                     | Yes               | Yes      |
 | Upload X-Ray                     | No                     | Yes               | Yes      |
 | Run AI prediction                | No                     | Yes               | Yes      |
-| View own AI result               | Yes                    | No                | No       |
+| View own AI result               | No                     | No                | No       |
 | View patient AI result           | No                     | Yes               | Yes      |
 | Add doctor note                  | No                     | Yes               | Yes      |
 | Validate AI prediction           | No                     | Yes               | Yes      |

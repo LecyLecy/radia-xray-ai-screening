@@ -38,6 +38,38 @@ export const getDoctorExaminations = async () => {
   }
 };
 
+export const getDoctorExaminationDetail = async (examinationId) => {
+  try {
+    const response = await api.get(`/doctor/examinations/${examinationId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, 'Failed to load examination detail.'), { cause: error });
+  }
+};
+
+export const startDoctorExamination = async ({
+  patientEmail,
+  symptomsDescription,
+  preliminarySolution,
+  xrayImage,
+}) => {
+  try {
+    const formData = new FormData();
+    formData.append('patient_email', patientEmail);
+    formData.append('symptoms_description', symptomsDescription);
+    formData.append('preliminary_solution', preliminarySolution);
+    formData.append('xray_image', xrayImage);
+
+    const response = await api.post('/doctor/examinations/start', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, 'Failed to start examination.'), { cause: error });
+  }
+};
+
 export const createExamination = async (patientId) => {
   try {
     const response = await api.post('/doctor/examinations', { patient_id: patientId });
@@ -84,6 +116,26 @@ export const saveDoctorFeedback = async (examinationId, feedbackStatus, feedback
     return response.data;
   } catch (error) {
     throw new Error(getApiErrorMessage(error, 'Failed to save doctor feedback.'), { cause: error });
+  }
+};
+
+export const saveFinalDoctorReview = async (
+  examinationId,
+  finalDiagnosisResult,
+  finalDoctorNote,
+  feedbackStatus,
+  feedbackNote,
+) => {
+  try {
+    const response = await api.patch(`/doctor/examinations/${examinationId}/final-review`, {
+      final_diagnosis_result: finalDiagnosisResult,
+      final_doctor_note: finalDoctorNote,
+      feedback_status: feedbackStatus,
+      feedback_note: feedbackNote,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, 'Failed to save final review.'), { cause: error });
   }
 };
 

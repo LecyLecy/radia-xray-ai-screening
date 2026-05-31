@@ -76,15 +76,15 @@ Project Duration
 47. Validate model input/output
 48. Create AI inference wrapper
 49. Connect backend upload to AI prediction
-50. Display prediction result and confidence score
+50. Display prediction result and confidence score to doctor/admin
 51. Add Grad-CAM display if feasible
 52. PDF Report Feature
 53. Design PDF report layout
 54. Include patient information
 55. Include doctor information
 56. Include examination date
-57. Include AI result and confidence score
-58. Include doctor note
+57. Include final diagnosis
+58. Include final doctor note
 59. Include medical disclaimer
 60. Enable patient download
 61. Testing
@@ -166,7 +166,7 @@ Project Duration
 28. Date Range
 29. 28 May – 4 Jun
 30. Output:
-31. X-Ray upload, AI prediction, examination history, doctor note, PDF report.
+31. X-Ray upload, AI prediction, examination history, final doctor review, PDF report.
 32. Milestone 8 — Final Testing and Demo Completed
 33. Date Range
 34. 5 Jun – 11 Jun
@@ -183,16 +183,16 @@ Project Duration
 * Cost Constraint:
 * The project uses free or low-cost tools such as Google Docs, Google Sheets, GitHub, Supabase free tier, and open-source libraries.
 * Quality Constraint:
-* The MVP must provide a usable end-to-end workflow involving patient registration, doctor/admin examination management, X-Ray upload, AI-assisted result, examination history, and PDF report access.
+* The MVP must provide a usable end-to-end workflow involving patient registration, doctor-owned examination management, X-Ray upload, AI-assisted doctor decision support, examination history, and PDF report access.
 
 # Project Success Criteria
 
 1. Patient can register, login, view profile, view examination history, and download PDF report.
-2. Doctor can login, select patient, create examination, upload X-Ray, view AI prediction, add note, validate result, and generate report.
+2. Doctor can login, start a scan for a registered patient by email, upload X-Ray, view AI prediction as decision support, save final review, and generate report.
 3. Admin can login and manage major system data.
 4. Examination records are stored in the database.
 5. AI-assisted prediction returns Normal/Pneumonia and confidence score.
-6. PDF report includes patient information, doctor information, examination result, AI output, doctor note, and disclaimer.
+6. PDF report includes patient information, doctor information, examination date, final diagnosis, final doctor note, and disclaimer.
 7. The system applies role-based access control.
 8. The project includes SDLC documentation, requirements, design diagrams, testing report, risk/security analysis, and GitHub repository for version control.
 

@@ -2,24 +2,32 @@ import { NavLink } from 'react-router-dom';
 import './components.css';
 
 export const Sidebar = ({ role }) => {
-  const isMedicalWorkspace = role === 'doctor' || role === 'admin';
-
   return (
     <aside className="radia-sidebar">
       <div className="sidebar-menu">
-        {isMedicalWorkspace ? (
+        {role === 'admin' ? (
           <>
             <NavLink to="/doctor/dashboard" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
               Dashboard Overview
             </NavLink>
-            <NavLink to="/doctor/patients" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
-              Patient Registry
+            <NavLink to="/admin/directory" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
+              Users Directory
             </NavLink>
-            {role === 'admin' && (
-              <NavLink to="/admin/doctors" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
-                Medical Staff
-              </NavLink>
-            )}
+            <NavLink to="/admin/add-medical-staff" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
+              Add Medical Staff
+            </NavLink>
+          </>
+        ) : role === 'doctor' ? (
+          <>
+            <NavLink to="/doctor/dashboard" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
+              Dashboard Overview
+            </NavLink>
+            <NavLink to="/doctor/start-scan" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
+              Start New Scan
+            </NavLink>
+            <NavLink to="/doctor/examinations" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
+              My Examinations
+            </NavLink>
           </>
         ) : (
           <>

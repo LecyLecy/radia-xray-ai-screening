@@ -235,8 +235,8 @@ export default function PatientDashboard() {
                 <span className="val"><StatusBadge status={latestExamination.status} /></span>
               </div>
               <div className="meta-item">
-                <span className="label">AI Result</span>
-                <span className="val">{latestExamination.prediction_result || '-'}</span>
+                <span className="label">Final Diagnosis</span>
+                <span className="val">{latestExamination.final_diagnosis_result || '-'}</span>
               </div>
               <div className="meta-item">
                 <span className="label">Report</span>

@@ -3,6 +3,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from app.schemas.user_schema import PatientProfileResponse
+
 
 PredictionResult = Literal["Normal", "Pneumonia"]
 ExaminationStatus = Literal["pending_review", "reviewed", "report_ready"]
@@ -39,6 +41,11 @@ class DoctorFeedbackRequest(BaseModel):
     feedback_note: str | None = None
 
 
+class FinalDoctorReviewRequest(DoctorFeedbackRequest):
+    final_diagnosis_result: PredictionResult
+    final_doctor_note: str = Field(min_length=1)
+
+
 class DoctorFeedbackResponse(BaseModel):
     id: str
     examination_id: str
@@ -55,6 +62,10 @@ class ExaminationResponse(BaseModel):
     examination_date: datetime
     status: ExaminationStatus
     doctor_note: str | None = None
+    symptoms_description: str | None = None
+    preliminary_solution: str | None = None
+    final_diagnosis_result: PredictionResult | None = None
+    final_doctor_note: str | None = None
 
 
 class PatientExaminationHistoryItem(BaseModel):
@@ -62,8 +73,7 @@ class PatientExaminationHistoryItem(BaseModel):
     examination_date: datetime
     status: ExaminationStatus
     doctor_name: str | None = None
-    prediction_result: PredictionResult | None = None
-    confidence_percentage: int | None = Field(default=None, ge=0, le=100)
+    final_diagnosis_result: PredictionResult | None = None
     report_id: str | None = None
 
 
@@ -71,6 +81,7 @@ class DoctorExaminationSummary(BaseModel):
     id: str
     patient_id: str
     patient_name: str | None = None
+    patient_email: str | None = None
     examination_date: datetime
     status: ExaminationStatus
     prediction_result: PredictionResult | None = None
@@ -124,9 +135,17 @@ class PatientExaminationDetailResponse(BaseModel):
     examination_date: datetime
     status: ExaminationStatus
     doctor_note: str | None = None
+    symptoms_description: str | None = None
+    preliminary_solution: str | None = None
+    final_diagnosis_result: PredictionResult | None = None
+    final_doctor_note: str | None = None
     doctor: PatientDoctorSummary | None = None
     xray_image: PatientXraySummary | None = None
     ai_prediction: PatientPredictionSummary | None = None
     doctor_feedback: PatientFeedbackSummary | None = None
     report: PatientReportSummary | None = None
     disclaimer: str
+
+
+class DoctorExaminationDetailResponse(PatientExaminationDetailResponse):
+    patient: PatientProfileResponse | None = None

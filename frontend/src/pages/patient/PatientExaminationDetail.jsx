@@ -60,7 +60,7 @@ export default function PatientExaminationDetail() {
     return <div className="p-4" style={{ color: '#dc2626' }}>{errorMessage || 'Examination log not found.'}</div>;
   }
 
-  const prediction = exam.ai_prediction;
+  const isFinalized = ['reviewed', 'report_ready'].includes(exam.status);
 
   return (
     <div className="patient-panel">
@@ -89,7 +89,7 @@ export default function PatientExaminationDetail() {
         </Card>
 
         <div className="detail-meta-stack">
-          <Card title="Analysis Parameters">
+          <Card title="Examination Summary">
             <div className="meta-item">
               <span className="label">Examination ID</span>
               <span className="val"><strong>{exam.id}</strong></span>
@@ -102,25 +102,31 @@ export default function PatientExaminationDetail() {
               <span className="label">Status</span>
               <span className="val"><StatusBadge status={exam.status} /></span>
             </div>
+            <div className="meta-item">
+              <span className="label">Doctor</span>
+              <span className="val">{exam.doctor?.full_name || exam.doctor?.email || '-'}</span>
+            </div>
+            <div className="meta-item">
+              <span className="label">Symptoms</span>
+              <span className="val">{exam.symptoms_description || '-'}</span>
+            </div>
+            <div className="meta-item">
+              <span className="label">Preliminary Solution</span>
+              <span className="val">{exam.preliminary_solution || '-'}</span>
+            </div>
             <div className="meta-item border-top">
-              <span className="label">AI Screening Diagnostics</span>
-              <span className={`val thick ${prediction?.prediction_result?.toLowerCase() || ''}`}>
-                {prediction?.prediction_result || '-'}
+              <span className="label">Final Diagnosis</span>
+              <span className={`val thick ${exam.final_diagnosis_result?.toLowerCase() || ''}`}>
+                {isFinalized ? exam.final_diagnosis_result || '-' : 'Still under review'}
               </span>
-            </div>
-            <div className="meta-item">
-              <span className="label">Statistical Accuracy</span>
-              <span className="val font-mono">{prediction?.confidence_percentage ?? '-'}%</span>
-            </div>
-            <div className="meta-item">
-              <span className="label">Doctor Feedback</span>
-              <span className="val">{exam.doctor_feedback?.feedback_status || '-'}</span>
             </div>
           </Card>
 
-          <Card title="Radiologist Evaluation Note">
+          <Card title="Doctor Evaluation Note">
             <p className="clinical-notes">
-              {exam.doctor_note || 'Clinical evaluations are being reviewed by the designated medical specialist.'}
+              {isFinalized
+                ? exam.final_doctor_note || 'Final doctor note is not available yet.'
+                : 'Your scan is still being checked by the designated medical specialist.'}
             </p>
             <div className="signature-block">
               <p>Attending Radiologist,</p>
