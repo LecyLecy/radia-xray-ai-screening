@@ -35,6 +35,7 @@
 
 .empty-text { font-size: 0.9rem; color: var(--text-muted); text-align: center; padding: 2rem 0; }
 .error-text { font-size: 0.9rem; color: var(--danger-text); background: var(--danger-bg); padding: 1rem; border-radius: 6px; }
+.success-text { font-size: 0.9rem; color: var(--success-text); background: var(--success-bg); padding: 1rem; border-radius: 6px; margin-top: 1rem; }
 
 @media (max-width: 992px) {
   .metrics-grid {

@@ -9,7 +9,6 @@ import './auth.css';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('patient');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
@@ -45,17 +44,6 @@ export default function Login() {
         </div>
         <Card title="Account Sign In">
           <form onSubmit={handleLoginSubmit}>
-            <div className="role-switch-container">
-              <label className={`role-tab ${role === 'patient' ? 'active' : ''}`}>
-                <input type="radio" name="role" value="patient" checked={role === 'patient'} onChange={() => setRole('patient')} />
-                Patient Portal
-              </label>
-              <label className={`role-tab ${role === 'doctor' ? 'active' : ''}`}>
-                <input type="radio" name="role" value="doctor" checked={role === 'doctor'} onChange={() => setRole('doctor')} />
-                Medical Staff
-              </label>
-            </div>
-
             <FormInput
               label="Email Address"
               type="email"
@@ -78,11 +66,9 @@ export default function Login() {
             </Button>
             {errorMessage && <p className="auth-error">{errorMessage}</p>}
           </form>
-          {role === 'patient' && (
-            <div className="auth-redirect">
-              New patient? <Link to="/register">Create an account</Link>
-            </div>
-          )}
+          <div className="auth-redirect">
+            New patient? <Link to="/register">Create an account</Link>
+          </div>
         </Card>
       </div>
     </div>

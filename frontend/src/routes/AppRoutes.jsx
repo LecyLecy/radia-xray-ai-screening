@@ -12,6 +12,7 @@ import PatientExaminationDetail from '../pages/patient/PatientExaminationDetail'
 import DoctorDashboard from '../pages/doctor/DoctorDashboard';
 import PatientList from '../pages/doctor/PatientList';
 import DoctorPatientDetail from '../pages/doctor/DoctorPatientDetail';
+import AdminDoctors from '../pages/admin/AdminDoctors';
 
 const RoleRoute = ({ allowedRoles, children }) => {
   const token = localStorage.getItem('access_token');
@@ -47,6 +48,7 @@ export const AppRoutes = () => {
         <Route path="/doctor/dashboard" element={<RoleRoute allowedRoles={['doctor', 'admin']}><DoctorDashboard /></RoleRoute>} />
         <Route path="/doctor/patients" element={<RoleRoute allowedRoles={['doctor', 'admin']}><PatientList /></RoleRoute>} />
         <Route path="/doctor/patient/:id" element={<RoleRoute allowedRoles={['doctor', 'admin']}><DoctorPatientDetail /></RoleRoute>} />
+        <Route path="/admin/doctors" element={<RoleRoute allowedRoles={['admin']}><AdminDoctors /></RoleRoute>} />
       </Route>
 
       {/* Wildcard Guard Catching Unmapped Trailing Routes */}

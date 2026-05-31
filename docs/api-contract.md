@@ -104,6 +104,9 @@ Frontend notes:
 - On success, redirect patient to login.
 - Do not expect tokens from register response.
 - Login separately after registration.
+- Public registration is patient-only. Doctor/medical staff accounts are
+  provisioned through admin/manual setup, and admin accounts are created
+  manually for the MVP.
 
 ### `POST /auth/login`
 
@@ -143,10 +146,12 @@ Expected errors:
 Frontend notes:
 
 - Store `access_token`, `refresh_token`, `user.user_id`, and `user.role`.
+- Use one shared sign-in form for all roles. Do not ask the user to choose
+  patient, medical staff, or admin before login.
 - Redirect by returned role:
   - `patient` -> `/patient/dashboard`
   - `doctor` -> `/doctor/dashboard`
-  - `admin` -> admin route when admin UI exists.
+  - `admin` -> `/doctor/dashboard` until a dedicated admin UI exists.
 
 ## Patient
 
@@ -821,6 +826,104 @@ demo/security hardening.
 
 ## Current Limitations
 
-- Doctor/admin creation endpoints are not implemented yet.
-- Admin CRUD endpoints and admin UI are not implemented yet.
+- Admin medical staff listing and doctor account creation are implemented.
+- Other admin CRUD endpoints are not implemented yet.
+
+## Admin Workflow
+
+These endpoints require an authenticated user with role `admin`.
+
+### `GET /admin/doctors`
+
+Returns medical staff profile rows for the admin medical staff screen.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Success response:
+
+```json
+[
+  {
+    "id": "doctor_profile_uuid",
+    "user_id": "auth_user_uuid",
+    "email": "doctor@example.com",
+    "full_name": "Doctor Name",
+    "phone_number": "08123456789",
+    "age": 35,
+    "gender": "male",
+    "profile_picture_url": null,
+    "license_number": "DOC-001",
+    "specialization": "Radiology"
+  }
+]
+```
+
+Expected errors:
+
+- `401`: missing or invalid bearer token.
+- `403`: authenticated user is not admin.
+- `500`: doctor profiles could not be loaded.
+
+### `POST /admin/doctors`
+
+Creates a Supabase Auth doctor user, `profiles` row with role `doctor`, and
+matching `doctor_profiles` row.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Request:
+
+```json
+{
+  "email": "doctor@example.com",
+  "password": "Doctor12345",
+  "full_name": "Doctor Name",
+  "phone_number": "08123456789",
+  "age": 35,
+  "gender": "male",
+  "license_number": "DOC-001",
+  "specialization": "Radiology"
+}
+```
+
+Required fields:
+
+```text
+email
+password
+full_name
+```
+
+Success response:
+
+```json
+{
+  "id": "doctor_profile_uuid",
+  "user_id": "auth_user_uuid",
+  "email": "doctor@example.com",
+  "full_name": "Doctor Name",
+  "phone_number": "08123456789",
+  "age": 35,
+  "gender": "male",
+  "profile_picture_url": null,
+  "license_number": "DOC-001",
+  "specialization": "Radiology"
+}
+```
+
+Expected errors:
+
+- `400`: Supabase Auth rejected the account creation, usually duplicate email or invalid password.
+- `401`: missing or invalid bearer token.
+- `403`: authenticated user is not admin.
+- `422`: missing or invalid request field.
+- `500`: profile rows could not be saved.
 - Real AI model inference and Grad-CAM remain future work; current stored predictions are mock AI results.

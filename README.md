@@ -22,8 +22,10 @@ Current MVP foundation progress:
 - Supabase database schema and private storage buckets have been prepared.
 - Backend Supabase connection test is available.
 - Patient registration and login backend auth foundation is available.
+- Frontend auth uses one shared sign-in page for patient, doctor, and admin users. Public registration creates patient users only.
 - Current patient profile endpoint is available for authenticated patient dashboard data.
 - Doctor/admin patient list, examination summary, examination workflow, X-Ray upload storage, mock AI persistence, doctor review, PDF report generation, and signed report download are available.
+- Admin medical staff listing and doctor account creation are available.
 - Patient-owned examination history/detail report access endpoints are available.
 - Backend CI is available through GitHub Actions and builds the backend Docker image for validation.
 - Frontend login, register, patient dashboard/history/detail, and doctor dashboard/workflow pages are connected to backend endpoints on `frontend-ai`.
@@ -47,6 +49,8 @@ Implemented backend endpoints include:
 - `POST /doctor/examinations/{examination_id}/predict`
 - `POST /doctor/examinations/{examination_id}/report`
 - `GET /reports/{report_id}/download`
+- `GET /admin/doctors`
+- `POST /admin/doctors`
 
 ## DevOps Pipeline
 

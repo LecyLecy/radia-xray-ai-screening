@@ -79,10 +79,14 @@ the expected file size and MIME type rules are visible in code.
 - `GET /reports/{report_id}/download` returns a temporary signed URL for a private PDF report.
 - `GET /patients/me/examinations` returns the current patient's own examination history.
 - `GET /patients/me/examinations/{examination_id}` returns the current patient's owned examination detail with related AI/report metadata.
+- `GET /admin/doctors` lists medical staff accounts for authenticated admin users.
+- `POST /admin/doctors` creates a Supabase Auth doctor user, `profiles` row, and `doctor_profiles` row for authenticated admin users.
 
 ## Current Limitations
 
-- Doctor/admin accounts are still created manually in Supabase for MVP testing.
+- Admin accounts are still created manually in Supabase for MVP testing.
+- The frontend uses one shared sign-in page for patient, doctor, and admin users. Public registration creates patient accounts only.
+- Medical staff accounts can be created from the admin UI.
 - Real AI model inference is still planned; the workflow endpoint currently persists mock AI predictions.
 - Admin CRUD endpoints and admin UI are future work unless the final demo explicitly requires them.
 - Current DevOps setup validates backend compile, frontend lint/build, and backend Docker build only; it does not deploy or push Docker images yet.
