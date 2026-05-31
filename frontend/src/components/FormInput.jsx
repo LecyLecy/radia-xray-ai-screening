@@ -1,6 +1,16 @@
 import './components.css';
 
-export const FormInput = ({ label, type = 'text', name, value, onChange, placeholder, required = false, disabled = false }) => {
+export const FormInput = ({
+  label,
+  type = 'text',
+  name,
+  value,
+  onChange,
+  placeholder,
+  required = false,
+  disabled = false,
+  ...props
+}) => {
   return (
     <div className="radia-form-group">
       {label && <label className="radia-label">{label}</label>}
@@ -13,6 +23,7 @@ export const FormInput = ({ label, type = 'text', name, value, onChange, placeho
         required={required}
         disabled={disabled}
         className="radia-input"
+        {...props}
       />
     </div>
   );

@@ -42,6 +42,12 @@ export default function Register() {
     setIsSubmitting(true);
     setErrorMessage('');
 
+    if (formData.password.length < 6) {
+      setErrorMessage('Password must be at least 6 characters.');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       await registerPatient({
         email: formData.email,
@@ -108,7 +114,8 @@ export default function Register() {
               type="password"
               value={formData.password}
               onChange={handleInputChange}
-              placeholder="Create strong password"
+              placeholder="Minimum 6 characters"
+              minLength={6}
               required
             />
             <Button type="submit" variant="primary" className="w-full" disabled={isSubmitting}>
