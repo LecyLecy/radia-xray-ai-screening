@@ -55,7 +55,7 @@ URLs in screenshots.
 3. Enter the registered patient email.
 4. Fill symptoms/keluhan and preliminary solution.
 5. Upload a JPG or PNG X-Ray image under 10 MB.
-6. Submit to create the examination, upload the scan, and run mock AI.
+6. Submit to create the examination, upload the scan, and run AI prediction.
 7. Confirm the app redirects to the doctor examination detail.
 8. Open My Examinations and confirm the scan is in the doctor's own queue.
 9. Login as the patient.

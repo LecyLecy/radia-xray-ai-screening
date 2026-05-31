@@ -24,8 +24,8 @@ Current MVP foundation progress:
 - Patient registration and login backend auth foundation is available.
 - Frontend auth uses one shared sign-in page for patient, doctor, and admin users. Public registration creates patient users only.
 - Shared read-only profile menu data is available for authenticated users.
-- Doctor/admin patient list, examination summary, examination workflow, X-Ray upload storage, mock AI persistence, doctor review, PDF report generation, and signed report download are available.
-- Admin medical staff listing and patient-to-medical-staff promotion are available.
+- Doctor/admin patient list, examination summary, examination workflow, X-Ray upload storage, AI prediction persistence, doctor review, PDF report generation, and signed report download are available.
+- Admin patient and medical staff CRUD, plus patient-to-medical-staff promotion, are available.
 - Patient-owned examination history/detail report access endpoints are available.
 - Backend CI is available through GitHub Actions and builds the backend Docker image for validation.
 - Frontend login, register, patient history/detail, doctor dashboard/workflow, shared profile menu, and admin medical staff pages are connected to backend endpoints.
@@ -52,6 +52,13 @@ Implemented backend endpoints include:
 - `POST /doctor/examinations/{examination_id}/report`
 - `GET /reports/{report_id}/download`
 - `GET /admin/doctors`
+- `POST /admin/doctors`
+- `PATCH /admin/doctors/{doctor_id}`
+- `DELETE /admin/doctors/{doctor_id}`
+- `GET /admin/patients`
+- `POST /admin/patients`
+- `PATCH /admin/patients/{patient_id}`
+- `DELETE /admin/patients/{patient_id}`
 - `GET /admin/patients/search`
 - `POST /admin/doctors/promote`
 

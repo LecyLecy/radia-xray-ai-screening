@@ -277,22 +277,26 @@ matching `doctor_profiles` row. The AI prediction enum in Supabase must accept
    19. GET /admin/patients
    20. POST /admin/patients
    21. PATCH /admin/patients/{id}
-   22. GET /admin/doctors
-   23. GET /admin/patients/search
-   24. POST /admin/doctors/promote
+   22. DELETE /admin/patients/{id}
+   23. GET /admin/doctors
+   24. POST /admin/doctors
    25. PATCH /admin/doctors/{id}
-   26. GET /admin/examinations
-   27. PATCH /admin/examinations/{id}
-   28. DELETE /admin/examinations/{id}
-   29. Report
-   30. GET /reports/{id}/download
+   26. DELETE /admin/doctors/{id}
+   27. GET /admin/patients/search
+   28. POST /admin/doctors/promote
+   29. GET /admin/examinations
+   30. PATCH /admin/examinations/{id}
+   31. DELETE /admin/examinations/{id}
+   32. Report
+   33. GET /reports/{id}/download
 
 2. Temporary / Development Endpoints
    1. GET /supabase/test
       1. Development-only endpoint to verify backend Supabase connectivity.
       2. Should be removed or protected before demo/security hardening.
    2. POST /ai/predict/mock
-      1. Temporary mock AI endpoint for frontend upload/result integration.
+      1. Legacy standalone AI upload/result endpoint; uses the configured model
+         with deterministic fallback when unavailable.
       2. Accepts JPG, JPEG, and PNG files and returns Normal/Pneumonia with confidence score.
       3. Does not store images or predictions in Supabase yet.
 

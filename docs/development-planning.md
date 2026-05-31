@@ -139,7 +139,7 @@ Current backend progress snapshot:
    6. Patient profile editing and profile picture upload endpoint
    7. Doctor/admin patient list and examination creation endpoints
    8. Mock AI prediction endpoints
-   9. Doctor workflow X-Ray upload storage and mock AI prediction persistence
+   9. Doctor workflow X-Ray upload storage and AI prediction persistence
    10. Doctor note and AI feedback persistence
    11. PDF report generation and signed download access
    12. Patient-owned examination history and detail report access endpoints
@@ -556,7 +556,7 @@ chore
 
 1. If AI model integration fails
 
-   1. **	**use mock AI response temporarily
+   1. **	**use deterministic AI fallback temporarily when the configured model is unavailable
    2. **	**document as fallback
    3. **	**continue database and report workflow
 2. If Grad CAM fails

@@ -75,6 +75,26 @@
   align-items: center;
   margin-bottom: 1.25rem;
 }
+.admin-crud-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 1rem;
+}
+.admin-crud-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.table-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.table-actions .radia-btn {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8rem;
+}
 
 @media (max-width: 992px) {
   .metrics-grid {
@@ -98,6 +118,10 @@
   }
 
   .patient-search-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-crud-form {
     grid-template-columns: 1fr;
   }
 }

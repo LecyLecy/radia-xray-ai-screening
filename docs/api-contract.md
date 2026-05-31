@@ -1041,8 +1041,8 @@ demo/security hardening.
 
 ## Current Limitations
 
-- Admin medical staff listing and patient-to-doctor promotion are implemented.
-- Other admin CRUD endpoints are not implemented yet.
+- Admin patient and medical staff CRUD endpoints are implemented.
+- Admin examination CRUD endpoints remain future work.
 
 ## Admin Workflow
 
@@ -1082,6 +1082,140 @@ Expected errors:
 - `401`: missing or invalid bearer token.
 - `403`: authenticated user is not admin.
 - `500`: doctor profiles could not be loaded.
+
+### `POST /admin/doctors`
+
+Creates a medical staff auth account, `profiles` role row, and
+`doctor_profiles` row.
+
+Headers:
+
+```text
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+Request:
+
+```json
+{
+  "email": "doctor@example.com",
+  "password": "Doctor12345",
+  "full_name": "Doctor Name",
+  "phone_number": "08123456789",
+  "age": 35,
+  "gender": "male",
+  "license_number": "DOC-001",
+  "specialization": "Radiology"
+}
+```
+
+Success response uses the same row shape as `GET /admin/doctors`.
+
+Expected errors:
+
+- `400`: auth account could not be created.
+- `401`: missing or invalid bearer token.
+- `403`: authenticated user is not admin.
+- `422`: missing or invalid request field.
+- `500`: profile rows could not be saved.
+
+### `PATCH /admin/doctors/{doctor_id}`
+
+Updates editable medical staff profile fields and Supabase Auth user metadata.
+Email and password are not edited by this endpoint.
+
+Success response uses the same row shape as `GET /admin/doctors`.
+
+Expected errors:
+
+- `401`: missing or invalid bearer token.
+- `403`: authenticated user is not admin.
+- `404`: doctor profile was not found.
+- `422`: invalid request field.
+- `500`: profile could not be updated.
+
+### `DELETE /admin/doctors/{doctor_id}`
+
+Deletes a medical staff profile only when no examination references that doctor.
+If the same auth user still has a patient profile, the user role is demoted back
+to `patient`; otherwise the role row and auth user are removed.
+
+Expected errors:
+
+- `401`: missing or invalid bearer token.
+- `403`: authenticated user is not admin.
+- `404`: doctor profile was not found.
+- `409`: examination records still reference this doctor.
+- `500`: profile could not be deleted.
+
+### `GET /admin/patients`
+
+Returns patient profile rows for the admin users directory.
+
+Success response uses the same row shape as `GET /doctor/patients`.
+
+Expected errors:
+
+- `401`: missing or invalid bearer token.
+- `403`: authenticated user is not admin.
+- `500`: patient profiles could not be loaded.
+
+### `POST /admin/patients`
+
+Creates a patient auth account, `profiles` role row, and `patient_profiles` row.
+
+Request:
+
+```json
+{
+  "email": "patient@example.com",
+  "password": "Patient12345",
+  "full_name": "Patient Name",
+  "phone_number": "08123456789",
+  "age": 30,
+  "gender": "female"
+}
+```
+
+Success response uses the same row shape as `GET /admin/patients`.
+
+Expected errors:
+
+- `400`: auth account could not be created.
+- `401`: missing or invalid bearer token.
+- `403`: authenticated user is not admin.
+- `422`: missing or invalid request field.
+- `500`: profile rows could not be saved.
+
+### `PATCH /admin/patients/{patient_id}`
+
+Updates editable patient profile fields and Supabase Auth user metadata. Email
+and password are not edited by this endpoint.
+
+Success response uses the same row shape as `GET /admin/patients`.
+
+Expected errors:
+
+- `401`: missing or invalid bearer token.
+- `403`: authenticated user is not admin.
+- `404`: patient profile was not found.
+- `422`: invalid request field.
+- `500`: profile could not be updated.
+
+### `DELETE /admin/patients/{patient_id}`
+
+Deletes a patient profile only when no examination references that patient. If
+the same auth user still has a doctor profile, the user remains medical staff;
+otherwise the role row and auth user are removed.
+
+Expected errors:
+
+- `401`: missing or invalid bearer token.
+- `403`: authenticated user is not admin.
+- `404`: patient profile was not found.
+- `409`: examination records still reference this patient.
+- `500`: profile could not be deleted.
 
 ### `GET /admin/patients/search`
 
