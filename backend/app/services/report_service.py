@@ -311,7 +311,7 @@ def generate_examination_report(
         )
 
     try:
-        supabase.table("examinations").update({"status": "ready"}).eq(
+        supabase.table("examinations").update({"status": "report_ready"}).eq(
             "id", examination_id
         ).execute()
     except Exception as error:

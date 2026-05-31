@@ -622,7 +622,7 @@ def create_examination(
         "doctor_id": doctor_id,
         "created_by_user_id": current_user.user_id,
         "examination_date": examination_date.isoformat(),
-        "status": "not_ready",
+        "status": "pending_review",
         "doctor_note": None,
         "symptoms_description": None,
         "preliminary_solution": None,
@@ -683,7 +683,7 @@ async def start_doctor_examination(
         "doctor_id": doctor_id,
         "created_by_user_id": current_user.user_id,
         "examination_date": examination_date.isoformat(),
-        "status": "not_ready",
+        "status": "pending_review",
         "doctor_note": None,
         "symptoms_description": cleaned_symptoms,
         "preliminary_solution": cleaned_preliminary_solution,
@@ -878,7 +878,7 @@ def save_doctor_feedback(
         )
 
     try:
-        supabase.table("examinations").update({"status": "not_ready"}).eq(
+        supabase.table("examinations").update({"status": "reviewed"}).eq(
             "id", examination_id
         ).execute()
     except Exception as error:
@@ -929,7 +929,7 @@ def save_final_doctor_review(
                     "final_diagnosis_result": payload.final_diagnosis_result,
                     "final_doctor_note": payload.final_doctor_note,
                     "doctor_note": payload.final_doctor_note,
-                    "status": "not_ready",
+                    "status": "reviewed",
                 }
             )
             .eq("id", examination_id)

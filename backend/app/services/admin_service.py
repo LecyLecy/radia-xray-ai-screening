@@ -333,7 +333,7 @@ def _patient_has_ongoing_examination(patient_id: str) -> bool:
             supabase.table("examinations")
             .select("id,status")
             .eq("patient_id", patient_id)
-            .in_("status", ["not_ready", "pending_review", "reviewed"])
+            .in_("status", ["pending_review", "reviewed"])
             .limit(1)
             .execute()
         )
