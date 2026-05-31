@@ -74,13 +74,13 @@ the expected file size and MIME type rules are visible in code.
 - `GET /doctor/patients/{patient_id}` returns one patient profile by `patient_profiles.id`.
 - `GET /doctor/examinations` returns the current doctor's examination queue; admin users can see all rows.
 - `GET /doctor/examinations/{examination_id}` returns one doctor-owned examination detail with patient, scan, AI support, feedback, and report metadata.
-- `POST /doctor/examinations/start` accepts `patient_email`, `symptoms_description`, `preliminary_solution`, and `xray_image` as multipart form data, creates a doctor-owned examination, uploads the X-Ray, runs mock AI, and stores the prediction.
+- `POST /doctor/examinations/start` accepts `patient_email`, `symptoms_description`, `preliminary_solution`, and `xray_image` as multipart form data, creates a doctor-owned examination, uploads the X-Ray, runs the configured DenseNet121 AI model, and stores the prediction.
 - `PATCH /doctor/examinations/{examination_id}/final-review` saves the doctor's final diagnosis, final patient-facing note, and AI feedback, then marks the examination `reviewed`.
 - `POST /doctor/examinations` creates an examination row for a selected patient. This legacy endpoint remains for compatibility.
 - `PATCH /doctor/examinations/{examination_id}/note` saves the doctor's clinical note. This legacy endpoint remains for compatibility.
 - `PATCH /doctor/examinations/{examination_id}/feedback` saves AI validation feedback and marks the examination reviewed. This legacy endpoint remains for compatibility.
-- `POST /ai/predict/mock` accepts a JPG/JPEG/PNG X-Ray file and returns a mock Normal/Pneumonia prediction.
-- `POST /doctor/examinations/{examination_id}/predict` stores a JPG/JPEG/PNG X-Ray image up to 10 MB, saves image metadata, runs mock AI prediction, and saves the prediction.
+- `POST /ai/predict/mock` accepts a JPG/JPEG/PNG X-Ray file and returns a Normal/Pneumonia prediction. The route name is legacy; it uses the real model when `AI_MODEL_PATH` is available.
+- `POST /doctor/examinations/{examination_id}/predict` stores a JPG/JPEG/PNG X-Ray image up to 10 MB, saves image metadata, runs AI prediction, and saves the prediction.
 - `POST /doctor/examinations/{examination_id}/report` generates a reviewed examination PDF and saves it in Supabase Storage.
 - `GET /reports/{report_id}/download` returns a temporary signed URL for a private PDF report.
 - `GET /patients/me/examinations` returns the current patient's own examination history.
@@ -95,6 +95,6 @@ the expected file size and MIME type rules are visible in code.
 - The frontend uses one shared sign-in page for patient, doctor, and admin users. Public registration creates patient accounts only.
 - Medical staff accounts are created by registering as patient first, then having an admin promote that existing account from the `Medical Staff` screen.
 - Patient, doctor, and admin profiles are displayed from the navbar profile menu and are read-only in the current MVP.
-- Real AI model inference is still planned; the workflow endpoint currently persists mock AI predictions.
+- Real AI model inference uses a DenseNet121 checkpoint from `AI_MODEL_PATH`; if the model cannot be loaded, the service falls back to the deterministic mock prediction and marks the response with `is_mock=true`.
 - Admin CRUD endpoints and admin UI are future work unless the final demo explicitly requires them.
 - Current DevOps setup validates backend compile, frontend lint/build, and backend Docker build only; it does not deploy or push Docker images yet.

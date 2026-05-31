@@ -2,6 +2,8 @@ from hashlib import sha256
 
 from fastapi import UploadFile
 
+from app.ai.model_loader import ModelLoadError
+from app.ai.predict import predict_pneumonia
 from app.schemas.examination_schema import MockAIPredictionResponse
 
 
@@ -24,6 +26,20 @@ async def create_mock_prediction(
     file_bytes: bytes | None = None,
 ) -> MockAIPredictionResponse:
     prediction_bytes = file_bytes if file_bytes is not None else await xray_image.read()
+    try:
+        prediction = predict_pneumonia(prediction_bytes)
+        return MockAIPredictionResponse(
+            examination_id=examination_id,
+            prediction_result=prediction.prediction_result,
+            confidence_score=prediction.confidence_score,
+            confidence_percentage=prediction.confidence_percentage,
+            model_name=prediction.model_name,
+            is_mock=False,
+            disclaimer=MEDICAL_AI_DISCLAIMER,
+        )
+    except (ModelLoadError, RuntimeError, OSError, ValueError):
+        pass
+
     seed_source = prediction_bytes or (xray_image.filename or "radia-mock").encode()
     seed = int.from_bytes(sha256(seed_source).digest()[:2], "big")
 

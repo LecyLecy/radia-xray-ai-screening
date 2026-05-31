@@ -587,7 +587,7 @@ Expected errors:
 Starts the doctor-owned examination flow in one request. The patient must
 already be registered. The backend finds `patient_profiles` by email, creates
 an examination owned by the logged-in doctor, uploads the X-Ray to
-`xray-images`, runs the mock AI prediction, stores `xray_images` and
+`xray-images`, runs AI prediction, stores `xray_images` and
 `ai_predictions`, and leaves the examination status as `pending_review`.
 
 Headers:
@@ -614,8 +614,8 @@ Success response:
   "prediction_result": "Pneumonia",
   "confidence_score": 0.82,
   "confidence_percentage": 82,
-  "model_name": "radia-mock-cxr-v1",
-  "is_mock": true,
+  "model_name": "chexnet-densenet121-pneumonia",
+  "is_mock": false,
   "disclaimer": "AI result is for decision support only...",
   "xray_image_id": "xray_image_uuid",
   "ai_prediction_id": "ai_prediction_uuid",
@@ -917,12 +917,14 @@ Frontend notes:
 - Doctors/admins may download examination reports. Patients may only download
   their own reports.
 
-## AI Mock
+## AI Prediction
 
 ### `POST /ai/predict/mock`
 
-Temporary mock endpoint so frontend upload/result pages can work before the
-real model workflow is ready.
+Legacy mock-named endpoint for standalone upload/result testing. It uses the
+configured real model when `AI_MODEL_PATH` is available. If the model cannot be
+loaded, the backend falls back to deterministic mock output and returns
+`is_mock=true`.
 
 Request:
 
@@ -941,8 +943,8 @@ Success response:
   "prediction_result": "Normal",
   "confidence_score": 0.74,
   "confidence_percentage": 74,
-  "model_name": "radia-mock-ai-v1",
-  "is_mock": true,
+  "model_name": "chexnet-densenet121-pneumonia",
+  "is_mock": false,
   "disclaimer": "This AI assisted result is provided for clinical decision support only..."
 }
 ```
@@ -957,13 +959,13 @@ Frontend notes:
 
 - Show the disclaimer with the AI result.
 - Display `is_mock` clearly in development/testing if useful.
-- This endpoint does not store images or predictions in Supabase yet.
+- This endpoint does not store images or predictions in Supabase.
 
 ### `POST /doctor/examinations/{examination_id}/predict`
 
-Workflow-shaped mock prediction endpoint for doctor examination screens. This
+Workflow-shaped prediction endpoint for doctor examination screens. This
 endpoint validates and stores the X-Ray image in Supabase Storage, saves image
-metadata in `xray_images`, saves the mock AI result in `ai_predictions`, and
+metadata in `xray_images`, saves the AI result in `ai_predictions`, and
 returns the stored IDs.
 
 Request:
@@ -987,8 +989,8 @@ Success response:
   "prediction_result": "Pneumonia",
   "confidence_score": 0.82,
   "confidence_percentage": 82,
-  "model_name": "radia-mock-ai-v1",
-  "is_mock": true,
+  "model_name": "chexnet-densenet121-pneumonia",
+  "is_mock": false,
   "disclaimer": "This AI assisted result is provided for clinical decision support only..."
 }
 ```
@@ -1179,5 +1181,5 @@ Expected errors:
 - `422`: missing or invalid request field.
 - `500`: role/profile rows could not be updated.
 
-Real AI model inference and Grad-CAM remain future work; current stored
-predictions are mock AI results.
+Grad-CAM remains future work. Stored predictions use the configured DenseNet121
+model when available, with deterministic mock fallback marked by `is_mock=true`.
