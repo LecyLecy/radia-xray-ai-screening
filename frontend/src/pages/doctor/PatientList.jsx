@@ -72,7 +72,7 @@ export default function PatientList() {
       const patientRows = await searchDoctorPatientsByEmail(emailQuery);
       setPatients(patientRows);
       if (patientRows.length === 0) {
-        setNoticeMessage('No registered patient matched that email. Ask the patient to register first.');
+        setNoticeMessage('No registered patient was found with that email. Ask the patient to register first.');
       }
     } catch (error) {
       setErrorMessage(error.message);
@@ -94,8 +94,8 @@ export default function PatientList() {
         <h2>{isAdmin ? 'All Patients' : 'Patient Registry'}</h2>
         <p>
           {isAdmin
-            ? 'View every registered patient account in the system'
-            : 'Search a registered patient or start a scan from the doctor workspace'}
+            ? 'View all registered patient accounts in the system'
+            : 'Search registered patients or start a scan from the doctor workspace'}
         </p>
       </div>
 
@@ -105,7 +105,7 @@ export default function PatientList() {
           type="email"
           value={searchEmail}
           onChange={(event) => setSearchEmail(event.target.value)}
-          placeholder="Search registered patient by email"
+          placeholder="Search registered patients by email"
         />
         <Button type="submit" variant="primary" disabled={isSearching}>
           {isSearching ? 'Searching...' : 'Search'}

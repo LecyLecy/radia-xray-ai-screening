@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { StatusBadge } from '../../components/StatusBadge';
 import { Table } from '../../components/Table';
-import { getDoctorExaminations } from '../../services/examinationService';
+import {
+  deleteDoctorExamination,
+  getDoctorExaminations,
+} from '../../services/examinationService';
 import '../styles/doctor.css';
 
 const formatDate = (value) => {
@@ -32,12 +35,28 @@ export default function DoctorExaminations() {
     fetchExaminations();
   }, []);
 
+  const handleDelete = async (exam) => {
+    const confirmed = window.confirm(
+      `Delete examination for ${exam.patient_name || exam.patient_email || exam.patient_id}?`,
+    );
+    if (!confirmed) return;
+
+    try {
+      setErrorMessage('');
+      await deleteDoctorExamination(exam.id);
+      localStorage.removeItem(`doctor_scan_assessment_${exam.id}`);
+      setExaminations((current) => current.filter((item) => item.id !== exam.id));
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  };
+
   return (
     <div className="doctor-panel">
       <div className="header-action-row">
         <div className="section-title">
           <h2>My Examinations</h2>
-          <p>Review scans assigned to your doctor queue.</p>
+          <p>Review scans that enter your doctor queue.</p>
         </div>
         <Button variant="primary" onClick={() => navigate('/doctor/start-scan')}>
           Start New Scan
@@ -67,9 +86,14 @@ export default function DoctorExaminations() {
                 </td>
                 <td>{exam.confidence_percentage ?? '-'}%</td>
                 <td>
-                  <Button variant="secondary" onClick={() => navigate(`/doctor/examinations/${exam.id}`)}>
-                    {exam.status === 'ready' ? 'Open' : 'Review'}
-                  </Button>
+                  <div className="table-actions">
+                    <Button variant="secondary" onClick={() => navigate(`/doctor/examinations/${exam.id}`)}>
+                      {exam.status === 'ready' ? 'Open' : 'Review'}
+                    </Button>
+                    <Button variant="danger" onClick={() => handleDelete(exam)}>
+                      Delete
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}

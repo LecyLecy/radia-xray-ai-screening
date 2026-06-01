@@ -1,44 +1,63 @@
-# UI Prompt Guidelines (Radia)
+# UI Guidelines
 
 ## Design Direction
-Create Radia UI with a simple professional medical dashboard style.
 
-- Use clean white background.
-- Use blue as primary color.
-- Use gray for neutral text and borders.
-- Use soft cards with rounded corners.
-- Use clear tables for patient and examination data.
-- Use simple forms with consistent labels and spacing.
-- Use badges for statuses such as `Pending Review`, `Reviewed`, `Report Ready`.
-- Use primary button for main actions.
-- Use secondary button for cancel or back actions.
-- Use danger style only for delete or critical action.
-- Avoid complex animations.
-- Avoid colorful gradients.
-- Prioritize readability and consistency.
-- Make the UI look like a clinical web app, not a flashy landing page.
+Radia uses a clean clinical dashboard style:
 
-## Minimal Required Components
-The UI should include at minimum the following components:
+- White and light gray backgrounds.
+- Blue primary actions.
+- Neutral text and borders.
+- Compact cards, tables, and forms.
+- Clear status badges for `READY` and `NOT READY`.
+- Consistent English labels.
+- Restrained spacing and typography.
+- No decorative gradients or unnecessary animations.
 
-1. Button
-2. Input
-3. Select
-4. Textarea
-5. Card
-6. Table
-7. Badge
-8. Modal
-9. Navbar
-10. Sidebar
-11. PageHeader
-12. UploadBox
-13. ReportPreview
-14. ResultCard
+## Core Components
 
-## Consistency Notes
-- Keep spacing scale consistent across pages and components.
-- Reuse component variants instead of creating one-off styles.
-- Keep typography hierarchy clear for titles, section labels, and helper text.
-- Ensure form labels and validation messaging are consistent.
-- Ensure status color usage remains stable across modules.
+- Button
+- Form input
+- Select
+- Textarea
+- Card
+- Table
+- Status badge
+- Navbar
+- Sidebar
+- X-Ray upload preview
+- Empty state
+- Error/success message
+
+## Page Guidelines
+
+### Public
+
+- Login uses one form for all roles.
+- Register is patient-only and includes full name, email, phone, date of birth, gender, and password.
+
+### Patient
+
+- Show history and final doctor-approved information.
+- Do not show AI confidence or internal AI details.
+- Pending examinations can show symptoms and preliminary solution.
+- Ready examinations show final diagnosis, final doctor note, and PDF download.
+
+### Doctor
+
+- Start New Scan should keep Patient Email, Symptoms / Complaints, and Preliminary Solution clearly stacked.
+- X-Ray preview holder must stay fixed and should not become a black screen when no image is selected.
+- Doctor detail should show AI result/confidence, final review controls, report action, and delete action.
+
+### Admin
+
+- User directory should be dense and clear.
+- Medical staff promotion should search by patient email and show selected patient context.
+
+## Accessibility and Usability
+
+- Keep labels visible.
+- Use readable contrast.
+- Keep button text action-oriented.
+- Use danger styling only for delete/destructive actions.
+- Keep upload empty state friendly and non-black.
+- Avoid exposing private storage object paths in the UI.

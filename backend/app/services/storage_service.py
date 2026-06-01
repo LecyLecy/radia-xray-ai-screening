@@ -11,6 +11,7 @@ from app.config import (
     MAX_PROFILE_PICTURE_BYTES,
     MAX_XRAY_UPLOAD_BYTES,
     STORAGE_BUCKET_PROFILE,
+    STORAGE_BUCKET_REPORT,
     STORAGE_BUCKET_XRAY,
 )
 from app.services.supabase_service import get_supabase_client
@@ -213,3 +214,23 @@ def create_xray_signed_url(object_path: str | None) -> str | None:
         "signedURL",
         None,
     )
+
+
+def delete_storage_objects(bucket_name: str, object_paths: list[str]) -> None:
+    paths = [path for path in object_paths if path]
+    if not paths:
+        return
+
+    supabase = get_supabase_client()
+    try:
+        supabase.storage.from_(bucket_name).remove(paths)
+    except Exception:
+        return
+
+
+def delete_xray_objects(object_paths: list[str]) -> None:
+    delete_storage_objects(STORAGE_BUCKET_XRAY, object_paths)
+
+
+def delete_report_objects(object_paths: list[str]) -> None:
+    delete_storage_objects(STORAGE_BUCKET_REPORT, object_paths)

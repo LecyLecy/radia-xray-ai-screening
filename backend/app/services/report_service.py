@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from io import BytesIO
+import json
 
 from fastapi import status
 from postgrest.exceptions import APIError
@@ -25,6 +26,61 @@ def _read_error_message(error: Exception) -> str:
     if isinstance(error, APIError):
         return error.message
     return str(error)
+
+
+def _decode_feedback_note(feedback_note: str | None) -> dict:
+    if not feedback_note:
+        return {
+            "feedback_note": feedback_note,
+            "final_diagnosis_result": None,
+            "final_doctor_note": None,
+        }
+
+    try:
+        decoded = json.loads(feedback_note)
+    except (TypeError, ValueError):
+        return {
+            "feedback_note": feedback_note,
+            "final_diagnosis_result": None,
+            "final_doctor_note": None,
+        }
+
+    if not isinstance(decoded, dict):
+        return {
+            "feedback_note": feedback_note,
+            "final_diagnosis_result": None,
+            "final_doctor_note": None,
+        }
+
+    return {
+        "feedback_note": decoded.get("feedback_note"),
+        "final_diagnosis_result": decoded.get("final_diagnosis_result"),
+        "final_doctor_note": decoded.get("final_doctor_note"),
+    }
+
+
+def _apply_feedback_final_review(
+    examination: dict,
+    feedback: dict | None,
+    prediction: dict | None = None,
+) -> dict:
+    if not feedback:
+        return {
+            **examination,
+            "final_diagnosis_result": examination.get("final_diagnosis_result")
+            or (prediction or {}).get("prediction_result"),
+        }
+
+    decoded_note = _decode_feedback_note(feedback.get("feedback_note"))
+    return {
+        **examination,
+        "final_diagnosis_result": examination.get("final_diagnosis_result")
+        or decoded_note["final_diagnosis_result"]
+        or (prediction or {}).get("prediction_result"),
+        "final_doctor_note": examination.get("final_doctor_note")
+        or decoded_note["final_doctor_note"]
+        or examination.get("doctor_note"),
+    }
 
 
 def _single_or_not_found(response_data, message: str) -> dict:
@@ -212,7 +268,6 @@ def _build_report_pdf(
     )
     add_line("Status", report_status)
     add_line("X-Ray File", xray_image.get("file_name"))
-    add_line("X-Ray Storage Path", xray_image.get("image_url"))
 
     add_heading("Doctor Review")
     add_line("Final Diagnosis", examination.get("final_diagnosis_result"))
@@ -264,6 +319,7 @@ def generate_examination_report(
     xray_image = _get_latest("xray_images", "examination_id", examination_id, "uploaded_at")
     prediction = _get_latest("ai_predictions", "examination_id", examination_id, "created_at")
     feedback = _get_latest("doctor_feedbacks", "examination_id", examination_id, "created_at")
+    examination = _apply_feedback_final_review(examination, feedback, prediction)
     _require_review_ready(examination, feedback)
 
     pdf_bytes = _build_report_pdf(

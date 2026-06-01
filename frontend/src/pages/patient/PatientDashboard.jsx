@@ -104,12 +104,12 @@ export default function PatientDashboard() {
     if (!file) return;
 
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      setErrorMessage('Only JPG, PNG, and WEBP profile pictures are supported.');
+      setErrorMessage('Profile photo only supports JPG, PNG, and WEBP.');
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      setErrorMessage('Profile picture must be 2 MB or smaller.');
+      setErrorMessage('Profile photo must be 2 MB or smaller.');
       return;
     }
 
@@ -123,7 +123,7 @@ export default function PatientDashboard() {
       const updatedProfile = await uploadCurrentPatientProfilePicture(file);
       setProfile(updatedProfile);
       setAvatarPreview(updatedProfile.profile_picture_download_url || previewUrl);
-      setSuccessMessage('Profile picture uploaded successfully.');
+      setSuccessMessage('Profile photo uploaded successfully.');
     } catch (error) {
       setErrorMessage(error.message);
     } finally {
@@ -146,14 +146,14 @@ export default function PatientDashboard() {
     <div className="patient-panel">
       <div className="section-title">
         <h2>My Medical Profile</h2>
-        <p>Manage your account settings and credentials</p>
+        <p>Manage your account settings and identity details</p>
       </div>
 
       {errorMessage && <p className="error-text">{errorMessage}</p>}
       {successMessage && <p className="success-text">{successMessage}</p>}
 
       <div className="grid-profile">
-        <Card title="Profile Picture">
+        <Card title="Profile Photo">
           <div className="avatar-upload-block">
             {avatarPreview ? (
               <img src={avatarPreview} alt="Avatar" className="profile-preview-img" />
@@ -172,7 +172,7 @@ export default function PatientDashboard() {
                   disabled={isUploadingPicture}
                 />
               </label>
-              <p className="upload-tip">Supports JPG, PNG, or WEBP. Max 2 MB.</p>
+              <p className="upload-tip">Supports JPG, PNG, or WEBP. Maximum 2 MB.</p>
             </div>
           </div>
         </Card>

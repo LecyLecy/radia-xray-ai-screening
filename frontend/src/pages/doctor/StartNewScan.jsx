@@ -24,7 +24,7 @@ export default function StartNewScan() {
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      setErrorMessage('X-Ray image must be 10 MB or smaller.');
+      setErrorMessage('X-Ray image size must be 10 MB or smaller.');
       return;
     }
 
@@ -38,7 +38,7 @@ export default function StartNewScan() {
     setErrorMessage('');
 
     if (!selectedFile) {
-      setErrorMessage('Please upload a JPG or PNG X-Ray image.');
+      setErrorMessage('Upload a JPG or PNG X-Ray image first.');
       return;
     }
 
@@ -50,7 +50,17 @@ export default function StartNewScan() {
         preliminarySolution: preliminarySolution.trim(),
         xrayImage: selectedFile,
       });
-      navigate(`/doctor/examinations/${result.examination_id}`);
+      const assessment = {
+        symptoms_description: symptomsDescription.trim(),
+        preliminary_solution: preliminarySolution.trim(),
+      };
+      localStorage.setItem(
+        `doctor_scan_assessment_${result.examination_id}`,
+        JSON.stringify(assessment),
+      );
+      navigate(`/doctor/examinations/${result.examination_id}`, {
+        state: { assessment },
+      });
     } catch (error) {
       setErrorMessage(error.message);
     } finally {
@@ -71,52 +81,58 @@ export default function StartNewScan() {
         </div>
       )}
 
-      <form className="doctor-workspace-grid" onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
-        <div className="radia-card" style={{ background: '#fff', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-          <h3 style={{ marginBottom: '1rem', color: 'var(--text-main)' }}>Patient and Initial Assessment</h3>
+      <form className="scan-form-grid" onSubmit={handleSubmit}>
+        <div className="scan-card">
+          <h3>Patient and Initial Assessment</h3>
 
-          <label className="form-label" htmlFor="patient-email">Patient Email</label>
-          <input
-            id="patient-email"
-            className="radia-input"
-            type="email"
-            value={patientEmail}
-            onChange={(event) => setPatientEmail(event.target.value)}
-            placeholder="patient@example.com"
-            required
-          />
+          <div className="scan-form-field">
+            <label htmlFor="patient-email">Patient Email</label>
+            <input
+              id="patient-email"
+              className="radia-input"
+              type="email"
+              value={patientEmail}
+              onChange={(event) => setPatientEmail(event.target.value)}
+              placeholder="patient@example.com"
+              required
+            />
+          </div>
 
-          <label className="form-label" htmlFor="symptoms-description" style={{ marginTop: '1rem' }}>Symptoms / Keluhan</label>
-          <textarea
-            id="symptoms-description"
-            rows="5"
-            value={symptomsDescription}
-            onChange={(event) => setSymptomsDescription(event.target.value)}
-            placeholder="Describe patient symptoms and complaint context."
-            required
-            style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--border-color)', resize: 'vertical', fontFamily: 'inherit' }}
-          />
+          <div className="scan-form-field">
+            <label htmlFor="symptoms-description">Symptoms / Complaints</label>
+            <textarea
+              id="symptoms-description"
+              rows="5"
+              value={symptomsDescription}
+              onChange={(event) => setSymptomsDescription(event.target.value)}
+              placeholder="Describe the patient's symptoms and complaint context."
+              required
+            />
+          </div>
 
-          <label className="form-label" htmlFor="preliminary-solution" style={{ marginTop: '1rem' }}>Preliminary Solution</label>
-          <textarea
-            id="preliminary-solution"
-            rows="5"
-            value={preliminarySolution}
-            onChange={(event) => setPreliminarySolution(event.target.value)}
-            placeholder="Temporary instruction visible to the patient while review is pending."
-            required
-            style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--border-color)', resize: 'vertical', fontFamily: 'inherit' }}
-          />
+          <div className="scan-form-field">
+            <label htmlFor="preliminary-solution">Preliminary Solution</label>
+            <textarea
+              id="preliminary-solution"
+              rows="5"
+              value={preliminarySolution}
+              onChange={(event) => setPreliminarySolution(event.target.value)}
+              placeholder="Temporary instructions visible to the patient while waiting for review."
+              required
+            />
+          </div>
         </div>
 
-        <div className="radia-card" style={{ background: '#fff', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ marginBottom: '1rem', color: 'var(--text-main)' }}>X-Ray Upload</h3>
+        <div className="scan-card" style={{ display: 'flex', flexDirection: 'column' }}>
+          <h3>Upload X-Ray</h3>
 
-          <div style={{ width: '100%', minHeight: '280px', border: '2px dashed var(--border-color)', borderRadius: '6px', background: 'var(--bg-layout)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: '1rem' }}>
+          <div className="xray-upload-preview" style={{ marginBottom: '1rem' }}>
             {previewUrl ? (
-              <img src={previewUrl} alt="X-Ray scan preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <img src={previewUrl} alt="X-Ray scan preview" />
             ) : (
-              <p className="empty-text">No X-Ray image selected.</p>
+              <div className="xray-empty-state">
+                <p>No X-Ray image selected yet.</p>
+              </div>
             )}
           </div>
 
@@ -128,7 +144,7 @@ export default function StartNewScan() {
             style={{ display: 'none' }}
           />
           <label htmlFor="xray-file-input" className="radia-btn secondary" style={{ cursor: 'pointer', textAlign: 'center', padding: '0.7rem 1rem', background: 'var(--bg-layout)', border: '1px solid var(--border-color)', borderRadius: '4px', fontWeight: 600 }}>
-            {selectedFile ? selectedFile.name : 'Select JPG or PNG Scan'}
+            {selectedFile ? selectedFile.name : 'Choose JPG or PNG Scan'}
           </label>
 
           <Button

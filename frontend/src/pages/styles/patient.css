@@ -37,8 +37,30 @@
 
 .header-action-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .grid-detail-view { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
-.xray-frame { background: #000; display: flex; justify-content: center; border-radius: 6px; overflow: hidden; max-height: 480px; }
-.xray-frame img { max-width: 100%; height: auto; object-fit: contain; }
+.xray-frame {
+  height: clamp(280px, 38vw, 480px);
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.xray-frame img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.xray-empty-state {
+  width: 100%;
+  height: 100%;
+  padding: 1.5rem;
+  color: var(--text-muted);
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(255, 255, 255, 0.35)),
+    repeating-linear-gradient(45deg, #f8fafc 0, #f8fafc 12px, #eef2ff 12px, #eef2ff 24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
 
 .detail-meta-stack { display: flex; flex-direction: column; gap: 1.5rem; }
 .meta-item { display: flex; justify-content: space-between; padding: 0.65rem 0; font-size: 0.9rem; }

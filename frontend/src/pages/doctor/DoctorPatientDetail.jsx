@@ -58,7 +58,7 @@ export default function DoctorPatientDetail() {
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      setErrorMessage('X-Ray image must be 10 MB or smaller.');
+      setErrorMessage('X-Ray image size must be 10 MB or smaller.');
       return;
     }
 
@@ -70,7 +70,7 @@ export default function DoctorPatientDetail() {
 
   const runAiScreening = async () => {
     if (!selectedFile) {
-      setErrorMessage('Please select a JPG or PNG X-Ray image first.');
+      setErrorMessage('Choose a JPG or PNG X-Ray image first.');
       return;
     }
 
@@ -108,7 +108,7 @@ export default function DoctorPatientDetail() {
 
   const handleSaveReview = async () => {
     if (!examinationId || !aiResult) {
-      setErrorMessage('Run AI screening before saving doctor review.');
+      setErrorMessage('Run AI screening before saving the doctor review.');
       return;
     }
 
@@ -141,14 +141,14 @@ export default function DoctorPatientDetail() {
   }
 
   if (!patient) {
-    return <div style={{ padding: '2rem', color: '#dc2626' }}>{errorMessage || 'Patient not found.'}</div>;
+    return <div style={{ padding: '2rem', color: '#dc2626' }}>{errorMessage || 'Patient was not found.'}</div>;
   }
 
   return (
     <div className="doctor-panel">
       <div className="section-title" style={{ marginBottom: '2rem' }}>
         <h2>Patient Medical Folder</h2>
-        <p>Review patient profile, upload an X-Ray image, and save doctor validation.</p>
+        <p>Review the patient profile, upload an X-Ray image, and save doctor validation.</p>
       </div>
 
       {errorMessage && (
@@ -174,12 +174,12 @@ export default function DoctorPatientDetail() {
           <div className="radia-card" style={{ background: '#fff', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <h3 style={{ alignSelf: 'flex-start', marginBottom: '1.5rem', color: 'var(--text-main)' }}>Diagnostic Source Input</h3>
 
-            <div style={{ width: '100%', minHeight: '260px', border: '2px dashed var(--border-color)', borderRadius: '6px', background: 'var(--bg-layout)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: '1rem' }}>
+            <div className="xray-upload-preview" style={{ marginBottom: '1rem' }}>
               {previewUrl ? (
-                <img src={previewUrl} alt="X-Ray scan preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                <img src={previewUrl} alt="X-Ray scan preview" />
               ) : (
-                <div style={{ color: 'var(--text-muted)', padding: '1rem' }}>
-                  <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>No X-Ray image selected yet.</p>
+                <div className="xray-empty-state">
+                  <p>No X-Ray image selected yet.</p>
                 </div>
               )}
             </div>
@@ -192,11 +192,11 @@ export default function DoctorPatientDetail() {
               style={{ display: 'none' }}
             />
             <label htmlFor="xray-file-input" className="radia-btn secondary" style={{ cursor: 'pointer', padding: '0.6rem 1.2rem', background: 'var(--bg-layout)', border: '1px solid var(--border-color)', borderRadius: '4px', fontWeight: '500' }}>
-              {previewUrl ? 'Change Selected Image' : 'Select X-Ray Image'}
+              {previewUrl ? 'Replace Selected Image' : 'Choose X-Ray Image'}
             </label>
 
             <p className="upload-tip" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.75rem', textAlign: 'center' }}>
-              Supports JPG or PNG. Max 10 MB.
+              Supports JPG or PNG. Maximum 10 MB.
             </p>
 
             <Button
@@ -214,7 +214,7 @@ export default function DoctorPatientDetail() {
 
             {aiResult ? (
               <div style={{ padding: '1rem', background: 'rgba(37, 99, 235, 0.06)', borderRadius: '6px', border: '1px dashed var(--primary-color)', marginBottom: '1.5rem' }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Engine conclusion:</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>System conclusion:</span>
                 <p style={{ fontSize: '1.4rem', fontWeight: '700', color: 'var(--primary-dark)', margin: '0.25rem 0' }}>
                   {aiResult.prediction_result}
                 </p>
@@ -222,7 +222,7 @@ export default function DoctorPatientDetail() {
                   Confidence: <strong style={{ color: '#10B981' }}>{aiResult.confidence_percentage}%</strong>
                 </span>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  Model: {aiResult.model_name} | Mock: {String(aiResult.is_mock)}
+                  Model: {aiResult.model_name} | Simulation: {String(aiResult.is_mock)}
                 </p>
               </div>
             ) : (
@@ -236,14 +236,14 @@ export default function DoctorPatientDetail() {
             </label>
             <textarea
               rows="4"
-              placeholder="Write doctor clinical note before generating the PDF report."
+              placeholder="Write clinical doctor notes before generating the PDF report."
               value={doctorNote}
               onChange={(event) => setDoctorNote(event.target.value)}
               style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '0.9rem', resize: 'vertical', fontFamily: 'inherit', marginBottom: '1rem' }}
             />
 
             <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--text-main)' }}>
-              AI Feedback
+              Feedback AI
             </label>
             <select
               value={feedbackStatus}
@@ -257,7 +257,7 @@ export default function DoctorPatientDetail() {
 
             <textarea
               rows="3"
-              placeholder="Optional feedback note."
+              placeholder="Optional feedback notes."
               value={feedbackNote}
               onChange={(event) => setFeedbackNote(event.target.value)}
               style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '0.9rem', resize: 'vertical', fontFamily: 'inherit', marginBottom: '1rem' }}
@@ -273,7 +273,7 @@ export default function DoctorPatientDetail() {
                 disabled={!aiResult || isSavingReview}
                 style={{ flex: 2 }}
               >
-                {isSavingReview ? 'Saving Review...' : 'Save Review & Generate Report'}
+                {isSavingReview ? 'Saving Review...' : 'Save Review and Create Report'}
               </Button>
             </div>
 

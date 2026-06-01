@@ -54,7 +54,7 @@ export const uploadCurrentPatientProfilePicture = async (profilePicture) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to upload profile picture.'), { cause: error });
+    throw new Error(getApiErrorMessage(error, 'Failed to upload profile photo.'), { cause: error });
   }
 };
 

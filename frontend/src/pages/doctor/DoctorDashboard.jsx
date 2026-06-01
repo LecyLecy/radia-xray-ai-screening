@@ -38,7 +38,7 @@ export default function DoctorDashboard() {
     <div className="doctor-panel">
       <div className="section-title">
         <h2>Clinical Metrics Dashboard</h2>
-        <p>Overview of current screening queues and workflow logs</p>
+        <p>Summary of the current screening queue and workflow log</p>
       </div>
 
       <div className="metrics-grid">
@@ -47,12 +47,12 @@ export default function DoctorDashboard() {
           <h2 className="metric-value">{pendingCount} Patients</h2>
         </div>
         <div className="metric-card primary">
-          <span className="metric-label">Processed Diagnostics</span>
+          <span className="metric-label">Diagnostics Processed</span>
           <h2 className="metric-value">{completedCount} Cases</h2>
         </div>
         <div className="metric-card neutral">
           <span className="metric-label">My Queue</span>
-          <h2 className="metric-value">{examinations.length} Scans</h2>
+          <h2 className="metric-value">{examinations.length} Scan</h2>
         </div>
       </div>
 
@@ -63,7 +63,7 @@ export default function DoctorDashboard() {
           <p className="empty-text">No examinations have been created yet.</p>
         )}
         {!isLoading && !errorMessage && recentExaminations.length > 0 && (
-          <Table headers={["Exam ID", "Patient", "Email", "Screening Instance", "System Inference", "Status"]}>
+          <Table headers={["Examination ID", "Patient", "Email", "Screening Time", "System Inference", "Status"]}>
             {recentExaminations.map((exam) => (
               <tr key={exam.id}>
                 <td><strong>{exam.id}</strong></td>

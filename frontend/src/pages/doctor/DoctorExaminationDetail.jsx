@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { StatusBadge } from '../../components/StatusBadge';
 import {
+  deleteDoctorExamination,
   generateReport,
   getDoctorExaminationDetail,
   getReportDownload,
@@ -19,6 +20,7 @@ const formatDate = (value) => {
 
 export default function DoctorExaminationDetail() {
   const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const [exam, setExam] = useState(null);
   const [finalDiagnosis, setFinalDiagnosis] = useState('Normal');
@@ -36,9 +38,43 @@ export default function DoctorExaminationDetail() {
       try {
         setIsLoading(true);
         const detail = await getDoctorExaminationDetail(id);
-        setExam(detail);
-        setFinalDiagnosis(detail.final_diagnosis_result || detail.ai_prediction?.prediction_result || 'Normal');
-        setFinalNote(detail.final_doctor_note || detail.doctor_note || '');
+        const localAssessment = (() => {
+          const stateAssessment = location.state?.assessment;
+          if (stateAssessment) return stateAssessment;
+
+          try {
+            const cachedAssessment = localStorage.getItem(`doctor_scan_assessment_${id}`);
+            return cachedAssessment ? JSON.parse(cachedAssessment) : null;
+          } catch {
+            return null;
+          }
+        })();
+        const localFinalReview = (() => {
+          try {
+            const cachedReview = localStorage.getItem(`doctor_final_review_${id}`);
+            return cachedReview ? JSON.parse(cachedReview) : null;
+          } catch {
+            return null;
+          }
+        })();
+
+        const mergedDetail = {
+          ...detail,
+          symptoms_description:
+            detail.symptoms_description || localAssessment?.symptoms_description || null,
+          preliminary_solution:
+            detail.preliminary_solution || localAssessment?.preliminary_solution || null,
+          final_diagnosis_result:
+            detail.final_diagnosis_result || localFinalReview?.final_diagnosis_result || null,
+          final_doctor_note:
+            detail.final_doctor_note || localFinalReview?.final_doctor_note || null,
+          status: localFinalReview?.status || detail.status,
+          report: detail.report || localFinalReview?.report || null,
+        };
+
+        setExam(mergedDetail);
+        setFinalDiagnosis(mergedDetail.final_diagnosis_result || detail.ai_prediction?.prediction_result || 'Normal');
+        setFinalNote(mergedDetail.final_doctor_note || detail.doctor_note || '');
         setFeedbackStatus(detail.doctor_feedback?.feedback_status || 'correct');
         setFeedbackNote(detail.doctor_feedback?.feedback_note || '');
       } catch (error) {
@@ -51,7 +87,7 @@ export default function DoctorExaminationDetail() {
     if (id) {
       loadDetail();
     }
-  }, [id]);
+  }, [id, location.state]);
 
   const handleSaveReview = async () => {
     if (!finalNote.trim()) {
@@ -70,11 +106,28 @@ export default function DoctorExaminationDetail() {
         feedbackStatus,
         feedbackNote.trim() || null,
       );
+      let report = null;
+      try {
+        report = await generateReport(id);
+      } catch (reportError) {
+        setErrorMessage(reportError.message);
+      }
+      const finalReviewCache = {
+        final_diagnosis_result: finalDiagnosis,
+        final_doctor_note: finalNote.trim(),
+        status: 'ready',
+        report,
+      };
+      localStorage.setItem(`doctor_final_review_${id}`, JSON.stringify(finalReviewCache));
       setExam((current) => ({
         ...current,
         ...updated,
-        final_diagnosis_result: updated.final_diagnosis_result,
-        final_doctor_note: updated.final_doctor_note,
+        status: 'ready',
+        report,
+        symptoms_description: null,
+        preliminary_solution: null,
+        final_diagnosis_result: updated.final_diagnosis_result || finalDiagnosis,
+        final_doctor_note: updated.final_doctor_note || finalNote.trim(),
         doctor_feedback: {
           ...(current?.doctor_feedback || {}),
           feedback_status: feedbackStatus,
@@ -122,21 +175,38 @@ export default function DoctorExaminationDetail() {
     }
   };
 
+  const handleDeleteExamination = async () => {
+    const confirmed = window.confirm('Delete this examination? Related AI data, X-Ray image, feedback, and reports will also be deleted.');
+    if (!confirmed) return;
+
+    setErrorMessage('');
+    try {
+      await deleteDoctorExamination(id);
+      localStorage.removeItem(`doctor_scan_assessment_${id}`);
+      navigate('/doctor/examinations');
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  };
+
   if (isLoading) {
     return <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading examination...</div>;
   }
 
   if (!exam) {
-    return <div style={{ padding: '2rem', color: '#dc2626' }}>{errorMessage || 'Examination not found.'}</div>;
+    return <div style={{ padding: '2rem', color: '#dc2626' }}>{errorMessage || 'Examination was not found.'}</div>;
   }
 
   const aiPrediction = exam.ai_prediction;
-  const canGenerateReport = Boolean(exam.final_diagnosis_result && exam.final_doctor_note);
+  const isFinalized = exam.status === 'ready';
 
   return (
     <div className="doctor-panel">
       <div className="header-action-row">
-        <Button variant="secondary" onClick={() => navigate('/doctor/examinations')}>Back to Queue</Button>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <Button variant="secondary" onClick={() => navigate('/doctor/examinations')}>Back to Queue</Button>
+          <Button variant="danger" onClick={handleDeleteExamination}>Delete Examination</Button>
+        </div>
         <StatusBadge status={exam.status} />
       </div>
 
@@ -167,21 +237,32 @@ export default function DoctorExaminationDetail() {
             </div>
           </Card>
 
-          <Card title="Initial Assessment">
-            <div className="meta-item">
-              <span className="label">Symptoms</span>
-              <span className="val">{exam.symptoms_description || '-'}</span>
-            </div>
-            <div className="meta-item">
-              <span className="label">Preliminary Solution</span>
-              <span className="val">{exam.preliminary_solution || '-'}</span>
-            </div>
-          </Card>
+          {!isFinalized && (
+            <Card title="Initial Assessment">
+              <div className="meta-item">
+                <span className="label">Symptoms</span>
+                <span className="val">{exam.symptoms_description || '-'}</span>
+              </div>
+              <div className="meta-item">
+                <span className="label">Preliminary Solution</span>
+                <span className="val">{exam.preliminary_solution || '-'}</span>
+              </div>
+            </Card>
+          )}
 
           <Card title="Scan and AI Decision Support">
-            <p className="clinical-notes">
-              X-Ray storage path: {exam.xray_image?.image_url || '-'}
-            </p>
+            <div className="xray-frame">
+              {exam.xray_image?.image_download_url ? (
+                <img
+                  src={exam.xray_image.image_download_url}
+                  alt={exam.xray_image.file_name || 'X-Ray Image'}
+                />
+              ) : (
+                <div className="xray-empty-state">
+                  <p>X-Ray image is not available for preview yet.</p>
+                </div>
+              )}
+            </div>
             <div className="meta-item border-top">
               <span className="label">AI Result</span>
               <span className={`val thick ${aiPrediction?.prediction_result?.toLowerCase() || ''}`}>
@@ -202,6 +283,7 @@ export default function DoctorExaminationDetail() {
           <select
             value={finalDiagnosis}
             onChange={(event) => setFinalDiagnosis(event.target.value)}
+            disabled={isFinalized}
             style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--border-color)', marginBottom: '1rem' }}
           >
             <option value="Normal">Normal</option>
@@ -215,16 +297,18 @@ export default function DoctorExaminationDetail() {
             rows="6"
             value={finalNote}
             onChange={(event) => setFinalNote(event.target.value)}
-            placeholder="Final instruction for the patient."
+            disabled={isFinalized}
+            placeholder="Final instructions for the patient."
             style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--border-color)', resize: 'vertical', fontFamily: 'inherit', marginBottom: '1rem' }}
           />
 
           <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-            AI Feedback
+            Feedback AI
           </label>
           <select
             value={feedbackStatus}
             onChange={(event) => setFeedbackStatus(event.target.value)}
+            disabled={isFinalized}
             style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--border-color)', marginBottom: '1rem' }}
           >
             <option value="correct">Correct</option>
@@ -236,20 +320,25 @@ export default function DoctorExaminationDetail() {
             rows="4"
             value={feedbackNote}
             onChange={(event) => setFeedbackNote(event.target.value)}
-            placeholder="Optional AI feedback note."
+            disabled={isFinalized}
+            placeholder="Optional AI feedback notes."
             style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--border-color)', resize: 'vertical', fontFamily: 'inherit', marginBottom: '1rem' }}
           />
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <Button variant="primary" onClick={handleSaveReview} disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save Final Review'}
-            </Button>
-            <Button variant="secondary" onClick={handleGenerateReport} disabled={!canGenerateReport || isGenerating}>
-              {isGenerating ? 'Generating...' : 'Generate PDF'}
-            </Button>
-            {exam.report?.id && (
+            {!isFinalized && (
+              <Button variant="primary" onClick={handleSaveReview} disabled={isSaving}>
+                {isSaving ? 'Saving and Creating PDF...' : 'Save Final Review'}
+              </Button>
+            )}
+            {isFinalized && !exam.report?.id && (
+              <Button variant="primary" onClick={handleGenerateReport} disabled={isGenerating}>
+                {isGenerating ? 'Creating...' : 'Download PDF'}
+              </Button>
+            )}
+            {isFinalized && exam.report?.id && (
               <Button variant="secondary" onClick={handleOpenReport} disabled={isDownloading}>
-                {isDownloading ? 'Preparing...' : 'Open PDF'}
+                {isDownloading ? 'Preparing...' : 'Download PDF'}
               </Button>
             )}
           </div>

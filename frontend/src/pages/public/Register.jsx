@@ -27,6 +27,7 @@ export default function Register() {
     email: '',
     phone: '',
     dob: '',
+    gender: '',
     password: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,6 +56,7 @@ export default function Register() {
         full_name: formData.name,
         phone_number: formData.phone || null,
         age: calculateAge(formData.dob),
+        gender: formData.gender || null,
       });
 
       alert('Registration successful. Please sign in.');
@@ -73,14 +75,14 @@ export default function Register() {
           <h1>RADIA</h1>
           <p>Patient Account Registration</p>
         </div>
-        <Card title="Register Medical Profile">
+        <Card title="Medical Profile Registration">
           <form onSubmit={handleRegisterSubmit}>
             <FormInput
-              label="Full Name (According to Identity Card)"
+              label="Full Name"
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="e.g. Andi Wijaya"
+              placeholder="Example: Andi Wijaya"
               required
             />
             <FormInput
@@ -108,6 +110,21 @@ export default function Register() {
               onChange={handleInputChange}
               required
             />
+            <div className="radia-form-group">
+              <label className="radia-label" htmlFor="register-gender">Gender</label>
+              <select
+                id="register-gender"
+                name="gender"
+                className="radia-input"
+                value={formData.gender}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
             <FormInput
               label="Password"
               name="password"

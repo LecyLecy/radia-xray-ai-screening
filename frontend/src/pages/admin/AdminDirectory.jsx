@@ -162,7 +162,7 @@ export default function AdminDirectory() {
       resetForm();
       await loadDirectory();
       setSuccessMessage(
-        `${isDoctorTable ? 'Medical staff' : 'Patient'} ${isEditing ? 'updated' : 'created'}.`,
+        `${isDoctorTable ? 'Medical staff' : 'Patient'} ${isEditing ? 'updated' : 'created'} successfully.`,
       );
     } catch (error) {
       setErrorMessage(error.message);
@@ -188,7 +188,7 @@ export default function AdminDirectory() {
       }
       if (editingUser?.id === user.id) resetForm();
       await loadDirectory();
-      setSuccessMessage(`${isDoctorTable ? 'Medical staff' : 'Patient'} deleted.`);
+      setSuccessMessage(`${isDoctorTable ? 'Medical staff' : 'Patient'} deleted successfully.`);
     } catch (error) {
       setErrorMessage(error.message);
     } finally {
@@ -200,8 +200,8 @@ export default function AdminDirectory() {
     <div className="doctor-panel">
       <div className="header-action-row">
         <div className="section-title">
-          <h2>Users Directory</h2>
-          <p>Create, update, and manage registered medical staff and patient accounts.</p>
+          <h2>User Directory</h2>
+          <p>Create, update, and manage medical staff and registered patient accounts.</p>
         </div>
         <div className="segmented-actions">
           <Button
@@ -318,10 +318,10 @@ export default function AdminDirectory() {
         {isLoading && <p className="empty-text">Loading users...</p>}
 
         {!isLoading && isDoctorTable && doctors.length === 0 && (
-          <p className="empty-text">No medical staff accounts are available yet.</p>
+          <p className="empty-text">No medical staff accounts yet.</p>
         )}
         {!isLoading && isDoctorTable && doctors.length > 0 && (
-          <Table headers={['Name', 'Email', 'Specialization', 'License', 'Actions']}>
+          <Table headers={['Name', 'Email', 'Specialization', 'License', 'Action']}>
             {doctors.map((doctor) => (
               <tr key={doctor.id || doctor.user_id}>
                 <td><strong>{doctor.full_name}</strong></td>
@@ -340,10 +340,10 @@ export default function AdminDirectory() {
         )}
 
         {!isLoading && !isDoctorTable && patients.length === 0 && (
-          <p className="empty-text">No patient accounts are available yet.</p>
+          <p className="empty-text">No patient accounts yet.</p>
         )}
         {!isLoading && !isDoctorTable && patients.length > 0 && (
-          <Table headers={['Full Name', 'Email', 'Contact', 'Age', 'Gender', 'Actions']}>
+          <Table headers={['Full Name', 'Email', 'Contact', 'Age', 'Gender', 'Action']}>
             {patients.map((patient) => (
               <tr key={patient.id}>
                 <td><strong>{patient.full_name}</strong></td>

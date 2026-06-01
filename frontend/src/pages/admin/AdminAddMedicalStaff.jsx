@@ -41,7 +41,7 @@ export default function AdminAddMedicalStaff() {
       const patients = await searchPatientsByEmail(emailQuery);
       setSearchResults(patients);
       if (patients.length === 0) {
-        setErrorMessage('No patient account matched that email.');
+        setErrorMessage('No patient account was found with that email.');
       }
     } catch (error) {
       setErrorMessage(error.message);
@@ -79,7 +79,7 @@ export default function AdminAddMedicalStaff() {
       setSearchResults([]);
       setPromotionForm(emptyPromotionForm);
       setSearchEmail(promotedDoctor.email);
-      setSuccessMessage('Patient promoted to medical staff. Ask them to sign in again.');
+      setSuccessMessage('Patient promoted to medical staff successfully. Ask the user to sign in again.');
     } catch (error) {
       setErrorMessage(error.message);
     } finally {
@@ -91,10 +91,10 @@ export default function AdminAddMedicalStaff() {
     <div className="doctor-panel">
       <div className="section-title">
         <h2>Add Medical Staff</h2>
-        <p>Promote an existing registered patient account into the clinical workspace.</p>
+        <p>Promote a registered patient account into the clinical workspace.</p>
       </div>
 
-      <Card title="Promote Patient To Medical Staff">
+      <Card title="Promote Patient to Medical Staff">
         <form onSubmit={handleSearch} className="admin-search-form">
           <FormInput
             label="Patient Email"

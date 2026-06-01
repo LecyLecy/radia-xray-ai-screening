@@ -35,7 +35,7 @@ export default function PatientHistory() {
     <div className="patient-panel">
       <div className="section-title">
         <h2>My Examination History</h2>
-        <p>Track your X-Ray examination status and final doctor results</p>
+        <p>Track X-Ray examination status and final doctor results</p>
       </div>
 
       {isLoading && <div className="p-4">Loading examination history...</div>}
@@ -43,7 +43,7 @@ export default function PatientHistory() {
 
       {!isLoading && !errorMessage && (
         records.length > 0 ? (
-          <Table headers={['Exam ID', 'Date Checked', 'Radiologist', 'Final Diagnosis', 'Status', 'Actions']}>
+          <Table headers={['Examination ID', 'Exam Date', 'Doctor', 'Final Diagnosis', 'Status', 'Action']}>
             {records.map((record) => (
               <tr key={record.id}>
                 <td><strong>{record.id}</strong></td>
@@ -60,7 +60,7 @@ export default function PatientHistory() {
             ))}
           </Table>
         ) : (
-          <p className="empty-text">No examinations have been assigned to your profile yet.</p>
+          <p className="empty-text">No examinations are available for your profile yet.</p>
         )
       )}
     </div>

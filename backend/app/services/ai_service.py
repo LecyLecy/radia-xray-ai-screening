@@ -37,7 +37,7 @@ async def create_mock_prediction(
             is_mock=False,
             disclaimer=MEDICAL_AI_DISCLAIMER,
         )
-    except (ModelLoadError, RuntimeError, OSError, ValueError):
+    except (ImportError, ModelLoadError, RuntimeError, OSError, ValueError):
         pass
 
     seed_source = prediction_bytes or (xray_image.filename or "radia-mock").encode()

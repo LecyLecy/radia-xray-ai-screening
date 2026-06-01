@@ -42,14 +42,14 @@ export default function Login() {
           <h1>RADIA</h1>
           <p>Clinical X-Ray AI Screening Panel</p>
         </div>
-        <Card title="Account Sign In">
+        <Card title="Account Login">
           <form onSubmit={handleLoginSubmit}>
             <FormInput
               label="Email Address"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your credential email"
+              placeholder="Enter account email"
               required
             />
             <FormInput
@@ -57,10 +57,10 @@ export default function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="********"
               required
             />
-            
+
             <Button type="submit" variant="primary" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? 'Signing In...' : 'Sign In'}
             </Button>

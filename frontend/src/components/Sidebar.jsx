@@ -11,7 +11,7 @@ export const Sidebar = ({ role }) => {
               Dashboard Overview
             </NavLink>
             <NavLink to="/admin/directory" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
-              Users Directory
+              User Directory
             </NavLink>
             <NavLink to="/admin/add-medical-staff" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
               Add Medical Staff

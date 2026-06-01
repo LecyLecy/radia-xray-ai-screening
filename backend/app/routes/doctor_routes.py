@@ -16,6 +16,7 @@ from app.schemas.user_schema import CurrentUserResponse, PatientProfileResponse
 from app.services.examination_service import (
     ExaminationServiceError,
     create_examination,
+    delete_doctor_examination,
     get_doctor_examination_detail,
     get_patient_by_id,
     list_doctor_examinations,
@@ -147,6 +148,20 @@ def get_doctor_examination(
 ) -> DoctorExaminationDetailResponse:
     try:
         return get_doctor_examination_detail(examination_id, current_user)
+    except ExaminationServiceError as error:
+        raise HTTPException(
+            status_code=error.status_code,
+            detail=error.message,
+        ) from error
+
+
+@router.delete("/examinations/{examination_id}", status_code=204)
+def delete_doctor_examination_record(
+    examination_id: str,
+    current_user: CurrentUserResponse = Depends(require_doctor_or_admin),
+) -> None:
+    try:
+        delete_doctor_examination(examination_id, current_user)
     except ExaminationServiceError as error:
         raise HTTPException(
             status_code=error.status_code,

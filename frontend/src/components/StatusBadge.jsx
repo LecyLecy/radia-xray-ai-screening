@@ -6,7 +6,7 @@ export const StatusBadge = ({ status }) => {
     || normalizedStatus === 'report_ready'
     || normalizedStatus === 'report ready';
   const badgeClass = isReady ? 'badge-ready' : 'badge-pending';
-  const label = isReady ? 'READY' : 'NOT_READY';
+  const label = isReady ? 'READY' : 'NOT READY';
 
   return <span className={`radia-badge ${badgeClass}`}>{label}</span>;
 };

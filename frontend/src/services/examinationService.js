@@ -25,7 +25,7 @@ export const getDoctorPatient = async (patientId) => {
     const response = await api.get(`/doctor/patients/${patientId}`);
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to load patient detail.'), { cause: error });
+    throw new Error(getApiErrorMessage(error, 'Failed to load patient details.'), { cause: error });
   }
 };
 
@@ -43,7 +43,7 @@ export const getDoctorExaminationDetail = async (examinationId) => {
     const response = await api.get(`/doctor/examinations/${examinationId}`);
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to load examination detail.'), { cause: error });
+    throw new Error(getApiErrorMessage(error, 'Failed to load examination details.'), { cause: error });
   }
 };
 
@@ -139,6 +139,14 @@ export const saveFinalDoctorReview = async (
   }
 };
 
+export const deleteDoctorExamination = async (examinationId) => {
+  try {
+    await api.delete(`/doctor/examinations/${examinationId}`);
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, 'Failed to delete examination.'), { cause: error });
+  }
+};
+
 export const generateReport = async (examinationId) => {
   try {
     const response = await api.post(`/doctor/examinations/${examinationId}/report`);
@@ -162,7 +170,7 @@ export const getMyExaminationDetail = async (examinationId) => {
     const response = await api.get(`/patients/me/examinations/${examinationId}`);
     return response.data;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Failed to load examination detail.'), { cause: error });
+    throw new Error(getApiErrorMessage(error, 'Failed to load examination details.'), { cause: error });
   }
 };
 

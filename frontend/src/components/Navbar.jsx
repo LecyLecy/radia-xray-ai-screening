@@ -108,7 +108,7 @@ export const Navbar = ({ userRole, userName }) => {
                 <>
                   <span>Specialization</span>
                   <strong>{profile?.specialization || '-'}</strong>
-                  <span>License</span>
+                  <span>License Number</span>
                   <strong>{profile?.license_number || '-'}</strong>
                 </>
               )}
