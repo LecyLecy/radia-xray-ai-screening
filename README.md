@@ -2,6 +2,8 @@
 
 Radia is a web-based chest X-Ray examination management system with AI-assisted pneumonia screening. It helps medical staff create examination records, upload X-Ray images, receive AI decision support, finalize doctor reviews, generate PDF reports, and let patients download their own final reports.
 
+Live deployment: [radia-xray-ai-screening.vercel.app](https://radia-xray-ai-screening.vercel.app)
+
 This repository contains the final Software Engineering AOL project source code, documentation, database migration files, and CI pipeline setup.
 
 ## Features
