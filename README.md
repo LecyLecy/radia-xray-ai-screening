@@ -122,7 +122,7 @@ Apply migrations through Supabase CLI or SQL editor before demo if the remote sc
 
 See [docs/api-contract.md](docs/api-contract.md) for the detailed contract.
 
-## Verification
+## Verifications
 
 Backend:
 
